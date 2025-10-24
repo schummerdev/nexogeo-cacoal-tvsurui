@@ -1,0 +1,23 @@
+# Ignore unused API files
+api/audit.js
+api/auth.js
+api/authHelper.js
+api/authtest.js
+api/auth_backup.js
+api/caixa-misteriosa-live.js
+api/configuracoes.js
+api/dashboard.js
+api/debug-tables.js
+api/emissoras.js
+api/ganhadores.js
+api/hello.js
+api/inspect-db.js
+api/participantes.js
+api/promocoes.js
+api/setup.js
+api/sorteio.js
+api/test-auth.js
+
+# Only deploy these
+!api/index.js
+!api/caixa-misteriosa.js
