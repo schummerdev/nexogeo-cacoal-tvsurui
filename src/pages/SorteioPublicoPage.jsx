@@ -486,21 +486,21 @@ const SorteioPublicoPage = () => {
         {/* Informações NexoGeo */}
         <div className="nexogeo-info">
           <div className="nexogeo-logo-container">
-            <img 
-              src="/favicon.ico" 
-              alt="NexoGeo" 
+            <img
+              src="https://nexogeo-demo.vercel.app/imagens/logo0.png"
+              alt="NexoGeo"
               className="nexogeo-logo"
             />
             <span className="nexogeo-text">
-              <strong>Powered by NexoGeo</strong>
+              <strong>NexoGeo</strong>
             </span>
           </div>
           <p className="nexogeo-description">
             Sistema completo de gestão de promoções e sorteios
           </p>
-          <a 
-            href="https://nexogeo2.vercel.app/pacote" 
-            target="_blank" 
+          <a
+            href="https://nexogeo.vercel.app/demo"
+            target="_blank"
             rel="noopener noreferrer"
             className="nexogeo-link"
           >
