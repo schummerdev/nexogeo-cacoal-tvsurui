@@ -8,9 +8,9 @@ if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
 
-const { getAuthenticatedUser } = require('./authHelper.js');
+const { getAuthenticatedUser } = require('./_handlers/authHelper.js');
 const { checkRateLimit } = require('./_lib/security');
-const participantesHandler = require('./participantes.js');
+const participantesHandler = require('./_handlers/participantes.js');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
