@@ -1,4 +1,5 @@
 // API consolidada para resolver limite Vercel (12 funções max)
+// Fix: Caminhos de import corrigidos para _handlers/ subfolder
 const { query, testConnection, initDatabase } = require('../lib/db.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
