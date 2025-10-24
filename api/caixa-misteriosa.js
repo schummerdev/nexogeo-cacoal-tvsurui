@@ -3664,7 +3664,7 @@ module.exports = async (req, res) => {
     }
     if (path.startsWith('/game/')) {
         console.log('--- ROUTED TO getGameById ---');
-        const gameId = path.split('/')[2];
+        const gameId = path.split('/')[2].split('?')[0];  // Remove query params
         return await getGameById(req, res, gameId);
     }
     if (path.startsWith('/submit')) {
