@@ -481,7 +481,7 @@ async function getGameById(req, res, gameId) {
 
         // Busca as submissões do jogo
         const submissionsResult = await query(`
-            SELECT user_name, user_neighborhood, guess, created_at
+            SELECT id, user_name, user_neighborhood, guess, created_at
             FROM submissions
             WHERE game_id = $1
             ORDER BY created_at DESC
