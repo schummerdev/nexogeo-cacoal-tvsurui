@@ -16,6 +16,6 @@
     { "source": "/api/caixa-misteriosa/:path*", "destination": "/api/caixa-misteriosa" },
     { "source": "/api/:path*", "destination": "/api/index" },
     { "source": "/api", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/:path((?!static|favicon\\.ico|manifest\\.json|robots\\.txt|.*\\..*).*)", "destination": "/index.html" }
   ]
 }
