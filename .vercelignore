@@ -1,26 +1,26 @@
-# Ignore unused API files
-api/audit.js
-api/auth.js
-api/authHelper.js
+# Ignore test and debug files
 api/authtest.js
 api/auth_backup.js
-api/caixa-misteriosa-live.js
-api/configuracoes.js
-api/dashboard.js
 api/debug-tables.js
-api/emissoras.js
-api/ganhadores.js
 api/hello.js
 api/inspect-db.js
-api/participantes.js
-api/promocoes.js
 api/setup.js
-api/sorteio.js
 api/test-auth.js
+api/caixa-misteriosa-live.js
 
-# Ignore migrations
-api/migrations/**/*.js
-
-# Only deploy these
+# Keep these files (they are imported by index.js or caixa-misteriosa.js)
 !api/index.js
 !api/caixa-misteriosa.js
+!api/authHelper.js
+!api/participantes.js
+!api/auth.js
+!api/audit.js
+!api/configuracoes.js
+!api/dashboard.js
+!api/emissoras.js
+!api/ganhadores.js
+!api/promocoes.js
+!api/sorteio.js
+
+# Keep migrations folder
+!api/migrations/**/*
