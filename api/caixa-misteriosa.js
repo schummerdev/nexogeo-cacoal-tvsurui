@@ -438,6 +438,8 @@ async function getLastFinishedGame(req, res) {
 async function getGameById(req, res, gameId) {
     // ROTA PÚBLICA - não requer autenticação
     try {
+        console.log(`🔍 [getGameById] Iniciando busca do jogo ID: ${gameId}`);
+
         // Busca jogo específico por ID
         const gameResult = await query(`
             SELECT 
@@ -451,7 +453,10 @@ async function getGameById(req, res, gameId) {
             LIMIT 1
         `, [gameId]);
 
+        console.log(`✅ [getGameById] Query game executada. Rows: ${gameResult.rows.length}`);
+
         if (gameResult.rows.length === 0) {
+            console.log('❌ [getGameById] Jogo não encontrado - retornando 404');
             return res.status(404).json({
                 success: false,
                 message: 'Jogo não encontrado'
@@ -459,6 +464,7 @@ async function getGameById(req, res, gameId) {
         }
 
         const game = gameResult.rows[0];
+        console.log(`📊 [getGameById] Jogo encontrado: ID ${game.id}, Status: ${game.status}`);
 
         // Busca cidade padrão das configurações da emissora
         let defaultCity = '';
@@ -480,12 +486,15 @@ async function getGameById(req, res, gameId) {
         }
 
         // Busca as submissões do jogo
+        console.log(`🔍 [getGameById] Buscando submissions para game_id: ${game.id}`);
         const submissionsResult = await query(`
             SELECT id, user_name, user_neighborhood, guess, created_at
             FROM submissions
             WHERE game_id = $1
             ORDER BY created_at DESC
         `, [game.id]);
+
+        console.log(`✅ [getGameById] Submissions encontradas: ${submissionsResult.rows.length}`);
 
         // Busca o ganhador se existir
         let winner = null;
@@ -507,6 +516,8 @@ async function getGameById(req, res, gameId) {
                 };
             }
         }
+
+        console.log(`📦 [getGameById] Montando resposta para jogo ${game.id}`);
 
         const liveGame = {
             id: game.id,
@@ -540,6 +551,7 @@ async function getGameById(req, res, gameId) {
             defaultCity: defaultCity
         };
 
+        console.log(`✅ [getGameById] Retornando sucesso para jogo ${game.id}`);
         res.status(200).json(liveGame);
     } catch (error) {
         console.error('❌ Erro em getGameById:', error);
