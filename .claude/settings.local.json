@@ -34,7 +34,9 @@
       "Bash(git reset:*)",
       "Bash(node:*)",
       "Bash(PORT=3002 node:*)",
-      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_7EADUX3QeGaO@ep-hidden-fog-ac2jlx9e-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require\" node:*)"
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_7EADUX3QeGaO@ep-hidden-fog-ac2jlx9e-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require\" node:*)",
+      "Bash(rm:*)",
+      "Bash(VERCEL_TOKEN=Bf3IOYIND0TtyuO0Tfsrb4cu npx vercel:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

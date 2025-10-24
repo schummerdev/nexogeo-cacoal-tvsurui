@@ -53,4 +53,10 @@ nul
 erro.navegador.md
 print-tela.png
 
+# Credenciais (segurança)
+CREDENCIAIS_*.txt
+CREDENCIAIS_*.md
+*_CREDENCIAIS.txt
+*_CREDENCIAIS.md
+
 .vercel

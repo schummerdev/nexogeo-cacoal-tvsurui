@@ -1,6 +1,0 @@
-
-> nexogeo-manus-frontend@1.0.0 build
-> CI=false react-scripts build
-
-'CI' n∆o Ç reconhecido como um comando interno
-ou externo, um programa oper†vel ou um arquivo em lotes.
