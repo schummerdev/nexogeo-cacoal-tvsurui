@@ -35,6 +35,20 @@ node_modules/
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
 
 .vercel
+
+# Backup files
+backups/*.sql
+backups/*.xlsx
+backup-*.js
+clone-*.js
+execute-*.js
+fix-*.js
+test-*.js
+schema-*.sql
+INSTRUCOES_*.md
+nul
+erro.navegador.md
+print-tela.png
