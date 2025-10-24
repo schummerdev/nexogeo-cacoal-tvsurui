@@ -868,18 +868,49 @@ module.exports = async function handler(req, res) {
 
     // DEFAULT: Admin stats (quando não há action específica)
     try {
+      console.log('📊 [DASHBOARD] Buscando estatísticas com deduplicação...');
+
+      // Query unificada com deduplicação por telefone (alinhada com endpoint unificado)
       const stats = await query(`
+        WITH participantes_unificados AS (
+          -- Participantes regulares
+          SELECT
+            telefone as phone,
+            participou_em as created_at
+          FROM participantes
+
+          UNION ALL
+
+          -- Participantes públicos (Caixa Misteriosa)
+          SELECT
+            phone,
+            created_at
+          FROM public_participants
+        ),
+        participantes_unicos AS (
+          -- Deduplicar por telefone, mantendo o mais recente
+          SELECT DISTINCT ON (phone)
+            phone,
+            created_at
+          FROM participantes_unificados
+          ORDER BY phone, created_at DESC
+        )
         SELECT
           (SELECT COUNT(*) FROM promocoes
            WHERE status = 'ativa'
            AND DATE(data_inicio) <= CURRENT_DATE
            AND DATE(data_fim) >= CURRENT_DATE) as promocoes_ativas,
-          (SELECT COUNT(*) FROM participantes) as participantes_total,
-          (SELECT COUNT(*) FROM participantes
-           WHERE participou_em >= NOW() - INTERVAL '24 hours') as participantes_24h,
+          (SELECT COUNT(*) FROM participantes_unicos) as participantes_total,
+          (SELECT COUNT(*) FROM participantes_unicos
+           WHERE created_at >= NOW() - INTERVAL '24 hours') as participantes_24h,
           3 as usuarios_ativos,
           (SELECT COUNT(*) FROM promocoes) as promocoes_mes
       `);
+
+      console.log('✅ [DASHBOARD] Estatísticas calculadas:', {
+        participantes_total: stats.rows[0].participantes_total,
+        participantes_24h: stats.rows[0].participantes_24h
+      });
 
       // Simplificar atividades recentes para não depender de colunas específicas
       const recent_activities = [

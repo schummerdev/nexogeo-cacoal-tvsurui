@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCaixaMisteriosa } from '../hooks/useCaixaMisteriosa';
+import { fetchGameParticipantsStats } from '../services/participanteService';
 
 /**
  * Validação simples por normalização
@@ -103,6 +104,25 @@ const CaixaMisteriosaSorteioPage = () => {
 
     console.log('🎲 [SORTEIO PAGE] liveGame:', liveGame?.status, 'lastFinishedGame:', lastFinishedGame?.status, 'usando:', gameData?.status);
 
+    // Busca estatísticas totais de participantes cadastrados
+    useEffect(() => {
+        const loadParticipantStats = async () => {
+            try {
+                const statsData = await fetchGameParticipantsStats();
+                console.log('📊 [SORTEIO] Estatísticas de participantes recebidas:', statsData);
+
+                setStats(prev => ({
+                    ...prev,
+                    totalParticipants: statsData.total_participants || 0
+                }));
+            } catch (error) {
+                console.error('❌ [SORTEIO] Erro ao buscar estatísticas:', error);
+            }
+        };
+
+        loadParticipantStats();
+    }, []);
+
     // Verifica se já existe ganhador no jogo ao carregar
     useEffect(() => {
         if (existingWinner && !winner) {
@@ -151,12 +171,13 @@ const CaixaMisteriosaSorteioPage = () => {
 
             setCorrectParticipants(filteredCorrect);
 
-            setStats({
-                totalParticipants: 0,
+            // Atualiza stats mantendo totalParticipants (carregado pelo useEffect separado)
+            setStats(prev => ({
+                ...prev,
                 totalSubmissions: submissions.length,
                 correctGuesses: filteredCorrect.length,
                 uniqueParticipants: uniqueParticipantsSet.size
-            });
+            }));
 
             console.log('🎯 [DRAW PAGE] Participantes corretos:', filteredCorrect.length);
         } catch (error) {
