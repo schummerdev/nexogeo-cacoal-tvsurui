@@ -4,6 +4,84 @@ Este arquivo documenta pontos de restauração importantes do projeto.
 
 ---
 
+## v2.5 - Correções de Contagens (2025-10-24)
+
+**Commit:** `61c7c87` | **Tag:** `v2.5`
+
+### 🎯 Estado do Sistema
+
+Sistema de contagens **COMPLETAMENTE ALINHADO** - Dashboard, Participantes e Sorteio mostrando dados consistentes.
+
+### ✅ Correções Aplicadas
+
+**1. Divergência de Totais (107 vs 123)**
+- Dashboard unificado com deduplicação por telefone
+- Inclusão automática de participantes da Caixa Misteriosa
+- Query SQL otimizada com CTE (Common Table Expression)
+- Deduplicação automática mantendo registro mais recente
+
+**2. Total Cadastrados = 0**
+- Integração com API `fetchGameParticipantsStats`
+- useEffect para buscar dados reais ao carregar
+- Preservação de valores com `setStats(prev => ...)`
+
+### 📊 Métricas Finais
+
+**Participantes Únicos: 123**
+- 78 Regulares (107 registros - 29 duplicatas removidas)
+- 45 Públicos (Caixa Misteriosa)
+
+**Precisão:** 100% de alinhamento entre todas as páginas
+
+### 🔧 Arquivos Modificados
+
+1. **api/index.js** (linhas 871-913)
+   - Query dashboard com CTE unificada
+   - Deduplicação DISTINCT ON (phone)
+   - UNION ALL de participantes + public_participants
+
+2. **src/pages/CaixaMisteriosaSorteioPage.jsx**
+   - Import de fetchGameParticipantsStats
+   - useEffect para buscar estatísticas (linhas 108-124)
+   - setStats preservando totalParticipants (linhas 175-180)
+
+### 📝 Commits Incluídos
+
+```
+61c7c87 - docs: Adiciona documentação completa - Versão Estável 2.5
+9851839 - fix: Corrige divergência nas contagens de participantes e Total Cadastrados
+a730fca - docs: Confirma sucesso do teste de sorteio
+4d2d70d - fix: Alinha validação backend com frontend (keywords)
+```
+
+### 🔄 Como Restaurar
+
+```bash
+git checkout v2.5
+# ou
+git checkout 61c7c87
+```
+
+### 📚 Documentação
+
+Ver: `CORRECAO-CONTAGENS-2025-10-24.md` (documentação completa)
+
+### 🧪 Validação
+
+```bash
+# Dashboard (deve mostrar 123)
+curl "https://nexogeo-demo.vercel.app/api/?route=dashboard" | grep participantes_total
+
+# Endpoint Unificado (comparação)
+curl "https://nexogeo-demo.vercel.app/api/participantes?unified=true&includePublic=true" | grep total
+```
+
+**Resultado Esperado:**
+- Dashboard: `"participantes_total":123`
+- Unificado: `"total":123,"regular":78,"public":45`
+
+---
+
 ## v1.0.1-google-ai-fixed (2025-10-03)
 
 **Commit:** `fab0da6da47d5d61c92343586ddbc0aa6a8ffd8d`
