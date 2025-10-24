@@ -1,6 +1,6 @@
 // api/dashboard.js - Consolidação de todas as funções do dashboard
-const databasePool = require('./_lib/database');
-const { getSecureHeaders } = require('./_lib/security');
+const databasePool = require('../_lib/database');
+const { getSecureHeaders } = require('../_lib/security');
 
 module.exports = async (req, res) => {
   const headers = getSecureHeaders();

@@ -1,7 +1,7 @@
 // api/audit.js - Sistema de auditoria e logs consolidado
 const jwt = require('jsonwebtoken');
-const databasePool = require('./_lib/database');
-const { getSecureHeaders, getJWTSecret } = require('./_lib/security');
+const databasePool = require('../_lib/database');
+const { getSecureHeaders, getJWTSecret } = require('../_lib/security');
 
 // Função principal para roteamento
 module.exports = async (req, res) => {

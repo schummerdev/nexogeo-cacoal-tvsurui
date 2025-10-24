@@ -1,6 +1,6 @@
 // api/ganhadores.js - Consolidação de operações com ganhadores
-const databasePool = require('./_lib/database');
-const { getSecureHeaders } = require('./_lib/security');
+const databasePool = require('../_lib/database');
+const { getSecureHeaders } = require('../_lib/security');
 
 module.exports = async (req, res) => {
   const headers = getSecureHeaders();

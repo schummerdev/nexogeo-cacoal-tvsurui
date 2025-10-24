@@ -1,6 +1,6 @@
-const { getSecureHeaders, checkRateLimit } = require('./_lib/security');
-const databasePool = require('./_lib/database');
-const cacheManager = require('./_lib/cache');
+const { getSecureHeaders, checkRateLimit } = require('../_lib/security');
+const databasePool = require('../_lib/database');
+const cacheManager = require('../_lib/cache');
 
 module.exports = async (req, res) => {
   // Configurar CORS seguro

@@ -1,5 +1,5 @@
-const { getSecureHeaders, checkRateLimit } = require('./_lib/security');
-const databasePool = require('./_lib/database');
+const { getSecureHeaders, checkRateLimit } = require('../_lib/security');
+const databasePool = require('../_lib/database');
 
 // Função para buscar participantes disponíveis
 async function buscarParticipantesDisponiveis(req, res) {

@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const bcryptjs = require('bcryptjs');
-const { getSecureHeaders } = require('./_lib/security');
+const { getSecureHeaders } = require('../_lib/security');
 
 async function processEmissoras(req, res) {
   const pool = new Pool({

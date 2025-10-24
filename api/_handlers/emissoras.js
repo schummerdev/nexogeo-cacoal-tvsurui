@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const { getSecureHeaders } = require('./_lib/security');
+const { getSecureHeaders } = require('../_lib/security');
 
 module.exports = async (req, res) => {
   // Configurar CORS seguro
