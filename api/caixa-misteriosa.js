@@ -255,16 +255,66 @@ Retorne APENAS o JSON, sem texto adicional antes ou depois.
 }
 
 /**
+ * Validação por palavras-chave (alinhado com frontend)
+ * Aceita palpites que contenham todas as palavras principais do produto
+ */
+function validateByKeywords(guess, correctAnswer) {
+    const normalize = (text) => text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')  // Remove acentos
+        .replace(/[^a-z0-9\s]/g, '')       // Remove pontuação
+        .trim();
+
+    const stopWords = ['de', 'da', 'do', 'das', 'dos', 'a', 'o', 'as', 'os', 'para', 'com', 'em', 'no', 'na'];
+
+    const extractWords = (text) => normalize(text)
+        .split(/\s+/)
+        .filter(word => !stopWords.includes(word) && word.length > 2)
+        .map(word => word.endsWith('s') && word.length > 3 ? word.slice(0, -1) : word);
+
+    const guessWords = extractWords(guess);
+    const answerWords = extractWords(correctAnswer);
+
+    // Se TODAS as palavras do palpite estão no produto, aceitar
+    if (guessWords.length > 0 && guessWords.every(word => answerWords.includes(word))) {
+        console.log('📌 [VALIDAÇÃO KEYWORDS]:', {
+            guess: guessWords.join(' '),
+            answer: answerWords.join(' '),
+            match: true
+        });
+
+        return {
+            isCorrect: true,
+            confidence: 1.0,
+            reason: `Palpite aceito por conter todas as palavras-chave do produto (${guessWords.join(', ')})`
+        };
+    }
+
+    return null; // Não passou - continua para próxima validação
+}
+
+/**
  * Valida se um palpite está semanticamente correto
  * ORDEM DE VALIDAÇÃO:
- * 1️⃣ Validação local (rápida, sem custo)
- * 2️⃣ Se rejeitar, tenta com IA (para casos de variação)
+ * 1️⃣ Validação por palavras-chave (alinhado com frontend)
+ * 2️⃣ Validação Levenshtein (robusta para typos)
+ * 3️⃣ Se rejeitar, tenta com IA (para casos de variação)
  */
 async function validateGuessWithAI(guess, correctAnswer) {
     try {
         console.log('🎯 [VALIDAÇÃO] Iniciando validação:', { guess, correctAnswer });
 
-        // 1️⃣ PRIMEIRA TENTATIVA: Validação Levenshtein (robusta para typos)
+        // 1️⃣ PRIMEIRA TENTATIVA: Validação por palavras-chave
+        const keywordValidation = validateByKeywords(guess, correctAnswer);
+        if (keywordValidation) {
+            console.log('✅ [VALIDAÇÃO KEYWORDS] Palpite correto!', keywordValidation);
+            return keywordValidation;
+        }
+
+        console.log('❌ [VALIDAÇÃO KEYWORDS] Palpite rejeitado. Tentando Levenshtein...');
+
+        // 2️⃣ SEGUNDA TENTATIVA: Validação Levenshtein (robusta para typos)
         const levenshteinValidation = validateWithLevenshtein(guess, correctAnswer);
         if (levenshteinValidation.isCorrect) {
             console.log('✅ [VALIDAÇÃO LEVENSHTEIN] Palpite correto!', levenshteinValidation);
@@ -273,7 +323,7 @@ async function validateGuessWithAI(guess, correctAnswer) {
 
         console.log('❌ [VALIDAÇÃO LEVENSHTEIN] Palpite rejeitado. Tentando com IA...');
 
-        // 2️⃣ SEGUNDA TENTATIVA: Validação com IA (apenas se Levenshtein falhou)
+        // 3️⃣ TERCEIRA TENTATIVA: Validação com IA (apenas se tudo falhou)
         if (!process.env.GOOGLE_API_KEY) {
             console.log('⚠️ GOOGLE_API_KEY não configurada - mantendo resultado Levenshtein');
             return levenshteinValidation; // Retorna o resultado da primeira etapa
