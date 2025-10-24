@@ -18,6 +18,9 @@ api/setup.js
 api/sorteio.js
 api/test-auth.js
 
+# Ignore migrations
+api/migrations/**/*.js
+
 # Only deploy these
 !api/index.js
 !api/caixa-misteriosa.js
