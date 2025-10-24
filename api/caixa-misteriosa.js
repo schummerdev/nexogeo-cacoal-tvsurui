@@ -1,7 +1,7 @@
 // Handler consolidado para toda a lógica do Caixa Misteriosa
 
 const { query } = require('../lib/db.js');
-const { getAuthenticatedUser } = require('./authHelper.js'); // Precisaremos extrair a função de auth para um helper
+const { getAuthenticatedUser } = require('./_handlers/authHelper.js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // --- Função de Auditoria ---
