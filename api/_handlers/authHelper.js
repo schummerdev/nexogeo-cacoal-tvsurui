@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { query } = require('../lib/db.js');
+const { query } = require('../../lib/db.js');
 
 // Verificar se JWT_SECRET existe
 if (!process.env.JWT_SECRET) {
