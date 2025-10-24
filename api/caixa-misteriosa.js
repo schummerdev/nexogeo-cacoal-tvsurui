@@ -3600,7 +3600,7 @@ module.exports = async (req, res) => {
         console.log('--- REQUEST BODY ---', JSON.stringify(req.body, null, 2));
     }
 
-    const { endpoint, id } = req.query;
+    const { endpoint, id } = req.query || {};
     // Usar req.originalPath se disponível (passado por api/index.js), senão extrair manualmente
     const path = req.originalPath ||
                  (req.originalUrl ? req.originalUrl.replace('/api/caixa-misteriosa', '') : req.url.replace('/api/caixa-misteriosa', ''));
