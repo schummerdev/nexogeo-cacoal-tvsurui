@@ -1067,4 +1067,4 @@ p, .text {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
   border: 1px solid rgba(245, 158, 11, 0.3);
   animation: pulse-glow 2s ease-in-out infinite;
-} 
+} /* v2.7.2 - Cache Bust Force */
