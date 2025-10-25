@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
+import './CaixaMisteriosaPub.css';
 
 // Página pública da Caixa Misteriosa - sem necessidade de login
 const CaixaMisteriosaPub = () => {
@@ -735,7 +736,7 @@ E aí, qual você prefere?
     const remainingGuesses = availableGuesses - usedGuessesCount;
 
     return (
-        <main style={styles.main}>
+        <main style={styles.main} className="caixa-misteriosa-pub-container">
             {/* Seletor de Tema */}
             <div style={{
                 position: 'absolute',
