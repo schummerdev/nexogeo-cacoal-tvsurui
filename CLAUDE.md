@@ -303,3 +303,77 @@ Use utilitários em `src/utils/`:
 - **API retorna**: `ORDER BY created_at DESC` (mais recentes primeiro)
 - **Frontend**: NÃO aplicar `.reverse()` - usar ordem direta da API
 - **Formato de exibição**: `HH:MM - Nome - Bairro - Palpite ✅`
+
+## 🎨 Design System v2.7 (Novo!)
+
+O projeto agora possui um Design System aprimorado com novos efeitos visuais e cores. Consulte `DESIGN_SYSTEM_v2.7.md` para documentação completa.
+
+### Paleta de Cores Extendida
+```css
+/* Cores Complementares */
+--color-purple: #8b5cf6       /* Roxo */
+--color-pink: #ec4899         /* Rosa */
+--color-indigo: #6366f1       /* Índigo */
+--color-cyan: #06b6d4         /* Ciano */
+--color-teal: #14b8a6         /* Teal */
+--color-lime: #84cc16         /* Lima */
+```
+
+### Novos Efeitos Disponíveis
+
+#### Animações
+- `.float` / `.float-slow`: Flutuação suave
+- `.pulse-glow`: Pulso de luminosidade
+- `.shimmer`: Efeito brilho (skeleton loading)
+- `.bounce-in`: Entrada com salto
+- `.slide-in-left` / `.slide-in-right`: Entradas laterais
+- `.color-shift`: Rotação contínua de cores
+
+#### Estilos Visuais
+- `.gradient-border`: Borda com gradiente vibrante
+- `.glow-border`: Borda com efeito luminoso
+- `.neon`: Texto neon com brilho
+- `.blur-bg` / `.blur-bg-dark`: Glassmorphism
+- `.btn-gradient`: Botão com gradiente aprimorado
+- `.text-gradient`: Texto com gradiente de cor
+- `.underline-hover`: Sublinha animada ao hover
+
+#### Efeitos de Ícones
+- `.icon-rotate`: Rotação ao hover
+- `.icon-scale`: Escala ao hover
+- `.icon-bounce`: Salto ao hover
+
+#### Estados Visuais
+- `.loading-card`: Animação de carregamento
+- `.success-state`: Estado de sucesso
+- `.error-state`: Estado de erro (shake)
+- `.warning-state`: Estado de aviso (pulsante)
+
+### Como Usar
+
+```jsx
+// Exemplo: Card flutuante com brilho
+<div class="card-modern float pulse-glow">
+  <h2 class="text-gradient">Título Especial</h2>
+  <button class="btn btn-gradient">Ação</button>
+</div>
+
+// Exemplo: Texto neon com entrada animada
+<h1 class="neon slide-in-left">Bem-vindo</h1>
+
+// Exemplo: Link com sublinha animada
+<a href="#" class="underline-hover">Clique aqui</a>
+
+// Exemplo: Ícone com rotação
+<i class="icon-rotate">⚙️</i>
+```
+
+### Tema Escuro Automático
+Todos os efeitos se adaptam automaticamente ao tema escuro do usuário via `@media (prefers-color-scheme: dark)`.
+
+### Performance
+- ✅ CSS-only (sem JavaScript)
+- ✅ GPU Accelerated
+- ✅ Acessibilidade (respeita `prefers-reduced-motion`)
+- ✅ ~15KB adicional apenas
+- ✅ Compatível com v2.6
