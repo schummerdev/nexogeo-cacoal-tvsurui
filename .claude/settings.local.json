@@ -39,9 +39,6 @@
       "Bash(VERCEL_TOKEN=Bf3IOYIND0TtyuO0Tfsrb4cu npx vercel:*)"
     ]
   },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "task-master-ai",
-    "gemini-cli"
+  
   ]
 }
