@@ -2286,3 +2286,175 @@
     font-size: 0.8rem;
   }
 }
+
+/* === NOVOS EFEITOS DO DESIGN SYSTEM v2.7 === */
+
+/* Aplicar efeitos aos cards do dashboard */
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.stat-card:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+  transform: translateY(-4px);
+}
+
+.kpi-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.kpi-card:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.chart-card {
+  transition: all 0.3s ease-in-out;
+  border-radius: 16px;
+}
+
+.chart-card:hover {
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Aplicar animação flutuante aos cards importantes */
+.stat-card.clickable {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Efeito de brilho para cards de sucesso */
+.success-state {
+  animation: pulse-glow 2s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+  }
+}
+
+/* Efeito de shake para erros */
+.error-state {
+  animation: shake 0.4s ease-in-out;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Gradiente vibrante para botões */
+.btn-primary, .btn-secondary, .btn-danger {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Aplicar glassmorphism aos cards */
+.card, .card-modern, .modal-content {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Efeito de texto gradiente para títulos */
+.card-title, .chart-title, .section-title {
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover .chart-title {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Efeito de sublinha animada em links */
+.legal-link {
+  position: relative;
+}
+
+.legal-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+.legal-link:hover::after {
+  width: 100%;
+}
+
+/* Efeito de entrada para modais */
+.modal-overlay {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ícones com efeito de rotação */
+.icon-rotate {
+  transition: transform 0.3s ease;
+}
+
+.icon-rotate:hover {
+  transform: rotate(360deg);
+}
+
+/* Badges com efeito de escala */
+.status-badge, .position-badge, .role-badge {
+  transition: all 0.3s ease;
+}
+
+.status-badge:hover, .position-badge:hover, .role-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Tema escuro com efeitos aprimorados */
+@media (prefers-color-scheme: dark) {
+  .stat-card:hover,
+  .kpi-card:hover,
+  .chart-card:hover {
+    box-shadow: 0 0 25px rgba(96, 165, 250, 0.3);
+  }
+
+  .chart-card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .modal-content {
+    background: #1e293b;
+    border-color: #334155;
+  }
+}
