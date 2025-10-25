@@ -1,7 +1,0 @@
-src/
-|-- components/
-|   |-- CapturaForm/
-|   |   |-- CapturaForm.jsx  (O código do componente)
-|   |   |-- CapturaForm.css  (O código de estilo)
-|-- App.jsx                (Onde você usaria o componente)
-|-- index.css              (Estilos globais)
