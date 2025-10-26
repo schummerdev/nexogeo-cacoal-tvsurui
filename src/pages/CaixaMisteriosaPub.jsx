@@ -625,10 +625,9 @@ E aí, qual você prefere?
             border: '1.5px solid #b0b5bf !important',  // Borda mais visível
             borderRadius: '0.5rem',
             padding: '0.75rem',
-            color: '#1f2937 !important',  // Sempre texto escuro para legibilidade
+            color: '#1f2937 !important',  // Sempre texto escuro para legibilidade máxima
             marginTop: '0.25rem',
             fontSize: '0.95rem',
-            transition: 'all 0.3s ease',
             boxShadow: '0 2px 4px rgba(0,0,0,0.05) !important'
         },
         button: {

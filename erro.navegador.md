@@ -3,21 +3,13 @@ https://nexogeo-demo.vercel.app/caixa-misteriosa-pub
 
 veja a imagem print-tela.png
 
-tem partes que esta fundo preto deixar tons 
-degrade para a cor selecionada e preto so quando for dark
+tem partes que esta fundo preto fiz riscos de amarelo
+
+mudar para usar a cores do tema degrade para a cor selecionada
+ e preto so quando for dark
 
 
-
-cuida para quando passar o mouse ou for escrever nao ficar a mesma cor 
-da fonte igual ao fundo e as letras nao ter como ler.
-
-
-
-https://nexogeo.vercel.app/demo
-colocar essa pagina o mesmo padrao cores e fundos e efeitos
- do https://nexogeo-demo.vercel.app/login
-
-ajustar as caixas de texto centralizadas da largura do banner superior
-
-
+tirar efeito de mudar cores quando passa o mouse
+cuida para quando escrever nao ficar a mesma cor 
+do fundo e as letras nao ter como ler.
 

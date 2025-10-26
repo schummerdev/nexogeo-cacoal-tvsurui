@@ -146,11 +146,10 @@
     0 0 30px var(--color-primary, rgba(102, 126, 234, 0.4)) !important;
 }
 
-/* Inputs com focus glow */
+/* Inputs com melhor contraste - sem transições */
 .caixa-misteriosa-pub-container input,
 .caixa-misteriosa-pub-container textarea,
 .caixa-misteriosa-pub-container select {
-  transition: all 0.3s ease-in-out;
   border-radius: 8px;
   background: #ffffff !important;
   color: #1f2937 !important;
@@ -167,13 +166,11 @@
   opacity: 1;
 }
 
-/* Estados de hover */
+/* Estados de hover - mantém estável sem mudar cores */
 .caixa-misteriosa-pub-container input:hover,
 .caixa-misteriosa-pub-container textarea:hover,
 .caixa-misteriosa-pub-container select:hover {
-  border-color: #667eea !important;
-  box-shadow:
-    0 2px 8px rgba(102, 126, 234, 0.15) !important;
+  /* Sem mudança de cor - mantém consistência */
 }
 
 /* Estados de focus com melhor contraste */
@@ -184,10 +181,8 @@
   background: #ffffff !important;
   border-color: #667eea !important;
   box-shadow:
-    0 0 0 3px rgba(102, 126, 234, 0.1),
-    0 0 20px rgba(102, 126, 234, 0.4) !important;
+    0 0 0 2px rgba(102, 126, 234, 0.2) !important;
   color: #1f2937 !important;
-  transform: translateY(-2px);
 }
 
 /* Headings com text-shadow para legibilidade */
