@@ -621,14 +621,15 @@ E aí, qual você prefere?
         },
         input: {
             width: '100%',
-            background: '#f5f5f7 !important',  // Sempre branco/claro
-            border: '1.5px solid #d1d5db !important',  // Borda cinza clara
+            background: '#ffffff !important',  // Sempre branco puro
+            border: '1.5px solid #b0b5bf !important',  // Borda mais visível
             borderRadius: '0.5rem',
             padding: '0.75rem',
             color: '#1f2937 !important',  // Sempre texto escuro para legibilidade
             marginTop: '0.25rem',
             fontSize: '0.95rem',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05) !important'
         },
         button: {
             width: '100%', background: currentThemeData.gradient,
@@ -799,12 +800,12 @@ E aí, qual você prefere?
                     </div>
                 )}
 
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{ color: currentThemeData.primary, fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
+                <div style={{ textAlign: 'center', marginBottom: '2rem', background: currentThemeData.gradient, padding: '1.5rem 1rem', borderRadius: '1rem', color: 'white' }}>
+                    <h1 style={{ color: 'white', fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
                         🎁 Caixa Misteriosa
                     </h1>
 
-                    <p style={{ color: currentThemeData.textSecondary, marginTop: '1rem' }}>Um oferecimento de:</p>
+                    <p style={{ color: 'rgba(255, 255, 255, 0.9)', marginTop: '1rem', fontSize: '1rem' }}>Um oferecimento de:</p>
 
                     {/* Logo do patrocinador OU texto - dependendo se logo_url existe */}
                     {console.log('🖼️ [LOGO DEBUG] sponsorLogoUrl:', liveGame.giveaway?.sponsor?.logo_url, 'sponsorName:', liveGame.giveaway?.sponsor?.name)}
@@ -817,17 +818,19 @@ E aí, qual você prefere?
                                     maxWidth: '250px',
                                     maxHeight: '120px',
                                     objectFit: 'contain',
-                                    borderRadius: '0.5rem'
+                                    borderRadius: '0.5rem',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                    padding: '0.5rem'
                                 }}
                                 onError={(e) => {
                                     // Se a imagem falhar ao carregar, mostra o texto como fallback
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = `<h2 style="fontSize: 2rem; fontWeight: bold; color: #A78BFA; margin: 0.5rem 0;">${liveGame.giveaway.sponsor.name || 'Patrocinador'}</h2>`;
+                                    e.target.parentElement.innerHTML = `<h2 style="fontSize: 2rem; fontWeight: bold; color: white; margin: 0.5rem 0;">${liveGame.giveaway.sponsor.name || 'Patrocinador'}</h2>`;
                                 }}
                             />
                         </div>
                     ) : (
-                        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: currentThemeData.primary, margin: '0.5rem 0' }}>
+                        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'white', margin: '0.5rem 0' }}>
                             {liveGame.giveaway?.sponsor?.name || 'Patrocinador'}
                         </h2>
                     )}
@@ -926,7 +929,12 @@ E aí, qual você prefere?
                                     Cadastre-se para Participar!
                                 </h3>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                                gap: '1rem',
+                                marginBottom: '0'
+                            }}>
                                 <input
                                     style={styles.input}
                                     type="text"

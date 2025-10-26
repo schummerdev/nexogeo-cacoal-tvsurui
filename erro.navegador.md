@@ -1,20 +1,23 @@
 https://nexogeo-demo.vercel.app/caixa-misteriosa-pub
-https://nexogeo.vercel.app/demo
-https://nexogeo-demo.vercel.app/participar?id=16&utm_source=website&utm_medium=referral
-https://nexogeo-demo.vercel.app/dashboard
-https://nexogeo-demo.vercel.app/dashboard/promocoes
-https://nexogeo-demo.vercel.app/dashboard/participantes
-https://nexogeo-demo.vercel.app/dashboard/sorteio
-https://nexogeo-demo.vercel.app/dashboard/mapas
-https://nexogeo-demo.vercel.app/dashboard/mapa-participantes
-https://nexogeo-demo.vercel.app/dashboard/configuracoes
-https://nexogeo-demo.vercel.app/dashboard/audit-logs
-
-
-
-fundo ainda nao tem efeito e nem cores vivas 
-quero igual esse site
-https://preview--nexogeo-demo.lumi.ing/#home
-
-mudar as cores do fundo de acordo com a selecao dos temas
  
+
+veja a imagem print-tela.png
+
+tem partes que esta fundo preto deixar tons 
+degrade para a cor selecionada e preto so quando for dark
+
+
+
+cuida para quando passar o mouse ou for escrever nao ficar a mesma cor 
+da fonte igual ao fundo e as letras nao ter como ler.
+
+
+
+https://nexogeo.vercel.app/demo
+colocar essa pagina o mesmo padrao cores e fundos e efeitos
+ do https://nexogeo-demo.vercel.app/login
+
+ajustar as caixas de texto centralizadas da largura do banner superior
+
+
+
