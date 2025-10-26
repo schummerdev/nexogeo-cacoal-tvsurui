@@ -757,22 +757,23 @@ E aí, qual você prefere?
                 {/* Indicador de usuário logado + botão logout */}
                 {participant && (
                     <div style={{
-                        background: currentThemeData.surface,
+                        background: currentThemeData.gradient,
                         padding: '0.75rem 1rem',
                         borderRadius: '0.5rem',
                         marginBottom: '1rem',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        border: `1px solid ${currentThemeData.border}`
+                        border: `2px solid ${currentThemeData.primary}`,
+                        color: 'white'
                     }}>
                         <div>
-                            <span style={{ color: currentThemeData.textSecondary, fontSize: '0.85rem' }}>Você está logado como:</span>
+                            <span style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem' }}>Você está logado como:</span>
                             <br />
-                            <span style={{ color: currentThemeData.success, fontWeight: 'bold', fontSize: '1.1rem' }}>
+                            <span style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                 {participant.name}
                             </span>
-                            <span style={{ color: currentThemeData.textSecondary, fontSize: '0.9rem', marginLeft: '0.5rem' }}>
+                            <span style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '0.9rem', marginLeft: '0.5rem' }}>
                                 (ID: {participant.id})
                             </span>
                         </div>
@@ -990,14 +991,14 @@ E aí, qual você prefere?
                             {/* Mensagem de cadastro realizado - APENAS na primeira vez (showShareLink) */}
                             {showShareLink && (
                                 <div style={{
-                                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                                    background: currentThemeData.gradient,
                                     color: 'white',
                                     padding: '1rem',
                                     borderRadius: '0.5rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: '2px solid #6EE7B7'
+                                    border: `2px solid ${currentThemeData.primary}`
                                 }}>
                                     ✅ Cadastro realizado com sucesso! Compartilhe o link abaixo para ganhar palpites extras.
                                 </div>
@@ -1006,14 +1007,14 @@ E aí, qual você prefere?
                             {/* Informação de palpites disponíveis - APENAS quando tem palpites */}
                             {remainingGuesses > 0 && (
                                 <div style={{
-                                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                                    background: currentThemeData.gradient,
                                     color: 'white',
                                     padding: '1rem',
                                     borderRadius: '0.5rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: '2px solid #6EE7B7'
+                                    border: `2px solid ${currentThemeData.primary}`
                                 }}>
                                     ✅ Você tem <strong>{remainingGuesses} palpite{remainingGuesses !== 1 ? 's' : ''}</strong> disponíve{remainingGuesses !== 1 ? 'is' : 'l'}
                                 </div>
@@ -1022,14 +1023,14 @@ E aí, qual você prefere?
                             {/* Mensagens de erro e sucesso */}
                             {errorMessage && errorMessage !== 'Você já usou todos os seus palpites.' && (
                                 <div style={{
-                                    background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                                    background: currentThemeData.danger,
                                     color: 'white',
                                     padding: '1rem',
                                     borderRadius: '0.5rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: '2px solid #FCA5A5'
+                                    border: `2px solid ${currentThemeData.danger}`
                                 }}>
                                     ❌ {errorMessage}
                                 </div>
@@ -1044,13 +1045,13 @@ E aí, qual você prefere?
 
                                     return (
                                         <div style={{
-                                            background: 'linear-gradient(135deg, #10B981, #059669)',
+                                            background: currentThemeData.gradient,
                                             color: 'white',
                                             padding: '1.5rem',
                                             borderRadius: '0.75rem',
                                             marginBottom: '1rem',
                                             textAlign: 'center',
-                                            border: '2px solid #6EE7B7'
+                                            border: `2px solid ${currentThemeData.primary}`
                                         }}>
                                             <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
                                                 🎉 Parabéns! Seu palpite foi enviado!
@@ -1074,14 +1075,14 @@ E aí, qual você prefere?
                                 // Mensagem normal
                                 return (
                                     <div style={{
-                                        background: 'linear-gradient(135deg, #10B981, #059669)',
+                                        background: currentThemeData.gradient,
                                         color: 'white',
                                         padding: '1rem',
                                         borderRadius: '0.5rem',
                                         marginBottom: '1rem',
                                         textAlign: 'center',
                                         fontWeight: '500',
-                                        border: '2px solid #6EE7B7'
+                                        border: `2px solid ${currentThemeData.primary}`
                                     }}>
                                         {successMessage}
                                     </div>
@@ -1091,11 +1092,12 @@ E aí, qual você prefere?
                             {/* Seção de indicação antiga (código de referência) - REMOVIDA, substituída por link personalizado */}
                             {ownReferralCode && !shareUrl && (
                                 <div style={{
-                                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                                    background: currentThemeData.gradient,
                                     padding: '1.5rem',
                                     borderRadius: '0.75rem',
                                     marginBottom: '1.5rem',
-                                    color: 'white'
+                                    color: 'white',
+                                    border: `2px solid ${currentThemeData.primary}`
                                 }}>
                                     <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.3rem', fontWeight: 'bold', textAlign: 'center' }}>
                                         🎁 Ganhe Palpites Extras!
