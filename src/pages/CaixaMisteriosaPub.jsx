@@ -620,9 +620,15 @@ E aí, qual você prefere?
             color: currentThemeData.text, textAlign: 'center', border: `3px solid ${currentThemeData.primary}`
         },
         input: {
-            width: '100%', background: currentThemeData.surface, border: `1px solid ${currentThemeData.border}`,
-            borderRadius: '0.5rem', padding: '0.75rem', color: currentThemeData.text, marginTop: '0.25rem',
-            fontSize: '0.95rem', transition: 'all 0.2s ease'
+            width: '100%',
+            background: '#f5f5f7 !important',  // Sempre branco/claro
+            border: '1.5px solid #d1d5db !important',  // Borda cinza clara
+            borderRadius: '0.5rem',
+            padding: '0.75rem',
+            color: '#1f2937 !important',  // Sempre texto escuro para legibilidade
+            marginTop: '0.25rem',
+            fontSize: '0.95rem',
+            transition: 'all 0.2s ease'
         },
         button: {
             width: '100%', background: currentThemeData.gradient,
