@@ -841,9 +841,11 @@ E aí, qual você prefere?
                 )}
 
                 <div style={{ marginBottom: '2rem' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', marginBottom: '1rem', color: currentThemeData.primary }}>
-                        Dicas Reveladas:
-                    </h3>
+                    <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
+                            Dicas Reveladas:
+                        </h3>
+                    </div>
                     <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {revealedClues.length > 0 ?
                             revealedClues.map((clue, index) => (
@@ -860,9 +862,9 @@ E aí, qual você prefere?
                 </div>
 
                 {/* Status do jogo */}
-                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem', marginBottom: '2rem', textAlign: 'center' }}>
                     <span style={{
-                        color: liveGame.status === 'accepting' ? currentThemeData.success : currentThemeData.textSecondary,
+                        color: 'white',
                         fontSize: '1.1rem',
                         fontWeight: 'bold'
                     }}>
@@ -919,9 +921,11 @@ E aí, qual você prefere?
                     {/* Se não está registrado, mostrar formulário de cadastro */}
                     {!participant && liveGame.status === 'accepting' && (
                         <form onSubmit={handleRegister}>
-                            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', marginBottom: '1rem' }}>
-                                Cadastre-se para Participar!
-                            </h3>
+                            <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
+                                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
+                                    Cadastre-se para Participar!
+                                </h3>
+                            </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                 <input
                                     style={styles.input}
@@ -984,9 +988,11 @@ E aí, qual você prefere?
                     {/* Se está registrado, mostrar área de palpites */}
                     {participant && (
                         <div>
-                            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', marginBottom: '1rem' }}>
-                                Olá, {participant.name}!
-                            </h3>
+                            <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
+                                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
+                                    Olá, {participant.name}!
+                                </h3>
+                            </div>
 
                             {/* Mensagem de cadastro realizado - APENAS na primeira vez (showShareLink) */}
                             {showShareLink && (
