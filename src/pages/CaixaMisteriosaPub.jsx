@@ -1201,13 +1201,13 @@ E aí, qual você prefere?
                             {/* Link de compartilhamento personalizado - Movido para APÓS o formulário */}
                             {shareUrl && (
                                 <div style={{
-                                    background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
+                                    background: currentThemeData.gradient,
                                     padding: '1.5rem',
                                     borderRadius: '0.75rem',
                                     marginTop: '1.5rem',
                                     marginBottom: '1.5rem',
                                     color: 'white',
-                                    border: '2px solid #60A5FA'
+                                    border: `2px solid ${currentThemeData.primary}`
                                 }}>
                                     <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center' }}>
                                         📱 Compartilhe e Ganhe Palpites!

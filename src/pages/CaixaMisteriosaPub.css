@@ -179,9 +179,9 @@
 .caixa-misteriosa-pub-container select:focus {
   outline: none;
   background: #ffffff !important;
-  border-color: #667eea !important;
+  border-color: var(--color-primary, #667eea) !important;
   box-shadow:
-    0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+    0 0 0 2px color-mix(in srgb, var(--color-primary, #667eea) 20%, transparent) !important;
   color: #1f2937 !important;
 }
 
