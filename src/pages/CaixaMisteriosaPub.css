@@ -71,50 +71,22 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow:
     0 0 1px rgba(0, 0, 0, 0.05),
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 16px rgba(0, 0, 0, 0.15),
     0 20px 40px rgba(0, 0, 0, 0.2),
-    0 0 80px var(--color-primary, rgba(102, 126, 234, 0.4)),
     inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-  animation: card-subtle-glow 3s ease-in-out infinite;
+  animation: none;
 }
 
-@keyframes card-subtle-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 1px rgba(0, 0, 0, 0.05),
-      0 2px 4px rgba(0, 0, 0, 0.1),
-      0 8px 16px rgba(0, 0, 0, 0.15),
-      0 20px 40px rgba(0, 0, 0, 0.2),
-      0 0 80px var(--color-primary, rgba(102, 126, 234, 0.4)),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  }
-  50% {
-    box-shadow:
-      0 0 1px rgba(0, 0, 0, 0.05),
-      0 4px 8px rgba(0, 0, 0, 0.12),
-      0 12px 20px rgba(0, 0, 0, 0.18),
-      0 25px 50px rgba(0, 0, 0, 0.25),
-      0 0 100px var(--color-primary, rgba(102, 126, 234, 0.5)),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-}
+/* Animação removida - cards mantêm shadow estático */
 
 .caixa-misteriosa-pub-container .card:hover,
 .caixa-misteriosa-pub-container > div > div:hover {
-  background: rgba(255, 255, 255, 1) !important;
-  box-shadow:
-    0 0 2px rgba(0, 0, 0, 0.08),
-    0 4px 8px rgba(0, 0, 0, 0.15),
-    0 12px 24px rgba(0, 0, 0, 0.2),
-    0 30px 60px rgba(0, 0, 0, 0.3),
-    0 0 120px var(--color-primary, rgba(102, 126, 234, 0.6)),
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
-  transform: translateY(-8px) scale(1.01);
+  /* Sem mudança de cor - mantém consistência */
 }
 
 /* Botões com efeito */
@@ -133,17 +105,15 @@
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s ease-in-out;
+  display: none;
 }
 
 .caixa-misteriosa-pub-container button:hover::before {
-  left: 100%;
+  /* Sem efeito shimmer */
 }
 
 .caixa-misteriosa-pub-container button:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.15),
-    0 0 30px var(--color-primary, rgba(102, 126, 234, 0.4)) !important;
+  /* Sem mudança de cor no hover */
 }
 
 /* Inputs com melhor contraste - sem transições */

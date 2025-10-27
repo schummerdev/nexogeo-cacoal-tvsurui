@@ -1,16 +1,8 @@
 https://nexogeo-demo.vercel.app/caixa-misteriosa-pub
  
+parte seleciona com cor amarelo (deixar branco) 
 
-veja a imagem print-tela.png
+parte seleciona com cor laranja deixar na mesma cor do tema selecionado
 
-tem partes que esta fundo preto fiz riscos de amarelo
-
-mudar para usar a cores do tema degrade para a cor selecionada
- e preto so quando for dark
-
-
-tirar efeito de mudar cores quando passa o mouse
-cuida para quando escrever nao ficar a mesma cor 
-do fundo e as letras nao ter como ler.
-
+retirar os efeitos de mudar de cor quando passa o mouse sobre botoes e campos 
 
