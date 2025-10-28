@@ -799,12 +799,12 @@ E aí, qual você prefere?
                     </div>
                 )}
 
-                <div style={{ textAlign: 'center', marginBottom: '2rem', background: currentThemeData.gradient, padding: '1.5rem 1rem', borderRadius: '1rem', color: currentThemeData.text }}>
-                    <h1 style={{ color: currentThemeData.primary === '#ef4444' || currentThemeData.primary === '#8b5cf6' ? '#000' : 'white', fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
+                <div style={{ textAlign: 'center', marginBottom: '2rem', background: currentThemeData.gradient, padding: '1.5rem 1rem', borderRadius: '1rem' }}>
+                    <h1 style={{ color: currentThemeData.primary, fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
                         🎁 Caixa Misteriosa
                     </h1>
 
-                    <p style={{ color: currentThemeData.primary === '#ef4444' || currentThemeData.primary === '#8b5cf6' ? '#1f2937' : 'rgba(255, 255, 255, 0.9)', marginTop: '1rem', fontSize: '1rem' }}>Um oferecimento de:</p>
+                    <p style={{ color: currentThemeData.primary, marginTop: '1rem', fontSize: '1rem' }}>Um oferecimento de:</p>
 
                     {/* Logo do patrocinador OU texto - dependendo se logo_url existe */}
                     {console.log('🖼️ [LOGO DEBUG] sponsorLogoUrl:', liveGame.giveaway?.sponsor?.logo_url, 'sponsorName:', liveGame.giveaway?.sponsor?.name)}
@@ -866,7 +866,7 @@ E aí, qual você prefere?
                 {/* Status do jogo */}
                 <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem', marginBottom: '2rem', textAlign: 'center' }}>
                     <span style={{
-                        color: currentThemeData.primary === '#ef4444' || currentThemeData.primary === '#8b5cf6' ? '#000' : 'white',
+                        color: currentThemeData.primary,
                         fontSize: '1.1rem',
                         fontWeight: 'bold'
                     }}>

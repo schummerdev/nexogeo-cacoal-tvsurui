@@ -6,14 +6,21 @@ corrigir:
 
 Caixa Misteriosa
 Um oferecimento de:
-cor do fundo onde esta o texto e a logo e para ser da cor do tema no caso ai seria azul
+
+
+cor da fonte do texto e para ser da cor do tema quando azul cor azul 
+na imagem como esta cor escuro pode ser branco se o fundo estiver preto
+
 
 
 corrigir:
 Status: Aceitando Palpites
-cor do fundo onde esta o texto e a logo e para ser da cor do tema no caso ai seria azul
+cor da fonte do texto e para ser da cor do tema quando azul cor azul 
 
-veja no fundo da tabela tambem dos campos esta preto deveria ser azul
+
+no tema escuro: nao era para ter fundos brancos e para ser tudo preto
+
+
 
 
 na pagina 

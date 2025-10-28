@@ -167,10 +167,15 @@
 
 /* Tema escuro */
 @media (prefers-color-scheme: dark) {
-  /* Apenas cards iniciais (antes do conteúdo temático) */
-  .caixa-misteriosa-pub-container .card {
-    background: rgba(30, 30, 30, 0.95) !important;
-    border: 2px solid rgba(100, 100, 100, 0.3) !important;
+  /* Forçar TODOS os backgrounds para preto em dark mode */
+  .caixa-misteriosa-pub-container {
+    background: #000000 !important;
+  }
+
+  .caixa-misteriosa-pub-container .card,
+  .caixa-misteriosa-pub-container > div > div {
+    background: rgba(20, 20, 20, 0.98) !important;
+    border: 1px solid rgba(100, 100, 100, 0.2) !important;
     color: white;
   }
 
