@@ -167,7 +167,13 @@
 
 /* Tema escuro */
 @media (prefers-color-scheme: dark) {
-  /* Deixar cards com inline styles (currentThemeData.gradient) */
+  /* Forçar backgrounds escuros em dark mode (não branco) */
+  .caixa-misteriosa-pub-container .card,
+  .caixa-misteriosa-pub-container > div > div {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border: 2px solid rgba(100, 100, 100, 0.3) !important;
+    color: white;
+  }
 
   /* Manter inputs claros para legibilidade em dark mode */
   .caixa-misteriosa-pub-container input,
