@@ -6,16 +6,17 @@ corrigir:
 
 Caixa Misteriosa
 Um oferecimento de:
-
-texto na pagina esta ficando com cor branco e o fundo e branco.... colocar texto em Preto
-quando o tema for escuro colocar o texto em branco
+cor do fundo onde esta o texto e a logo e para ser da cor do tema no caso ai seria azul
 
 
 corrigir:
 Status: Aceitando Palpites
+cor do fundo onde esta o texto e a logo e para ser da cor do tema no caso ai seria azul
 
-texto na pagina esta ficando com cor branco e o fundo e branco.... colocar texto em Preto
-quando o tema for escuro colocar o texto em branco
+veja no fundo da tabela tambem dos campos esta preto deveria ser azul
 
-quando ficar o tema escuro nao pode ficar nenhuma parte da tela em branco
 
+na pagina 
+https://nexogeo-demo.vercel.app/demo
+mudar a logo para essa:
+https://nexogeo-demo.vercel.app/imagens/logo0.png

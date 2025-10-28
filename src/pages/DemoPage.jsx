@@ -61,7 +61,7 @@ const DemoPage = () => {
         {/* Header Section */}
         <header className="demo-header">
           <div className="demo-header-content">
-            <img src="/imagens/logo.png" alt="NexoGeo Logo" className="demo-logo" />
+            <img src="/imagens/logo0.png" alt="NexoGeo Logo" className="demo-logo" />
             <p className="demo-subtitle">Sistema de Gestão de Promoções e Engajamento de Telespectadores para Emissoras Locais</p>
           </div>
         </header>

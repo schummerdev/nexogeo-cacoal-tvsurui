@@ -932,7 +932,10 @@ E aí, qual você prefere?
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
                                 gap: '1rem',
-                                marginBottom: '0'
+                                marginBottom: '0',
+                                background: currentThemeData.surface,
+                                padding: '1rem',
+                                borderRadius: '0 0 0.5rem 0.5rem'
                             }}>
                                 <input
                                     style={styles.input}
@@ -982,13 +985,15 @@ E aí, qual você prefere?
                                     readOnly
                                 />
                             )}
-                            <button
-                                type="submit"
-                                style={styles.button}
-                                disabled={isRegistering}
-                            >
-                                {isRegistering ? 'Cadastrando...' : 'Cadastrar e Participar'}
-                            </button>
+                            <div style={{ background: currentThemeData.surface, padding: '0 1rem 1rem 1rem' }}>
+                                <button
+                                    type="submit"
+                                    style={styles.button}
+                                    disabled={isRegistering}
+                                >
+                                    {isRegistering ? 'Cadastrando...' : 'Cadastrar e Participar'}
+                                </button>
+                            </div>
                         </form>
                     )}
 

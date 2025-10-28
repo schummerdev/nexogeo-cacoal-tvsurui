@@ -167,9 +167,8 @@
 
 /* Tema escuro */
 @media (prefers-color-scheme: dark) {
-  /* Forçar backgrounds escuros em dark mode (não branco) */
-  .caixa-misteriosa-pub-container .card,
-  .caixa-misteriosa-pub-container > div > div {
+  /* Apenas cards iniciais (antes do conteúdo temático) */
+  .caixa-misteriosa-pub-container .card {
     background: rgba(30, 30, 30, 0.95) !important;
     border: 2px solid rgba(100, 100, 100, 0.3) !important;
     color: white;
