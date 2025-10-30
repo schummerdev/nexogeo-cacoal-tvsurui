@@ -67,19 +67,17 @@
 /* Cards com glassmorphism PREMIUM */
 .caixa-misteriosa-pub-container .card,
 .caixa-misteriosa-pub-container > div > div {
-  background: rgba(255, 255, 255, 0.97) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(15, 23, 42, 0.92) !important; /* slate-900 */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 20px !important;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(148, 163, 184, 0.2); /* slate-400 @ 20% */
+  transition: all 0.2s ease;
   box-shadow:
-    0 0 1px rgba(0, 0, 0, 0.05),
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 16px rgba(0, 0, 0, 0.15),
-    0 20px 40px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    0 0 0 1px rgba(148, 163, 184, 0.08),
+    0 8px 24px rgba(2, 6, 23, 0.5);
   animation: none;
+  color: #e5e7eb;
 }
 
 /* Animação removida - cards mantêm shadow estático */
@@ -121,12 +119,12 @@
 .caixa-misteriosa-pub-container textarea,
 .caixa-misteriosa-pub-container select {
   border-radius: 8px;
-  background: #ffffff !important;
-  color: #1f2937 !important;
-  border: 1.5px solid #b0b5bf !important;
+  background: #0b1220 !important; /* dark input */
+  color: #e5e7eb !important;
+  border: 1.5px solid #334155 !important; /* slate-700 */
   font-size: 14px;
   padding: 10px 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
 }
 
 .caixa-misteriosa-pub-container input::placeholder,
@@ -148,11 +146,10 @@
 .caixa-misteriosa-pub-container textarea:focus,
 .caixa-misteriosa-pub-container select:focus {
   outline: none;
-  background: #ffffff !important;
-  border-color: var(--color-primary, #667eea) !important;
-  box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--color-primary, #667eea) 20%, transparent) !important;
-  color: #1f2937 !important;
+  background: #0b1220 !important;
+  border-color: var(--color-primary, #4F46E5) !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25) !important;
+  color: #e5e7eb !important;
 }
 
 /* Headings com text-shadow para legibilidade */
@@ -165,33 +162,29 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Tema escuro */
-@media (prefers-color-scheme: dark) {
-  /* Forçar TODOS os backgrounds para preto em dark mode */
-  .caixa-misteriosa-pub-container {
-    background: #000000 !important;
-  }
-
+/* Tema claro (override) */
+@media (prefers-color-scheme: light) {
   .caixa-misteriosa-pub-container .card,
   .caixa-misteriosa-pub-container > div > div {
-    background: rgba(20, 20, 20, 0.98) !important;
-    border: 1px solid rgba(100, 100, 100, 0.2) !important;
-    color: white;
+    background: rgba(255, 255, 255, 0.97) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    color: #111827;
   }
 
-  /* Manter inputs claros para legibilidade em dark mode */
   .caixa-misteriosa-pub-container input,
   .caixa-misteriosa-pub-container textarea,
   .caixa-misteriosa-pub-container select {
-    background: rgba(245, 245, 247, 0.98) !important;
+    background: #ffffff !important;
     color: #1f2937 !important;
-    border: 1.5px solid rgba(180, 180, 180, 0.9) !important;
+    border: 1.5px solid #b0b5bf !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
   }
 
-  .caixa-misteriosa-pub-container input::placeholder,
-  .caixa-misteriosa-pub-container textarea::placeholder,
-  .caixa-misteriosa-pub-container select::placeholder {
-    color: #888888;
+  .caixa-misteriosa-pub-container input:focus,
+  .caixa-misteriosa-pub-container textarea:focus,
+  .caixa-misteriosa-pub-container select:focus {
+    background: #ffffff !important;
+    color: #1f2937 !important;
   }
 }
 

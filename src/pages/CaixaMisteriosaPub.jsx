@@ -621,14 +621,14 @@ E aí, qual você prefere?
         },
         input: {
             width: '100%',
-            background: '#ffffff !important',  // Sempre branco puro
-            border: '1.5px solid #b0b5bf !important',  // Borda mais visível
+            background: (currentThemeData.background || currentThemeData.surface),
+            border: `1.5px solid ${currentThemeData.border}`,
             borderRadius: '0.5rem',
             padding: '0.75rem',
-            color: '#1f2937 !important',  // Sempre texto escuro para legibilidade máxima
+            color: currentThemeData.text,
             marginTop: '0.25rem',
             fontSize: '0.95rem',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05) !important'
+            boxShadow: `0 2px 4px ${currentThemeData.primary}14`
         },
         button: {
             width: '100%', background: currentThemeData.gradient,
@@ -800,11 +800,11 @@ E aí, qual você prefere?
                 )}
 
                 <div style={{ textAlign: 'center', marginBottom: '2rem', background: currentThemeData.gradient, padding: '1.5rem 1rem', borderRadius: '1rem' }}>
-                    <h1 style={{ color: currentThemeData.primary, fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
+                    <h1 style={{ color: '#ffffff', fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
                         🎁 Caixa Misteriosa
                     </h1>
 
-                    <p style={{ color: currentThemeData.primary, marginTop: '1rem', fontSize: '1rem' }}>Um oferecimento de:</p>
+                    <p style={{ color: 'rgba(255,255,255,0.9)', marginTop: '1rem', fontSize: '1rem' }}>Um oferecimento de:</p>
 
                     {/* Logo do patrocinador OU texto - dependendo se logo_url existe */}
                     {console.log('🖼️ [LOGO DEBUG] sponsorLogoUrl:', liveGame.giveaway?.sponsor?.logo_url, 'sponsorName:', liveGame.giveaway?.sponsor?.name)}
@@ -866,7 +866,7 @@ E aí, qual você prefere?
                 {/* Status do jogo */}
                 <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem', marginBottom: '2rem', textAlign: 'center' }}>
                     <span style={{
-                        color: currentThemeData.primary,
+                        color: '#ffffff',
                         fontSize: '1.1rem',
                         fontWeight: 'bold'
                     }}>
