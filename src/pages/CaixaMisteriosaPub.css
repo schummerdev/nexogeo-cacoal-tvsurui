@@ -66,6 +66,7 @@
 
 /* Cards com glassmorphism PREMIUM */
 .caixa-misteriosa-pub-container .card,
+.caixa-misteriosa-pub-container > div,
 .caixa-misteriosa-pub-container > div > div {
   background: rgba(15, 23, 42, 0.92) !important; /* slate-900 */
   backdrop-filter: blur(16px);

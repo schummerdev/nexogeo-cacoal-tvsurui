@@ -809,17 +809,25 @@ E aí, qual você prefere?
                     {/* Logo do patrocinador OU texto - dependendo se logo_url existe */}
                     {console.log('🖼️ [LOGO DEBUG] sponsorLogoUrl:', liveGame.giveaway?.sponsor?.logo_url, 'sponsorName:', liveGame.giveaway?.sponsor?.name)}
                     {liveGame.giveaway?.sponsor?.logo_url ? (
-                        <div style={{ margin: '1rem 0' }}>
+                        <div style={{
+                            margin: '1rem 0',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '0.75rem 1rem',
+                            borderRadius: '0.75rem',
+                            background: 'rgba(0,0,0,0.25)',
+                            border: '1px solid rgba(255,255,255,0.15)'
+                        }}>
                             <img
                                 src={liveGame.giveaway.sponsor.logo_url}
                                 alt={liveGame.giveaway.sponsor.name}
                                 style={{
-                                    maxWidth: '250px',
-                                    maxHeight: '120px',
+                                    maxWidth: '240px',
+                                    maxHeight: '100px',
                                     objectFit: 'contain',
-                                    borderRadius: '0.5rem',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                    padding: '0.5rem'
+                                    filter: 'drop-shadow(0 1px 1.5px rgba(0,0,0,0.35))',
+                                    background: 'transparent'
                                 }}
                                 onError={(e) => {
                                     // Se a imagem falhar ao carregar, mostra o texto como fallback
