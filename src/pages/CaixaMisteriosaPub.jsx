@@ -853,61 +853,8 @@ E aí, qual você prefere?
                     </div>
                 )}
 
+                {/* Seção de Dicas Reveladas */}
                 <div style={{ marginBottom: '2rem' }}>
-                    <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
-                            Dicas Reveladas:
-                        </h3>
-                    </div>
-                    <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {revealedClues.length > 0 ?
-                            revealedClues.map((clue, index) => (
-                                <li key={index} style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', border: `2px solid ${currentThemeData.primary}`, color: '#e5e7eb' }}>
-                                    <strong style={{ color: currentThemeData.primary }}>Dica {index + 1}:</strong> {clue}
-                                </li>
-                            )) : (
-                                <li style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center', color: '#94a3b8', border: `1px solid rgba(148, 163, 184, 0.2)` }}>
-                                    Nenhuma dica revelada ainda.
-                                </li>
-                            )
-                        background: currentThemeData.gradient,
-                        padding: '1.5rem',
-                        borderRadius: '0.75rem',
-                        marginBottom: '2rem',
-                        textAlign: 'center',
-                        border: `3px solid ${currentThemeData.primary}`,
-                        color: 'white',
-                        boxShadow: `0 8px 20px ${currentThemeData.primary}4D`
-                    }}>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
-                            🎁 Palavra Secreta
-                        </h3>
-                        <p style={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 1.5rem 0', letterSpacing: '0.1em' }}>
-                            {liveGame.giveaway?.product?.name || 'Produto'}
-                        </p>
-
-                        {liveGame.winner && (
-                            <>
-                                <h3 style={{ fontSize: '1.3rem', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>
-                                    🏆 Ganhador(a)
-                                </h3>
-                                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-                                    {liveGame.winner.userName}
-                                    {liveGame.winner.userNeighborhood && ` - ${liveGame.winner.userNeighborhood}`}
-                                    {liveGame.winner.userPhone && ` - ${liveGame.winner.userPhone.replace(/\D/g, '').replace(/^(\d+)(\d{4})$/, '****-$2')}`}
-                                </p>
-                            </>
-                        )}
-                    </div>
-                )}
-
-                {liveGame.status === 'closed' && (
-                    <div style={{ textAlign: 'center', color: currentThemeData.warning, fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
-                        Aguardando Sorteio do Ganhador!
-                    </div>
-                )}
-
-                {liveGame.status === 'accepting' && participant && (
                     <div style={{ 
                         background: currentThemeData.gradient, 
                         padding: '0.75rem 1rem', 
@@ -921,6 +868,90 @@ E aí, qual você prefere?
                             margin: '0', 
                             color: 'white' 
                         }}>
+                            Dicas Reveladas:
+                        </h3>
+                    </div>
+                    
+                    {revealedClues.length > 0 ? (
+                        <ul style={{ 
+                            listStyle: 'none', 
+                            padding: 0, 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '0.75rem' 
+                        }}>
+                            {revealedClues.map((clue, index) => (
+                                <li 
+                                    key={index} 
+                                    style={{ 
+                                        background: 'rgba(30, 41, 59, 0.9)', 
+                                        padding: '1rem', 
+                                        borderRadius: '0.5rem', 
+                                        border: `2px solid ${currentThemeData.primary}`, 
+                                        color: '#e5e7eb' 
+                                    }}
+                                >
+                                    <strong style={{ color: currentThemeData.primary }}>
+                                        Dica {index + 1}:
+                                    </strong> {clue}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div style={{ 
+                            background: 'rgba(30, 41, 59, 0.9)', 
+                            padding: '1.5rem', 
+                            borderRadius: '0 0 0.5rem 0.5rem', 
+                            textAlign: 'center', 
+                            color: '#94a3b8', 
+                            border: '1px solid rgba(148, 163, 184, 0.2)'
+                        }}>
+                            Nenhuma dica revelada ainda.
+                        </div>
+                    )}
+                </div>
+
+                {/* Seção da Palavra Secreta */}
+                <div style={{
+                    background: currentThemeData.gradient,
+                    padding: '1.5rem',
+                    borderRadius: '0.75rem',
+                    marginBottom: '2rem',
+                    textAlign: 'center',
+                    border: `3px solid ${currentThemeData.primary}`,
+                    color: 'white',
+                    boxShadow: `0 8px 20px ${currentThemeData.primary}4D`
+                }}>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
+                        🎁 Palavra Secreta
+                    </h3>
+                    <p style={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 1.5rem 0', letterSpacing: '0.1em' }}>
+                        {liveGame.giveaway?.product?.name || 'Produto'}
+                    </p>
+
+                    {liveGame.winner && (
+                        <>
+                            <h3 style={{ fontSize: '1.3rem', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>
+                                🏆 Ganhador(a)
+                            </h3>
+                            <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                                {liveGame.winner.userName}
+                                {liveGame.winner.userNeighborhood && ` - ${liveGame.winner.userNeighborhood}`}
+                                {liveGame.winner.userPhone && ` - ${liveGame.winner.userPhone.replace(/\D/g, '').replace(/^(\d+)(\d{4})$/, '****-$2')}`}
+                            </p>
+                        </>
+                    )}
+                </div>
+
+                {liveGame.status === 'closed' && (
+                    <div style={{ textAlign: 'center', color: currentThemeData.warning, fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
+                        Aguardando Sorteio do Ganhador!
+                    </div>
+                )}
+
+                {liveGame.status === 'accepting' && participant && (
+                    <div className="section-title">
+                        <h3>
                             Aceitando Palpites!
                         </h3>
                     </div>
@@ -933,9 +964,8 @@ E aí, qual você prefere?
                     {/* Se não está registrado, mostrar formulário de cadastro */}
                     {!participant && liveGame.status === 'accepting' && (
                         <form onSubmit={handleRegister}>
-                            <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
-                                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
-                                    Cadastre-se para Participar!
+                            <div className="section-title">
+                                <h3>Cadastre-se para Participar!
                                 </h3>
                             </div>
                             <div style={{
