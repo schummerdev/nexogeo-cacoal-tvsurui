@@ -1414,10 +1414,11 @@ E aí, qual você prefere?
                         />
                     </div>
                     <p style={{
-                        color: currentThemeData.secondary,
+                        color: currentThemeData.text,
                         fontSize: '0.875rem',
                         margin: '0 0 1rem 0',
-                        lineHeight: '1.4'
+                        lineHeight: '1.4',
+                        fontWeight: '500'
                     }}>
                         Sistema completo de gestão de promoções e sorteios
                     </p>
@@ -1427,15 +1428,16 @@ E aí, qual você prefere?
                         rel="noopener noreferrer"
                         style={{
                             display: 'inline-block',
-                            background: currentThemeData.gradient,
-                            color: 'white',
+                            background: currentThemeData.primary,
+                            color: '#ffffff',
                             textDecoration: 'none',
                             padding: '0.75rem 1.5rem',
                             borderRadius: '8px',
                             fontSize: '0.875rem',
                             fontWeight: '600',
                             transition: 'all 0.2s ease',
-                            boxShadow: `0 2px 8px ${currentThemeData.primary}33`
+                            boxShadow: `0 4px 12px ${currentThemeData.primary}44`,
+                            border: `2px solid ${currentThemeData.primary}`
                         }}
                     >
                         📦 Conheça a NexoGeo
