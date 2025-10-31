@@ -886,22 +886,25 @@ E aí, qual você prefere?
                         )}
                     </ul>
                     
-                    <div style={{
-                        background: currentThemeData.gradient,
-                        padding: '1.5rem',
-                        borderRadius: '0.75rem',
-                        marginBottom: '2rem',
-                        textAlign: 'center',
-                        border: `3px solid ${currentThemeData.primary}`,
-                        color: 'white',
-                        boxShadow: `0 8px 20px ${currentThemeData.primary}4D`
-                    }}>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
-                            🎁 Palavra Secreta
-                        </h3>
-                        <p style={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 1.5rem 0', letterSpacing: '0.1em' }}>
-                            {liveGame.giveaway?.product?.name || 'Produto'}
-                        </p>
+                    {liveGame.status === 'accepting' && participant && (
+                        <div style={{
+                            background: currentThemeData.gradient,
+                            padding: '1.5rem',
+                            borderRadius: '0.75rem',
+                            marginBottom: '2rem',
+                            textAlign: 'center',
+                            border: `3px solid ${currentThemeData.primary}`,
+                            color: 'white',
+                            boxShadow: `0 8px 20px ${currentThemeData.primary}4D`
+                        }}>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
+                                🎁 Palavra Secreta
+                            </h3>
+                            <p style={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 1.5rem 0', letterSpacing: '0.1em' }}>
+                                {liveGame.giveaway?.product?.name || 'Produto'}
+                            </p>
+                        </div>
+                    )}
 
                         {liveGame.winner && (
                             <>
