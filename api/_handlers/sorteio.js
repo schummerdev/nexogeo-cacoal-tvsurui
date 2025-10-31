@@ -180,26 +180,34 @@ async function realizarSorteio(req, res) {
 
       console.log(`📊 [SORTEIO] Inserindo ganhador ${i + 1}/${quantidade}: ${participante.nome} (posição: ${i + 1})`);
 
-      // Inserir ganhador na tabela
-      const insertResult = await databasePool.query(`
-        INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio)
-        VALUES ($1, $2, $3, $4)
-        RETURNING *
-      `, [participante.id, promocaoId, i + 1, premio]);
+      try {
+        // Inserir ganhador na tabela
+        const insertResult = await databasePool.query(`
+          INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio)
+          VALUES ($1, $2, $3, $4)
+          RETURNING *
+        `, [participante.id, promocaoId, i + 1, premio]);
 
-      ganhadores.push({
-        id: `winner_${participante.id}`,
-        participante_id: participante.id,
-        promocao_id: promocaoId,
-        nome: participante.nome,
-        telefone: participante.telefone,
-        cidade: participante.cidade,
-        bairro: participante.bairro,
-        posicao: i + 1,
-        premio: premio,
-        sorteado_em: insertResult.rows[0].sorteado_em,
-        status: 'sorteado'
-      });
+        ganhadores.push({
+          id: `winner_${participante.id}`,
+          participante_id: participante.id,
+          promocao_id: promocaoId,
+          nome: participante.nome,
+          telefone: participante.telefone,
+          cidade: participante.cidade,
+          bairro: participante.bairro,
+          posicao: i + 1,
+          premio: premio,
+          sorteado_em: insertResult.rows[0].sorteado_em,
+          status: 'sorteado'
+        });
+
+        console.log(`✅ [SORTEIO] Ganhador ${i + 1} inserido com sucesso`);
+      } catch (insertError) {
+        console.error(`❌ [SORTEIO] ERRO ao inserir ganhador ${i + 1}:`, insertError.message);
+        console.error('Detalhes do erro:', insertError);
+        // Continuar com os próximos ganhadores mesmo se um falhar
+      }
     }
 
     console.log(`📊 [SORTEIO] Sorteio finalizado com ${ganhadores.length} ganhador(es)`);
