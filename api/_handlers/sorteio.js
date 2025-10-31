@@ -130,7 +130,8 @@ async function realizarSorteio(req, res) {
       quantidade = 3;
     }
 
-    console.log(`📊 Sorteio configurado para ${quantidade} ganhador(es)`);
+    console.log(`📊 [SORTEIO] Promo ${promocaoId} - numero_ganhadores do BD: ${promocaoInfo.rows[0].numero_ganhadores} (tipo: ${typeof promocaoInfo.rows[0].numero_ganhadores})`);
+    console.log(`📊 [SORTEIO] Quantidade após parseInt: ${quantidade} (tipo: ${typeof quantidade})`);
 
     // Verificar se já existem ganhadores para esta promoção e cancelá-los automaticamente
     const existingWinners = await databasePool.query(`
@@ -150,29 +151,35 @@ async function realizarSorteio(req, res) {
     }
 
     // Buscar participantes disponíveis para o sorteio
+    console.log(`📊 [SORTEIO] Buscando ${quantidade} participantes para promo ${promocaoId}`);
     const participantesResult = await databasePool.query(`
-      SELECT p.* 
-      FROM participantes p 
-      WHERE p.promocao_id = $1 
+      SELECT p.*
+      FROM participantes p
+      WHERE p.promocao_id = $1
       ORDER BY RANDOM()
       LIMIT $2
     `, [promocaoId, quantidade]);
 
+    console.log(`📊 [SORTEIO] Participantes retornados: ${participantesResult.rows.length}`);
+
     if (participantesResult.rows.length === 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Nenhum participante encontrado para esta promoção' 
+        message: 'Nenhum participante encontrado para esta promoção'
       });
     }
 
     // Criar os ganhadores
     const ganhadores = [];
     const premios = ['1º Lugar - R$ 10.000', '2º Lugar - R$ 5.000', '3º Lugar - R$ 2.000'];
-    
+
+    console.log(`📊 [SORTEIO] Iniciando loop para criar ganhadores - total a criar: ${quantidade}`);
     for (let i = 0; i < participantesResult.rows.length && i < quantidade; i++) {
       const participante = participantesResult.rows[i];
       const premio = premios[i] || `${i + 1}º Lugar`;
-      
+
+      console.log(`📊 [SORTEIO] Inserindo ganhador ${i + 1}/${quantidade}: ${participante.nome} (posição: ${i + 1})`);
+
       // Inserir ganhador na tabela
       const insertResult = await databasePool.query(`
         INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio)
@@ -195,6 +202,7 @@ async function realizarSorteio(req, res) {
       });
     }
 
+    console.log(`📊 [SORTEIO] Sorteio finalizado com ${ganhadores.length} ganhador(es)`);
     return res.status(200).json({
       success: true,
       data: ganhadores,
