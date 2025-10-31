@@ -25,12 +25,20 @@ html, body, #root, .caixa-misteriosa-pub-container {
   right: 0;
   bottom: 0;
   background:
-    radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.25) 0%, transparent 30%),
+    radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 30%),
     radial-gradient(circle at 85% 75%, rgba(0, 0, 0, 0.25) 0%, transparent 35%),
-    radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   animation: caixa-page-glow-intense 12s ease-in-out infinite;
+}
+
+/* Fundo para tema vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container::before {
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255, 200, 200, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 85% 75%, rgba(150, 0, 0, 0.2) 0%, transparent 35%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 150, 150, 0.1) 0%, transparent 50%);
 }
 
 /* CAMADA 2: Efeito de partículas/movimento */
@@ -47,6 +55,13 @@ html, body, #root, .caixa-misteriosa-pub-container {
   pointer-events: none;
   z-index: 0;
   animation: rotate-glow 25s linear infinite;
+}
+
+/* Efeito de partículas para tema vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container::after {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 200, 200, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(200, 100, 100, 0.05) 0%, transparent 50%);
 }
 
 @keyframes caixa-page-glow-intense {
@@ -362,6 +377,75 @@ html, body, #root, .caixa-misteriosa-pub-container {
 .caixa-misteriosa-pub-container h5,
 .caixa-misteriosa-pub-container h6 {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Tema Vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container {
+  --primary-color: #dc2626; /* red-600 */
+  --primary-dark: #b91c1c; /* red-700 */
+  --primary-light: #f87171; /* red-400 */
+  --text-on-primary: #ffffff;
+  --background: #1a0a0a; /* Fundo mais escuro para melhor contraste */
+  --surface: #2a0f0f; /* Superfície um pouco mais clara que o fundo */
+  --text: #f8fafc; /* slate-50 - texto claro para melhor legibilidade */
+  --text-secondary: #e2e8f0; /* slate-200 - texto secundário */
+  --border: #7f1d1d; /* red-900 - bordas escuras */
+  background: linear-gradient(135deg, #1a0a0a 0%, #2a0f0f 100%) !important;
+}
+
+/* Ajustar gradiente para elementos internos */
+.theme-vermelho .caixa-misteriosa-pub-container > div[style*="gradient"] {
+  background: linear-gradient(135deg, #2a0f0f 0%, #3a1414 100%) !important;
+  border: 1px solid #7f1d1d !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Aplicar cores do tema vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container {
+  background: var(--background) !important;
+  color: var(--text) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container .card,
+.theme-vermelho .caixa-misteriosa-pub-container > div,
+.theme-vermelho .caixa-misteriosa-pub-container > div > div {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container button.primary,
+.theme-vermelho .caixa-misteriosa-pub-container button[type="submit"] {
+  background-color: var(--primary-color) !important;
+  color: var(--text-on-primary) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container button.primary:hover,
+.theme-vermelho .caixa-misteriosa-pub-container button[type="submit"]:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container input,
+.theme-vermelho .caixa-misteriosa-pub-container select,
+.theme-vermelho .caixa-misteriosa-pub-container textarea {
+  background-color: rgba(30, 8, 8, 0.9) !important;
+  border-color: #7f1d1d !important;
+  color: #f8fafc !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container input:focus,
+.theme-vermelho .caixa-misteriosa-pub-container select:focus,
+.theme-vermelho .caixa-misteriosa-pub-container textarea:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container a {
+  color: var(--primary-light) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container a:hover {
+  color: var(--primary-color) !important;
 }
 
 /* Tema claro (override) */
