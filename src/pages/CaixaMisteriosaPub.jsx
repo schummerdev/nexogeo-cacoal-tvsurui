@@ -653,19 +653,15 @@ E aí, qual você prefere?
         }
     };
 
-    if (loading) {
-        return (
-            <main style={styles.main}>
+    return (
+        <main style={styles.main}>
+            {loading && (
                 <div style={styles.card}>
                     <h2 style={{ textAlign: 'center' }}>Carregando jogo...</h2>
                 </div>
-            </main>
-        );
-    }
+            )}
 
-    if (error) {
-        return (
-            <main style={styles.main}>
+            {error && (
                 <div style={styles.card}>
                     <h2 style={{ textAlign: 'center', color: currentThemeData.danger }}>Erro</h2>
                     <p style={{ textAlign: 'center' }}>{error}</p>
@@ -676,13 +672,14 @@ E aí, qual você prefere?
                         Tentar Novamente
                     </button>
                 </div>
+            )}
             </main>
         );
     }
 
     if (!liveGame) {
         return (
-            <main style={styles.main}>
+            <div style={styles.main}>
                 <div style={styles.card}>
                     <div style={{ textAlign: 'center' }}>
                         <h1 style={{ color: currentThemeData.primary, fontSize: '2.5rem', margin: '0 0 1rem 0' }}>
@@ -717,7 +714,7 @@ E aí, qual você prefere?
     // Se o participante é ganhador, mostrar destaque especial
     if (isWinner && liveGame?.status === 'finished') {
         return (
-            <main style={styles.main}>
+            <div style={styles.main}>
                 <div style={styles.winnerCard}>
                     <h1 style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>🎉</h1>
                     <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
