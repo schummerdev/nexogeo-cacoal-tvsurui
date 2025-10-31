@@ -872,15 +872,36 @@ E aí, qual você prefere?
                 </div>
 
                 {/* Status do jogo */}
-                <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem', marginBottom: '2rem', textAlign: 'center' }}>
+                <div style={{ 
+                    background: currentThemeData.gradient, 
+                    padding: '0.75rem 1rem', 
+                    borderRadius: '0.5rem', 
+                    marginBottom: '2rem', 
+                    textAlign: 'center',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                }}>
                     <span style={{
                         color: '#ffffff',
                         fontSize: '1.1rem',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
                     }}>
-                        Status: {liveGame.status === 'accepting' ? 'Aceitando Palpites' :
-                                liveGame.status === 'closed' ? 'Palpites Encerrados' :
-                                liveGame.status === 'finished' ? 'Jogo Finalizado' : liveGame.status}
+                        <span style={{
+                            display: 'inline-block',
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            backgroundColor: liveGame.status === 'accepting' ? '#10B981' : 
+                                           liveGame.status === 'closed' ? '#F59E0B' : 
+                                           liveGame.status === 'finished' ? '#EF4444' : '#9CA3AF',
+                            boxShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
+                        }}></span>
+                        {liveGame.status === 'accepting' ? 'Aceitando Palpites' :
+                         liveGame.status === 'closed' ? 'Palpites Encerrados' :
+                         liveGame.status === 'finished' ? 'Jogo Finalizado' : liveGame.status}
                     </span>
                 </div>
 

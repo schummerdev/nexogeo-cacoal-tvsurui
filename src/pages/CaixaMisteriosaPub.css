@@ -1,8 +1,13 @@
 /* CaixaMisteriosaPub.css - Estilo PREMIUM para a página pública da Caixa Misteriosa */
 
+/* Forçar o tema escuro em todos os elementos */
+html, body, #root, .caixa-misteriosa-pub-container {
+  color-scheme: dark !important;
+}
+
 .caixa-misteriosa-pub-container {
-  background: #0f172a; /* slate-900 */
-  color: #e5e7eb; /* slate-200 */
+  background: #0f172a !important; /* slate-900 */
+  color: #f1f5f9 !important; /* slate-100 - mais claro para melhor legibilidade */
   min-height: 100vh;
   position: relative;
   overflow: hidden;
@@ -70,7 +75,7 @@
 .caixa-misteriosa-pub-container .card,
 .caixa-misteriosa-pub-container > div,
 .caixa-misteriosa-pub-container > div > div {
-  background: rgba(15, 23, 42, 0.95) !important; /* slate-900 */
+  background: rgba(15, 23, 42, 1) !important; /* slate-900 - removido alpha para melhor opacidade */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: 12px !important;
@@ -127,8 +132,20 @@
 .caixa-misteriosa-pub-container input,
 .caixa-misteriosa-pub-container select,
 .caixa-misteriosa-pub-container textarea,
-.caixa-misteriosa-pub-container input::placeholder {
+.caixa-misteriosa-pub-container input::placeholder,
+.caixa-misteriosa-pub-container input[type="text"],
+.caixa-misteriosa-pub-container input[type="email"],
+.caixa-misteriosa-pub-container input[type="password"],
+.caixa-misteriosa-pub-container input[type="number"],
+.caixa-misteriosa-pub-container input[type="tel"],
+.caixa-misteriosa-pub-container input[type="date"],
+.caixa-misteriosa-pub-container input[type="time"],
+.caixa-misteriosa-pub-container input[type="search"] {
   color: #e2e8f0 !important; /* slate-200 - cor clara para melhor contraste */
+  background-color: #1e293b !important; /* slate-800 - fundo mais escuro para inputs */
+  border: 1px solid #334155 !important; /* slate-700 - borda sutil */
+  border-radius: 0.375rem !important; /* 6px */
+  padding: 0.5rem 0.75rem !important;
 }
 
 /* Melhorar contraste para textos de ajuda/dicas */
@@ -185,6 +202,14 @@
 
 /* Estilizar inputs */
 .caixa-misteriosa-pub-container input,
+.caixa-misteriosa-pub-container input[type="text"],
+.caixa-misteriosa-pub-container input[type="email"],
+.caixa-misteriosa-pub-container input[type="password"],
+.caixa-misteriosa-pub-container input[type="number"],
+.caixa-misteriosa-pub-container input[type="tel"],
+.caixa-misteriosa-pub-container input[type="date"],
+.caixa-misteriosa-pub-container input[type="time"],
+.caixa-misteriosa-pub-container input[type="search"],
 .caixa-misteriosa-pub-container select,
 .caixa-misteriosa-pub-container textarea {
   background-color: rgba(30, 41, 59, 0.9) !important; /* slate-800 com transparência reduzida */
