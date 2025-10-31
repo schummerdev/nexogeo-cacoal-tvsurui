@@ -4,6 +4,81 @@ Este arquivo documenta pontos de restauração importantes do projeto.
 
 ---
 
+## v1.0.2-caixa-misteriosa-temas - Caixa Misteriosa Temática (2025-10-31)
+
+**Commit:** `3071811` | **Tag:** `v1.0.2-caixa-misteriosa-temas`
+
+### 🎯 Estado do Sistema
+
+Versão estável com Caixa Misteriosa Pública completamente temática com suporte a múltiplos temas (preto, verde, vermelho) e contraste adequado em todos os elementos.
+
+### ✅ Melhorias Implementadas
+
+**1. Temas Dinâmicos Completos**
+- Suporte para temas: preto (padrão), verde e vermelho
+- Cores primárias, secundárias e bordas adaptadas por tema
+- Seletor de tema funcional na página pública
+
+**2. Rodapé NexoGeo Temático**
+- Fundo adaptado ao tema (`currentThemeData.surface`)
+- Texto com contraste máximo (`currentThemeData.text`)
+- Botão com cor primária do tema + texto branco
+- Borda e sombra adaptadas ao tema
+
+**3. Contraste e Acessibilidade**
+- Texto descritivo em `currentThemeData.text` para legibilidade
+- Botão usa `currentThemeData.primary` com texto branco (#ffffff)
+- Box-shadow com opacidade ajustada por tema
+- fontWeight aumentado para melhor visibilidade
+
+**4. Refatoração de Código**
+- CSS externo removido (CaixaMisteriosaPub.css)
+- Estilos substituídos por variáveis dinâmicas
+- Renderização condicional otimizada
+- Cores hardcoded eliminadas
+
+### 🔄 Commits Inclusos
+
+```
+3071811 chore: Marca versão estável v1.0.2-caixa-misteriosa-temas
+6c71ebb fix: Melhora contraste de texto e botão no rodapé NexoGeo
+e427f1c fix: Aplica tema dinâmico ao rodapé "Conheça o NexoGeo"
+f8dcedb refactor: Remove CSS externo e refatora estilos inline
+1ad6674 refactor: Simplifica renderização condicional do componente
+d0a9fcc fix: Ajusta indentação do rodapé NexoGeo
+40b037c fix: Corrige estrutura de tags e indentação do rodapé
+c904f00 fix: Corrige indentação e fechamento de tags
+0228f11 fix: Mostra Palavra Secreta apenas quando jogo está ativo
+39a0c91 fix: Corrige verificação de tema usando currentThemeData.name
+b9b2e49 fix: Melhora renderização de gradientes
+611c65e fix: Simplifica e otimiza estilos
+f700ead refactor: Reorganiza estrutura da Caixa Misteriosa
+10baa11 fix: Aprimora tema verde e vermelho
+```
+
+### 📋 Como Recuperar
+
+Para restaurar para esta versão estável:
+
+```bash
+# Usando tag
+git checkout v1.0.2-caixa-misteriosa-temas
+
+# Ou usando commit
+git reset --hard 3071811
+```
+
+### ✨ Testes Realizados
+
+- ✅ Tema preto: Rodapé com fundo escuro, texto claro
+- ✅ Tema verde: Rodapé com fundo verde, botão verde primário
+- ✅ Tema vermelho: Rodapé com fundo vermelho, botão vermelho primário
+- ✅ Contraste WCAG adequado em todos os temas
+- ✅ Botão clicável com cursor pointer
+- ✅ Logo do NexoGeo visível em todos os temas
+
+---
+
 ## v2.5 - Correções de Contagens (2025-10-24)
 
 **Commit:** `61c7c87` | **Tag:** `v2.5`
