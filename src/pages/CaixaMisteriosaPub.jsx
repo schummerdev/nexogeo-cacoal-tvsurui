@@ -1502,9 +1502,9 @@ E aí, qual você prefere?
                     </a>
                 </div>
             </div>
-
-        </main>
-    );
+        </div>
+    </main>
+);
 };
 
 export default CaixaMisteriosaPub;
