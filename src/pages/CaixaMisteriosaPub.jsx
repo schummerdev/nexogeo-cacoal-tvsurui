@@ -1439,15 +1439,14 @@ E aí, qual você prefere?
                     )}
                 </div>
             </div>
-        </div>
 
-        {/* Rodapé NexoGeo */}
-        <div style={{
-            marginTop: '2rem',
-            textAlign: 'center'
-        }}>
+            {/* Rodapé NexoGeo */}
             <div style={{
-                background: 'rgba(255, 255, 255, 0.9)',
+                marginTop: '2rem',
+                textAlign: 'center'
+            }}>
+                <div style={{
+                    background: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(10px)',
                     padding: '1.5rem',
                     borderRadius: '15px',
