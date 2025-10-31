@@ -121,7 +121,16 @@ async function realizarSorteio(req, res) {
       });
     }
 
-    const quantidade = promocaoInfo.rows[0].numero_ganhadores || 3;
+    let quantidade = parseInt(promocaoInfo.rows[0].numero_ganhadores, 10) || 3;
+
+    // Validar que quantidade está entre 1 e 3
+    if (isNaN(quantidade) || quantidade < 1) {
+      quantidade = 1;
+    } else if (quantidade > 3) {
+      quantidade = 3;
+    }
+
+    console.log(`📊 Sorteio configurado para ${quantidade} ganhador(es)`);
 
     // Verificar se já existem ganhadores para esta promoção e cancelá-los automaticamente
     const existingWinners = await databasePool.query(`

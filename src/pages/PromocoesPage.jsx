@@ -101,7 +101,7 @@ const PromocoesPage = () => {
     const { name, value } = e.target;
     setPromoData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'numero_ganhadores' ? parseInt(value, 10) : value
     }));
   };
 
