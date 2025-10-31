@@ -368,6 +368,8 @@ async function processarGanhadores(req, res) {
       ORDER BY g.posicao
     `, [promocaoId]);
 
+    console.log(`📊 [GANHADORES] Promo ${promocaoId} - Ganhadores existentes retornados: ${ganhadoresExistentes.rows.length}`);
+
     // Se não existem ganhadores, criar alguns baseado nos participantes
     if (ganhadoresExistentes.rows.length === 0) {
       const participantesResult = await databasePool.query(`
@@ -426,6 +428,11 @@ async function processarGanhadores(req, res) {
     // Isso evita exibir dados fake quando a promoção não tem ganhadores
     ganhadores = [];
   }
+
+  console.log(`📊 [GANHADORES] Response final - total: ${ganhadores.length}, data array length: ${ganhadores.length}`);
+  ganhadores.forEach((g, idx) => {
+    console.log(`  ${idx + 1}. ${g.nome} - Posição: ${g.posicao}`);
+  });
 
   return res.status(200).json({
     success: true,
