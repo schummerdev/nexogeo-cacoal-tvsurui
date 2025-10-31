@@ -610,9 +610,9 @@ E aí, qual você prefere?
             color: currentThemeData.text
         },
         card: {
-            width: '100%', maxWidth: '600px', background: currentThemeData.surface,
-            padding: '2rem', borderRadius: '1rem', boxShadow: `0 8px 32px ${currentThemeData.primary}33`,
-            backdropFilter: 'blur(10px)', border: `1px solid ${currentThemeData.border}`
+            width: '100%', maxWidth: '600px', background: 'rgba(15, 23, 42, 0.92)',
+            padding: '2rem', borderRadius: '1rem', boxShadow: `0 8px 32px rgba(2, 6, 23, 0.5)`,
+            backdropFilter: 'blur(16px)', border: '1px solid rgba(148, 163, 184, 0.2)', color: '#e5e7eb'
         },
         winnerCard: {
             width: '100%', maxWidth: '600px', background: currentThemeData.gradient,
@@ -643,9 +643,9 @@ E aí, qual você prefere?
             cursor: 'pointer', marginTop: '1rem', boxShadow: `0 2px 8px ${currentThemeData.primary}4D`
         },
         submissionItem: {
-            background: currentThemeData.surface, padding: '1rem', borderRadius: '0.5rem',
-            marginBottom: '0.75rem', border: `2px solid ${currentThemeData.secondary}`,
-            color: currentThemeData.text
+            background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem',
+            marginBottom: '0.75rem', border: '2px solid rgba(79, 70, 229, 0.3)',
+            color: '#e5e7eb'
         },
         correctSubmission: {
             background: currentThemeData.gradient,
@@ -693,7 +693,7 @@ E aí, qual você prefere?
                             Não há nenhum jogo da Caixa Misteriosa ativo no momento.<br/>
                             Os administradores precisam configurar e iniciar um novo jogo.
                         </p>
-                        <div style={{ background: currentThemeData.surface, padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'left', border: `1px solid ${currentThemeData.border}` }}>
+                        <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'left', border: '1px solid rgba(148, 163, 184, 0.2)', color: '#e5e7eb' }}>
                             <h3 style={{ color: currentThemeData.success, marginBottom: '1rem' }}>💡 Como funciona:</h3>
                             <ul style={{ color: currentThemeData.text, listStyle: 'none', padding: 0 }}>
                                 <li style={{ marginBottom: '0.5rem' }}>• Cadastre-se para participar quando um jogo estiver ativo</li>
@@ -859,11 +859,11 @@ E aí, qual você prefere?
                     <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {revealedClues.length > 0 ?
                             revealedClues.map((clue, index) => (
-                                <li key={index} style={{ background: currentThemeData.secondary, padding: '1rem', borderRadius: '0.5rem', border: `2px solid ${currentThemeData.primary}`, color: currentThemeData.text }}>
+                                <li key={index} style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', border: `2px solid ${currentThemeData.primary}`, color: '#e5e7eb' }}>
                                     <strong style={{ color: currentThemeData.primary }}>Dica {index + 1}:</strong> {clue}
                                 </li>
                             )) : (
-                                <li style={{ background: currentThemeData.surface, padding: '1rem', borderRadius: '0.5rem', textAlign: 'center', color: currentThemeData.textSecondary, border: `1px solid ${currentThemeData.border}` }}>
+                                <li style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center', color: '#94a3b8', border: `1px solid rgba(148, 163, 184, 0.2)` }}>
                                     Nenhuma dica revelada ainda.
                                 </li>
                             )
@@ -941,7 +941,7 @@ E aí, qual você prefere?
                                 gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
                                 gap: '1rem',
                                 marginBottom: '0',
-                                background: currentThemeData.surface,
+                                background: 'rgba(15, 23, 42, 0.85)',
                                 padding: '1rem',
                                 borderRadius: '0 0 0.5rem 0.5rem'
                             }}>
@@ -993,7 +993,7 @@ E aí, qual você prefere?
                                     readOnly
                                 />
                             )}
-                            <div style={{ background: currentThemeData.surface, padding: '0 1rem 1rem 1rem' }}>
+                            <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '0 1rem 1rem 1rem' }}>
                                 <button
                                     type="submit"
                                     style={styles.button}
@@ -1302,11 +1302,12 @@ E aí, qual você prefere?
                             {/* Histórico de compartilhamentos */}
                             {participant && (
                                 <div style={{
-                                    background: currentThemeData.surface,
+                                    background: 'rgba(15, 23, 42, 0.85)',
                                     padding: '1.5rem',
                                     borderRadius: '0.75rem',
                                     marginTop: '2rem',
-                                    border: `1px solid ${currentThemeData.border}`
+                                    border: '1px solid rgba(148, 163, 184, 0.2)',
+                                    color: '#e5e7eb'
                                 }}>
                                     <div style={{ marginBottom: '1rem' }}>
                                         <h4 style={{ color: currentThemeData.success, margin: 0, fontSize: '1.2rem' }}>
@@ -1317,13 +1318,13 @@ E aí, qual você prefere?
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                             {referrals.map((ref, idx) => (
                                             <div key={idx} style={{
-                                                background: currentThemeData.background,
+                                                background: 'rgba(30, 41, 59, 0.7)',
                                                 padding: '0.75rem',
                                                 borderRadius: '0.5rem',
                                                 display: 'flex',
                                                 justifyContent: 'space-between',
                                                 alignItems: 'center',
-                                                border: `1px solid ${currentThemeData.border}`
+                                                border: '1px solid rgba(148, 163, 184, 0.2)'
                                             }}>
                                                 <div style={{ flex: 1 }}>
                                                     <div>
@@ -1368,11 +1369,12 @@ E aí, qual você prefere?
                     {/* Feed de últimos palpites (público) */}
                     {liveGame && recentSubmissions.length > 0 && (
                         <div style={{
-                            background: currentThemeData.surface,
+                            background: 'rgba(15, 23, 42, 0.85)',
                             padding: '1.5rem',
                             borderRadius: '0.75rem',
                             marginTop: '2rem',
-                            border: `1px solid ${currentThemeData.border}`
+                            border: '1px solid rgba(148, 163, 184, 0.2)',
+                            color: '#e5e7eb'
                         }}>
                             <h4 style={{ color: currentThemeData.primary, margin: '0 0 1rem 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 🔥 Últimos Palpites
@@ -1388,11 +1390,12 @@ E aí, qual você prefere?
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                 {recentSubmissions.map((sub, idx) => (
                                     <div key={idx} style={{
-                                        background: currentThemeData.background,
+                                        background: 'rgba(30, 41, 59, 0.7)',
                                         padding: '1rem',
                                         borderRadius: '0.5rem',
                                         borderLeft: `4px solid ${currentThemeData.primary}`,
-                                        border: `1px solid ${currentThemeData.border}`
+                                        border: '1px solid rgba(148, 163, 184, 0.2)',
+                                        color: '#e5e7eb'
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                                             <span style={{ color: currentThemeData.text, fontWeight: '600', fontSize: '1rem' }}>
