@@ -1,0 +1,14 @@
+api/
+|-- node_modules/
+|-- src/
+|   |-- controllers/
+|   |   |-- participanteController.js  (A lógica para criar o participante)
+|   |-- routes/
+|   |   |-- participanteRoutes.js      (Define a rota POST /participantes)
+|   |-- services/
+|   |   |-- db.js                      (Configuração da conexão com o banco de dados)
+|   |-- app.js                         (Arquivo principal do Express)
+|   |-- server.js                      (Arquivo que inicia o servidor)
+|-- .env                             (Arquivo para variáveis de ambiente, como a conexão do DB)
+|-- package.json
+

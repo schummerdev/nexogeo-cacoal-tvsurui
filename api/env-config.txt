@@ -1,0 +1,14 @@
+# ARQUIVO .env - Copie este conteúdo para um arquivo .env na pasta src/
+
+# Configurações do Banco de Dados PostgreSQL
+DB_USER=postgres
+DB_HOST=postgres_postgres.1
+DB_DATABASE=postgres
+DB_PASSWORD=sua_senha_aqui
+DB_PORT=5432
+
+# Chave Secreta para JWT
+JWT_SECRET=nexogeo-jwt-secret-key-2024-super-segura-123456789
+
+# Porta do Servidor
+PORT=3001 

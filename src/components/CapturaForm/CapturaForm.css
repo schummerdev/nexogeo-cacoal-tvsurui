@@ -1,0 +1,528 @@
+/* src/components/CapturaForm/CapturaForm.css */
+
+.container-captura {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: clamp(1rem, 3vw, 2rem);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.form-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(1.5rem, 4vw, 2rem);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  max-width: 450px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Logo do sistema NexoGeo */
+.sistema-logo {
+  margin-bottom: 1.5rem;
+}
+
+.sistema-logo a {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.logo-nexogeo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border-radius: 15px;
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 215, 0, 0.5);
+}
+
+.logo-nexogeo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+}
+
+.logo-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: -0.5px;
+}
+
+/* Logo da emissora principal */
+.emissora-logo-section {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.logo-emissora-principal {
+  max-width: 150px;
+  max-height: 100px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Nome da emissora quando não há logo */
+.emissora-nome-section {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.nome-emissora-principal {
+  margin: 0;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  color: #333;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Logo da emissora (fallback - manter para compatibilidade) */
+.logo-emissora {
+  max-width: 120px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  margin-bottom: 1rem;
+  object-fit: contain;
+}
+
+/* Nome da emissora (fallback - manter para compatibilidade) */
+.nome-emissora {
+  margin: 0 0 1rem 0;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Informações da promoção */
+.promocao-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.promocao-titulo {
+  margin: 0 0 0.5rem 0;
+  font-size: clamp(1.5rem, 4vw, 1.75rem);
+  color: #333;
+  font-weight: 900;
+  line-height: 1.2;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.promocao-descricao {
+  margin: 0;
+  color: #64748b;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333 !important;
+  font-size: 1rem;
+  text-shadow: none;
+  background: transparent;
+}
+
+.form-group input {
+  width: 100%;
+  padding: clamp(0.75rem, 2vw, 0.875rem);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  background: white;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.form-footer button {
+  width: 100%;
+  padding: clamp(0.75rem, 2vw, 0.875rem);
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #fff;
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.form-footer button:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.form-footer button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error-message {
+  color: #dc2626;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+}
+
+/* Estilos para a tela de sucesso */
+.card-sucesso {
+  text-align: center;
+  background: #fff;
+  padding: clamp(2rem, 5vw, 3rem);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: scaleIn 0.3s ease-out;
+}
+
+.icone-sucesso {
+  font-size: clamp(3rem, 8vw, 4rem);
+  color: #10b981;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+/* Media Queries Responsivas */
+@media (max-width: 480px) {
+  .container-captura {
+    padding: 0.5rem;
+  }
+  
+  .form-card {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .form-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .form-header p {
+    font-size: 0.875rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group input {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .form-footer button {
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+  
+  .card-sucesso {
+    padding: 2rem 1.5rem;
+  }
+  
+  .icone-sucesso {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .form-card {
+    padding: 1.75rem;
+    max-width: 500px;
+  }
+  
+  .card-sucesso {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .form-card {
+    padding: 2rem;
+    max-width: 500px;
+  }
+  
+  .card-sucesso {
+    padding: 2.75rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .form-card {
+    padding: 2rem;
+    max-width: 500px;
+  }
+  
+  .card-sucesso {
+    padding: 3rem;
+  }
+}
+
+/* Orientação paisagem em dispositivos móveis */
+@media (max-height: 500px) and (orientation: landscape) {
+  .container-captura {
+    padding: 0.5rem;
+  }
+  
+  .form-card {
+    padding: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  .card-sucesso {
+    padding: 2rem;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Estados de hover apenas em dispositivos que suportam */
+@media (hover: hover) {
+  .form-footer button:hover {
+    transform: translateY(-1px);
+  }
+  
+  .form-group input:hover {
+    border-color: #9ca3af;
+  }
+}
+
+/* Estados de hover em dispositivos touch */
+@media (hover: none) {
+  .form-footer button:active {
+    transform: translateY(0);
+  }
+  
+  .form-group input:active {
+    border-color: #9ca3af;
+  }
+}
+
+/* Temas de cores para diferentes emissoras */
+.tema-azul .form-footer button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.tema-azul .form-footer button:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.tema-azul .form-group input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tema-verde .form-footer button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.tema-verde .form-footer button:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.tema-verde .form-group input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.tema-vermelho .form-footer button {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.tema-vermelho .form-footer button:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.tema-vermelho .form-group input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.tema-roxo .form-footer button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+}
+
+.tema-roxo .form-footer button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.tema-roxo .form-group input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+/* Rodapé NexoGeo */
+.nexogeo-footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.nexogeo-info {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.nexogeo-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.nexogeo-logo-footer {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.nexogeo-logo-small {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.nexogeo-text {
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.nexogeo-description {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.nexogeo-link {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.nexogeo-link:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .nexogeo-footer {
+    margin-top: 1.5rem;
+  }
+
+  .nexogeo-info {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .nexogeo-logo-footer {
+    width: 100px;
+  }
+
+  .nexogeo-link {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+  }
+}

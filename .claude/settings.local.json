@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npm test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: Corrige erro TypeError na funcionalidade Caixa Misteriosa\n\n- Fix: Adiciona verificações defensivas para prevenir erro ''Cannot read properties of undefined (reading productName)''\n- Fix: Implementa fallbacks em WinnerDisplay.jsx para productName undefined\n- Fix: Adiciona verificações de segurança em LiveControlView.jsx com optional chaining\n- Fix: Corrige URLs da API no hook useCaixaMisteriosa.js para padrão correto\n- Fix: Implementa estrutura de dados mock completa na API caixa-misteriosa.js\n- Fix: Substitui mock de autenticação por contexto real em CaixaMisteriosaPage.jsx\n- Docs: Atualiza CLAUDE.md para português brasileiro\n- Fix: Adiciona endpoints ausentes na API (reveal-clue, end-submissions, etc.)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(vercel:*)",
+      "Bash(git commit:*)",
+      "Bash(npm start)",
+      "Bash(PORT=3001 npm start)",
+      "Bash(npx vercel:*)",
+      "Bash(VERCEL_TOKEN=Bf3IOYIND0TtyuO0Tfsrb4cu npx vercel --prod)",
+      "Bash(PORT=3002 node server.js)",
+      "Bash(curl:*)",
+      "Bash(del \"C:\\schummerdev\\nexogeo\\api\\caixa-misteriosa-live.js\")",
+      "Bash(npm run test:ci:*)",
+      "Bash(cross-env CI=true npm run test -- --coverage --watchAll=false --passWithNoTests)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(npm run test:sprite:*)",
+      "Bash(timeout:*)",
+      "Bash(npm audit:*)",
+      "Bash(set CI=true)",
+      "Bash(npm run test:*)",
+      "Bash(ren:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(git tag:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git reset:*)",
+      "Bash(node:*)",
+      "Bash(PORT=3002 node:*)",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_7EADUX3QeGaO@ep-hidden-fog-ac2jlx9e-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require\" node:*)",
+      "Bash(rm:*)",
+      "Bash(VERCEL_TOKEN=Bf3IOYIND0TtyuO0Tfsrb4cu npx vercel:*)"
+    ]
+  },
+  
+  ]
+}

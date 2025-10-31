@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexoGeo - Limpeza de Cache</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.15);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .alert {
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 NexoGeo - Atualização</h1>
+
+        <div class="success">
+            <h3>✅ APIs Corrigidas!</h3>
+            <p>As correções foram aplicadas com sucesso. A Caixa Misteriosa está funcionando!</p>
+        </div>
+
+        <div class="alert">
+            <h3>⚠️ Cache do Navegador</h3>
+            <p>Você ainda pode estar vendo a versão antiga devido ao cache. Siga os passos abaixo:</p>
+        </div>
+
+        <div class="step">
+            <h3>1️⃣ Limpar Cache (Recomendado)</h3>
+            <p><strong>Windows/Linux:</strong> Pressione <code>Ctrl + Shift + R</code></p>
+            <p><strong>Mac:</strong> Pressione <code>Cmd + Shift + R</code></p>
+            <p>Ou pressione <code>F5</code> várias vezes</p>
+        </div>
+
+        <div class="step">
+            <h3>2️⃣ Modo Incógnito (Alternativa)</h3>
+            <p>Abra uma nova janela anônima/incógnita e acesse:</p>
+            <a href="https://nexogeo.vercel.app/dashboard/caixa-misteriosa" class="btn" target="_blank">
+                🎮 Caixa Misteriosa (Nova Janela)
+            </a>
+        </div>
+
+        <div class="step">
+            <h3>3️⃣ URL Direta (Garantido)</h3>
+            <p>Use temporariamente a URL direta do deploy:</p>
+            <a href="https://nexogeo-hx12uq61v-schummerdevs-projects.vercel.app/dashboard/caixa-misteriosa" class="btn" target="_blank">
+                🚀 URL Direta (100% Funcionando)
+            </a>
+        </div>
+
+        <div class="success">
+            <h3>✨ O Que Está Funcionando Agora:</h3>
+            <ul>
+                <li>✅ Geração de dicas com IA (Google Gemini)</li>
+                <li>✅ Iniciar jogo da Caixa Misteriosa</li>
+                <li>✅ Gerenciar patrocinadores e produtos</li>
+                <li>✅ Todas as APIs da Caixa Misteriosa</li>
+            </ul>
+        </div>
+
+        <p style="text-align: center; margin-top: 30px; opacity: 0.8;">
+            <small>Atualização aplicada em: <span id="timestamp"></span></small>
+        </p>
+    </div>
+
+    <script>
+        // Mostrar timestamp atual
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('pt-BR');
+
+        // Auto-refresh da página a cada 30 segundos para verificar se cache foi limpo
+        setTimeout(() => {
+            if (confirm('Tentar recarregar automaticamente para verificar se o cache foi limpo?')) {
+                window.location.reload(true);
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

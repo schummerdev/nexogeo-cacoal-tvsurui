@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Legal LGPD - NexoGeo2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1e293b; border-bottom: 3px solid #8b5cf6; padding-bottom: 1rem; }
+        h2 { color: #334155; margin-top: 2rem; }
+        .highlight { background: #e0e7ff; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .legal-base { background: #f0f9ff; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #0ea5e9; }
+        .article { background: #fefce8; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .date { color: #64748b; font-style: italic; }
+        .back-btn {
+            display: inline-block;
+            background: #8b5cf6;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard/configuracoes" class="back-btn">← Voltar às Configurações</a>
+
+        <h1>🛡️ Base Legal LGPD</h1>
+        <p class="date">Referência: Lei nº 13.709/2018 (Lei Geral de Proteção de Dados)</p>
+
+        <div class="highlight">
+            <strong>📋 Resumo Executivo:</strong> Este documento apresenta as bases legais que fundamentam o tratamento de dados pessoais no sistema NexoGeo2, em conformidade com a LGPD.
+        </div>
+
+        <h2>1. 📜 Fundamento Legal</h2>
+        <p>O tratamento de dados pessoais no sistema NexoGeo2 está fundamentado nos seguintes artigos da LGPD:</p>
+
+        <div class="article">
+            <strong>Art. 7º, I - CONSENTIMENTO:</strong><br>
+            "mediante o fornecimento de consentimento pelo titular"
+        </div>
+
+        <div class="article">
+            <strong>Art. 7º, II - CUMPRIMENTO DE OBRIGAÇÃO LEGAL:</strong><br>
+            "para o cumprimento de obrigação legal ou regulatória pelo controlador"
+        </div>
+
+        <div class="article">
+            <strong>Art. 7º, V - EXECUÇÃO DE CONTRATO:</strong><br>
+            "quando necessário para a execução de contrato ou de procedimentos preliminares relacionados a contrato do qual seja parte o titular"
+        </div>
+
+        <div class="article">
+            <strong>Art. 7º, IX - INTERESSE LEGÍTIMO:</strong><br>
+            "quando necessário para atender aos interesses legítimos do controlador ou de terceiro"
+        </div>
+
+        <h2>2. ⚖️ Aplicação das Bases Legais</h2>
+
+        <h3>🤝 Consentimento (Art. 7º, I)</h3>
+        <div class="legal-base">
+            <strong>Aplicação:</strong> Cadastro de participantes em promoções<br>
+            <strong>Dados tratados:</strong> Nome, CPF, telefone, e-mail, endereço<br>
+            <strong>Finalidade:</strong> Participação em promoções e sorteios<br>
+            <strong>Forma de coleta:</strong> Formulário de cadastro com checkbox de consentimento<br>
+            <strong>Revogação:</strong> Pode ser revogado a qualquer momento
+        </div>
+
+        <h3>📋 Cumprimento de Obrigação Legal (Art. 7º, II)</h3>
+        <div class="legal-base">
+            <strong>Aplicação:</strong> Declaração de prêmios para Receita Federal<br>
+            <strong>Dados tratados:</strong> CPF, nome e valor do prêmio dos ganhadores<br>
+            <strong>Finalidade:</strong> Cumprimento da legislação tributária<br>
+            <strong>Base legal específica:</strong> RIR/2018 (Decreto nº 9.580/2018)<br>
+            <strong>Retenção:</strong> 5 anos conforme legislação fiscal
+        </div>
+
+        <h3>📝 Execução de Contrato (Art. 7º, V)</h3>
+        <div class="legal-base">
+            <strong>Aplicação:</strong> Entrega de prêmios aos ganhadores<br>
+            <strong>Dados tratados:</strong> Nome, endereço, telefone para entrega<br>
+            <strong>Finalidade:</strong> Cumprimento da obrigação de entregar o prêmio<br>
+            <strong>Duração:</strong> Até a conclusão da entrega do prêmio
+        </div>
+
+        <h3>🛡️ Interesse Legítimo (Art. 7º, IX)</h3>
+        <div class="legal-base">
+            <strong>Aplicação:</strong> Logs de auditoria e segurança do sistema<br>
+            <strong>Dados tratados:</strong> IP, data/hora de acesso, ações realizadas<br>
+            <strong>Finalidade:</strong> Segurança, prevenção de fraudes e auditoria<br>
+            <strong>Teste de balanceamento:</strong> Interesse legítimo prevalece sobre direitos do titular<br>
+            <strong>Retenção:</strong> 2 anos para logs de auditoria
+        </div>
+
+        <h2>3. 📊 Dados Sensíveis</h2>
+        <div class="article">
+            <strong>Art. 11, II, c - EXECUÇÃO DE POLÍTICAS PÚBLICAS:</strong><br>
+            O sistema não trata dados sensíveis. Todos os dados coletados são considerados dados pessoais comuns conforme Art. 5º, I da LGPD.
+        </div>
+
+        <h2>4. 🔍 Auditoria e Transparência</h2>
+        <p>Conforme Art. 37 da LGPD, mantemos registros de todas as operações de tratamento:</p>
+        <ul>
+            <li>Data e hora de cada operação</li>
+            <li>Usuário responsável pela operação</li>
+            <li>Dados acessados ou modificados</li>
+            <li>Finalidade do acesso</li>
+            <li>Base legal aplicável</li>
+        </ul>
+
+        <h2>5. 👤 Direitos dos Titulares</h2>
+        <p>Garantimos todos os direitos previstos no Art. 18 da LGPD:</p>
+        <ul>
+            <li><strong>I - Confirmação e acesso:</strong> Interface dedicada para consulta</li>
+            <li><strong>II - Correção:</strong> Formulário de atualização de dados</li>
+            <li><strong>III - Anonimização/bloqueio/eliminação:</strong> Processo automatizado</li>
+            <li><strong>IV - Portabilidade:</strong> Exportação em formato estruturado</li>
+            <li><strong>V - Eliminação:</strong> Exclusão completa quando aplicável</li>
+            <li><strong>VI - Informação sobre compartilhamento:</strong> Relatório detalhado</li>
+            <li><strong>VIII - Revogação do consentimento:</strong> Processo simplificado</li>
+        </ul>
+
+        <h2>6. 🔐 Medidas de Segurança</h2>
+        <p>Implementamos medidas técnicas e organizacionais conforme Art. 46 da LGPD:</p>
+        <ul>
+            <li>Criptografia de dados em trânsito e em repouso</li>
+            <li>Controle de acesso baseado em perfis</li>
+            <li>Logs de auditoria abrangentes</li>
+            <li>Backups seguros e criptografados</li>
+            <li>Monitoramento contínuo de segurança</li>
+            <li>Treinamento regular da equipe</li>
+        </ul>
+
+        <h2>7. 📞 Encarregado de Dados (DPO)</h2>
+        <div class="legal-base">
+            <strong>Conforme Art. 41 da LGPD:</strong><br>
+            <strong>Nome:</strong> [Nome do DPO]<br>
+            <strong>E-mail:</strong> dpo@nexogeo2.com.br<br>
+            <strong>Telefone:</strong> (11) 9999-9999<br>
+            <strong>Função:</strong> Orientar colaboradores e realizar auditoria interna
+        </div>
+
+        <h2>8. 🔄 Revisão e Atualização</h2>
+        <p>Esta base legal é revisada:</p>
+        <ul>
+            <li>Semestralmente pela equipe jurídica</li>
+            <li>Sempre que houver mudanças na legislação</li>
+            <li>Quando novos tipos de dados forem tratados</li>
+            <li>Em caso de alterações no sistema</li>
+        </ul>
+
+        <h2>9. 📋 Relatórios de Conformidade</h2>
+        <p>Disponibilizamos relatórios periódicos sobre:</p>
+        <ul>
+            <li>Operações de tratamento realizadas</li>
+            <li>Exercício de direitos pelos titulares</li>
+            <li>Incidentes de segurança (se houver)</li>
+            <li>Medidas de adequação implementadas</li>
+        </ul>
+
+        <div class="highlight">
+            <strong>⚖️ Conformidade Total:</strong><br>
+            Este sistema está em total conformidade com a Lei 13.709/2018 (LGPD), Decreto 10.474/2020 e orientações da Autoridade Nacional de Proteção de Dados (ANPD).
+        </div>
+
+        <div class="legal-base">
+            <strong>📧 Contato para questões de privacidade:</strong><br>
+            E-mail: <a href="mailto:dpo@nexogeo2.com.br">dpo@nexogeo2.com.br</a><br>
+            Telefone: (11) 9999-9999<br>
+            Prazo de resposta: Até 15 dias úteis conforme Art. 19 da LGPD
+        </div>
+    </div>
+</body>
+</html>

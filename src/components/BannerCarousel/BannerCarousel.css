@@ -1,0 +1,103 @@
+.banner-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto 30px;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.banner-slide {
+  width: 100%;
+  height: auto;
+  position: relative;
+}
+
+.banner-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  max-height: 400px;
+}
+
+.banner-slide a {
+  display: block;
+  cursor: pointer;
+}
+
+.banner-slide a:hover img {
+  opacity: 0.95;
+  transition: opacity 0.3s ease;
+}
+
+/* Indicadores de navegação */
+.banner-indicators {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.indicator:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.1);
+}
+
+.indicator.active {
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .banner-carousel {
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .banner-slide img {
+    max-height: 250px;
+  }
+
+  .banner-indicators {
+    bottom: 10px;
+    gap: 8px;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-slide img {
+    max-height: 180px;
+  }
+
+  .banner-indicators {
+    bottom: 8px;
+    gap: 6px;
+  }
+
+  .indicator {
+    width: 8px;
+    height: 8px;
+  }
+}

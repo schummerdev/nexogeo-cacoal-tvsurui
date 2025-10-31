@@ -1,0 +1,146 @@
+/* src/components/ThemeSelector/ThemeSelector.css */
+
+/* Seletor inline para configurações */
+.theme-selector-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-label {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.theme-select {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+.theme-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+/* Seletor dropdown para header */
+.theme-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-selector-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.theme-selector-trigger:hover {
+  background: var(--color-secondary);
+  border-color: var(--color-primary);
+}
+
+.theme-icon {
+  font-size: 1rem;
+}
+
+.theme-name {
+  font-weight: 500;
+}
+
+.theme-arrow {
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.theme-arrow.open {
+  transform: rotate(180deg);
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 160px;
+  overflow: hidden;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
+
+.theme-option:hover {
+  background: var(--color-secondary);
+}
+
+.theme-option.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.theme-preview {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.theme-option-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.theme-check {
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .theme-selector-trigger {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .theme-name {
+    display: none;
+  }
+  
+  .theme-dropdown {
+    left: 0;
+    right: 0;
+    min-width: auto;
+  }
+}

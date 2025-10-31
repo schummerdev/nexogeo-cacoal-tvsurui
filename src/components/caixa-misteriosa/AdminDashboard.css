@@ -1,0 +1,21 @@
+/* Estilos para o painel admin da Caixa Misteriosa */
+
+.caixa-misteriosa-content {
+    padding: 2rem;
+    background: var(--color-background);
+    color: var(--color-text);
+    min-height: calc(100vh - 150px);
+}
+
+/* Responsividade mobile */
+@media (max-width: 768px) {
+    .caixa-misteriosa-content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .caixa-misteriosa-content {
+        padding: 0.5rem;
+    }
+}
