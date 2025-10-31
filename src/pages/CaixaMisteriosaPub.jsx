@@ -741,8 +741,11 @@ E aí, qual você prefere?
     // 🔥 Usar usedGuessesCount do estado, não submissions.length
     const remainingGuesses = availableGuesses - usedGuessesCount;
 
+    // Determinar a classe de tema com base no tema atual
+    const themeClass = `theme-${currentThemeData.name.toLowerCase()}`;
+    
     return (
-        <main style={styles.main} className="caixa-misteriosa-pub-container">
+        <main style={styles.main} className={`caixa-misteriosa-pub-container ${themeClass}`}>
             {/* Seletor de Tema */}
             <div style={{
                 position: 'absolute',
@@ -867,47 +870,6 @@ E aí, qual você prefere?
                                     Nenhuma dica revelada ainda.
                                 </li>
                             )
-                        }
-                    </ul>
-                </div>
-
-                {/* Status do jogo */}
-                <div style={{ 
-                    background: currentThemeData.gradient, 
-                    padding: '0.75rem 1rem', 
-                    borderRadius: '0.5rem', 
-                    marginBottom: '2rem', 
-                    textAlign: 'center',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                }}>
-                    <span style={{
-                        color: '#ffffff',
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                    }}>
-                        <span style={{
-                            display: 'inline-block',
-                            width: '12px',
-                            height: '12px',
-                            borderRadius: '50%',
-                            backgroundColor: liveGame.status === 'accepting' ? '#10B981' : 
-                                           liveGame.status === 'closed' ? '#F59E0B' : 
-                                           liveGame.status === 'finished' ? '#EF4444' : '#9CA3AF',
-                            boxShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
-                        }}></span>
-                        {liveGame.status === 'accepting' ? 'Aceitando Palpites' :
-                         liveGame.status === 'closed' ? 'Palpites Encerrados' :
-                         liveGame.status === 'finished' ? 'Jogo Finalizado' : liveGame.status}
-                    </span>
-                </div>
-
-                {/* Quando jogo finalizado, mostrar palavra secreta e ganhador */}
-                {liveGame.status === 'finished' && (
-                    <div style={{
                         background: currentThemeData.gradient,
                         padding: '1.5rem',
                         borderRadius: '0.75rem',
@@ -942,6 +904,25 @@ E aí, qual você prefere?
                 {liveGame.status === 'closed' && (
                     <div style={{ textAlign: 'center', color: currentThemeData.warning, fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
                         Aguardando Sorteio do Ganhador!
+                    </div>
+                )}
+
+                {liveGame.status === 'accepting' && participant && (
+                    <div style={{ 
+                        background: currentThemeData.gradient, 
+                        padding: '0.75rem 1rem', 
+                        borderRadius: '0.5rem 0.5rem 0 0', 
+                        marginBottom: '1rem' 
+                    }}>
+                        <h3 style={{ 
+                            fontSize: '1.5rem', 
+                            fontWeight: '600', 
+                            textAlign: 'center', 
+                            margin: '0', 
+                            color: 'white' 
+                        }}>
+                            Aceitando Palpites!
+                        </h3>
                     </div>
                 )}
 
