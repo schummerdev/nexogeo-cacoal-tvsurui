@@ -326,6 +326,22 @@ async function processarGanhadores(req, res) {
       console.log('Coluna cancelado já existe ou erro ao criar:', error.message);
     }
 
+    // Buscar configuração de número de ganhadores da promoção
+    let numeroGanhadores = 3; // padrão
+    try {
+      const promoConfig = await databasePool.query(`
+        SELECT numero_ganhadores FROM promocoes WHERE id = $1
+      `, [promocaoId]);
+      if (promoConfig.rows.length > 0) {
+        numeroGanhadores = parseInt(promoConfig.rows[0].numero_ganhadores, 10) || 3;
+        // Validar bounds
+        if (numeroGanhadores < 1) numeroGanhadores = 1;
+        if (numeroGanhadores > 3) numeroGanhadores = 3;
+      }
+    } catch (error) {
+      console.log('Não foi possível buscar numero_ganhadores, usando padrão 3:', error.message);
+    }
+
     // Primeiro, buscar ganhadores já existentes
     let ganhadoresExistentes = await databasePool.query(`
       SELECT g.*, p.nome, p.telefone, p.cidade, p.bairro, pr.nome as promocao_nome
@@ -339,13 +355,13 @@ async function processarGanhadores(req, res) {
     // Se não existem ganhadores, criar alguns baseado nos participantes
     if (ganhadoresExistentes.rows.length === 0) {
       const participantesResult = await databasePool.query(`
-        SELECT p.*, pr.nome as promocao_nome 
-        FROM participantes p 
-        LEFT JOIN promocoes pr ON p.promocao_id = pr.id 
-        WHERE p.promocao_id = $1 
+        SELECT p.*, pr.nome as promocao_nome
+        FROM participantes p
+        LEFT JOIN promocoes pr ON p.promocao_id = pr.id
+        WHERE p.promocao_id = $1
         ORDER BY p.id
-        LIMIT 3
-      `, [promocaoId]);
+        LIMIT $2
+      `, [promocaoId, numeroGanhadores]);
 
       if (participantesResult.rows.length > 0) {
         // Inserir ganhadores na tabela
@@ -389,37 +405,10 @@ async function processarGanhadores(req, res) {
     }));
 
   } catch (queryError) {
-    // Dados mock se não conseguir buscar participantes
-    ganhadores = [
-      {
-        id: 'winner_mock_1',
-        participante_id: 1,
-        promocao_id: parseInt(promocaoId),
-        nome: 'João Silva',
-        telefone: '(11) 99999-1111',
-        cidade: 'São Paulo',
-        bairro: 'Centro',
-        promocao_nome: 'Promoção de Exemplo',
-        posicao: 1,
-        premio: '1º Lugar - R$ 10.000',
-        sorteado_em: new Date().toISOString(),
-        status: 'sorteado'
-      },
-      {
-        id: 'winner_mock_2',
-        participante_id: 2,
-        promocao_id: parseInt(promocaoId),
-        nome: 'Maria Santos',
-        telefone: '(11) 99999-2222',
-        cidade: 'São Paulo',
-        bairro: 'Vila Madalena',
-        promocao_nome: 'Promoção de Exemplo',
-        posicao: 2,
-        premio: '2º Lugar - R$ 5.000',
-        sorteado_em: new Date().toISOString(),
-        status: 'sorteado'
-      }
-    ];
+    console.error('Erro ao buscar ganhadores:', queryError);
+    // Se houver erro, retornar array vazio em vez de dados mock
+    // Isso evita exibir dados fake quando a promoção não tem ganhadores
+    ganhadores = [];
   }
 
   return res.status(200).json({
