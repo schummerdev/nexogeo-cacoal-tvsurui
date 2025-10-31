@@ -747,7 +747,7 @@ E aí, qual você prefere?
     // Aplicar o gradiente de fundo diretamente no estilo do main
     const mainStyles = {
         ...styles.main,
-        background: currentTheme === 'verde' ? 'linear-gradient(135deg, #022c22 0%, #064e3b 100%)' : styles.main.background
+        background: currentThemeData.name.toLowerCase() === 'verde' ? 'linear-gradient(135deg, #022c22 0%, #064e3b 100%)' : styles.main.background
     };
     
     return (
@@ -926,7 +926,7 @@ E aí, qual você prefere?
 
                 {liveGame.status === 'accepting' && participant && (
                     <div className="game-status" style={{ 
-                        background: currentTheme === 'verde' ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : currentThemeData.gradient,
+                        background: currentThemeData.name.toLowerCase() === 'verde' ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : currentThemeData.gradient,
                         padding: '0.75rem 1rem', 
                         borderRadius: '0.5rem 0.5rem 0 0', 
                         marginBottom: '1rem' 
