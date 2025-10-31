@@ -182,9 +182,12 @@ async function realizarSorteio(req, res) {
 
       try {
         // Inserir ganhador na tabela
+        // Usar ON CONFLICT para atualizar em vez de falhar se já existe (por ex: sorteio repetido)
         const insertResult = await databasePool.query(`
-          INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio)
-          VALUES ($1, $2, $3, $4)
+          INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio, cancelado)
+          VALUES ($1, $2, $3, $4, false)
+          ON CONFLICT (participante_id, promocao_id)
+          DO UPDATE SET posicao = $3, premio = $4, cancelado = false, sorteado_em = CURRENT_TIMESTAMP
           RETURNING *
         `, [participante.id, promocaoId, i + 1, premio]);
 
