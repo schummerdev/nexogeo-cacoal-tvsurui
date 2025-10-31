@@ -1,12 +1,14 @@
 /* CaixaMisteriosaPub.css - Estilo PREMIUM para a página pública da Caixa Misteriosa */
 
 .caixa-misteriosa-pub-container {
-  background: var(--color-gradient);
+  background: #0f172a; /* slate-900 */
+  color: #e5e7eb; /* slate-200 */
   min-height: 100vh;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* CAMADA 1: Fundo com gradiente intenso */
@@ -64,21 +66,181 @@
   z-index: 1;
 }
 
-/* Cards com glassmorphism PREMIUM - FORÇAR ESCURO */
+/* Cards com glassmorphism PREMIUM - TEMA ESCURO */
 .caixa-misteriosa-pub-container .card,
 .caixa-misteriosa-pub-container > div,
 .caixa-misteriosa-pub-container > div > div {
-  background: rgba(15, 23, 42, 0.92) !important; /* slate-900 */
+  background: rgba(15, 23, 42, 0.95) !important; /* slate-900 */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-radius: 20px !important;
-  border: 1px solid rgba(148, 163, 184, 0.2) !important; /* slate-400 @ 20% */
-  transition: all 0.2s ease;
+  border-radius: 12px !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  transition: all 0.3s ease;
   box-shadow:
-    0 0 0 1px rgba(148, 163, 184, 0.08),
-    0 8px 24px rgba(2, 6, 23, 0.5) !important;
-  animation: none;
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
   color: #e5e7eb !important;
+  margin-bottom: 1.5rem;
+}
+
+/* Melhorar a legibilidade dos textos */
+.caixa-misteriosa-pub-container h1,
+.caixa-misteriosa-pub-container h2,
+.caixa-misteriosa-pub-container h3,
+.caixa-misteriosa-pub-container h4,
+.caixa-misteriosa-pub-container h5,
+.caixa-misteriosa-pub-container h6 {
+  color: #ffffff !important; /* Branco puro para melhor contraste */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* Sombra sutil para destacar */
+  font-weight: 600; /* Peso da fonte para melhor legibilidade */
+  line-height: 1.3; /* Espaçamento entre linhas */
+}
+
+/* Melhorar contraste para textos */
+.caixa-misteriosa-pub-container p,
+.caixa-misteriosa-pub-container span,
+.caixa-misteriosa-pub-container div,
+.caixa-misteriosa-pub-container label {
+  color: #f1f5f9 !important; /* slate-100 - mais claro para melhor contraste */
+  line-height: 1.5; /* Melhor espaçamento para leitura */
+}
+
+/* Melhorar contraste para links */
+.caixa-misteriosa-pub-container a {
+  color: #93c5fd !important; /* blue-300 - azul mais claro para melhor contraste */
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.caixa-misteriosa-pub-container a:hover {
+  color: #60a5fa !important; /* blue-400 - mais claro no hover */
+  text-decoration: underline;
+}
+
+/* Melhorar contraste para textos em cards */
+.caixa-misteriosa-pub-container .card,
+.caixa-misteriosa-pub-container .card * {
+  color: #f1f5f9 !important; /* Garante que o texto dentro dos cards tenha bom contraste */
+}
+
+/* Melhorar contraste para textos de formulário */
+.caixa-misteriosa-pub-container input,
+.caixa-misteriosa-pub-container select,
+.caixa-misteriosa-pub-container textarea,
+.caixa-misteriosa-pub-container input::placeholder {
+  color: #e2e8f0 !important; /* slate-200 - cor clara para melhor contraste */
+}
+
+/* Melhorar contraste para textos de ajuda/dicas */
+.caixa-misteriosa-pub-container .help-text,
+.caixa-misteriosa-pub-container .hint {
+  color: #cbd5e1 !important; /* slate-300 - um pouco mais claro que o texto normal */
+  font-size: 0.875rem; /* Tamanho um pouco menor para textos de ajuda */
+}
+
+/* Estilizar botões */
+.caixa-misteriosa-pub-container button {
+  background-color: #3b82f6 !important; /* blue-500 */
+  color: #ffffff !important; /* Branco puro para melhor contraste */
+  border: none !important;
+  padding: 0.6rem 1.25rem !important;
+  border-radius: 0.5rem !important;
+  cursor: pointer;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.caixa-misteriosa-pub-container button:hover {
+  background-color: #2563eb !important; /* blue-600 */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+.caixa-misteriosa-pub-container button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Botões secundários */
+.caixa-misteriosa-pub-container button.secondary {
+  background-color: #334155 !important; /* slate-700 */
+  color: #f8fafc !important;
+}
+
+.caixa-misteriosa-pub-container button.secondary:hover {
+  background-color: #475569 !important; /* slate-600 */
+}
+
+/* Botões de ação */
+.caixa-misteriosa-pub-container button.primary {
+  background-color: #3b82f6 !important; /* blue-500 */
+  color: white !important;
+}
+
+.caixa-misteriosa-pub-container button.primary:hover {
+  background-color: #2563eb !important; /* blue-600 */
+}
+
+/* Estilizar inputs */
+.caixa-misteriosa-pub-container input,
+.caixa-misteriosa-pub-container select,
+.caixa-misteriosa-pub-container textarea {
+  background-color: rgba(30, 41, 59, 0.9) !important; /* slate-800 com transparência reduzida */
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  color: #f8fafc !important; /* slate-50 - mais claro para melhor legibilidade */
+  border-radius: 0.5rem !important;
+  padding: 0.625rem 0.875rem !important;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+}
+
+/* Placeholder com melhor contraste */
+.caixa-misteriosa-pub-container input::placeholder,
+.caixa-misteriosa-pub-container textarea::placeholder {
+  color: #94a3b8 !important; /* slate-400 */
+  opacity: 1; /* Garante que a opacidade não seja alterada pelo navegador */
+}
+
+/* Estados de foco melhorados */
+.caixa-misteriosa-pub-container input:focus,
+.caixa-misteriosa-pub-container select:focus,
+.caixa-misteriosa-pub-container textarea:focus {
+  outline: none;
+  border-color: #60a5fa !important; /* blue-400 - mais claro para melhor visibilidade */
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4) !important;
+  background-color: rgba(30, 41, 59, 1) !important; /* Fundo mais sólido no foco */
+}
+
+/* Estilo para campos desabilitados */
+.caixa-misteriosa-pub-container input:disabled,
+.caixa-misteriosa-pub-container select:disabled,
+.caixa-misteriosa-pub-container textarea:disabled {
+  background-color: rgba(51, 65, 85, 0.5) !important; /* slate-700 com transparência */
+  color: #94a3b8 !important; /* slate-400 */
+  cursor: not-allowed;
+}
+
+/* Estilo para rótulos de formulário */
+.caixa-misteriosa-pub-container label {
+  color: #e2e8f0 !important; /* slate-200 */
+  font-weight: 500;
+  margin-bottom: 0.375rem;
+  display: block;
+}
+
+/* Mensagens de erro e validação */
+.caixa-misteriosa-pub-container .error-message {
+  color: #fca5a5 !important; /* red-300 */
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+}
+
+.caixa-misteriosa-pub-container .success-message {
+  color: #86efac !important; /* green-300 */
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
 }
 
 /* Forçar todas as listas e items de dica para escuro */

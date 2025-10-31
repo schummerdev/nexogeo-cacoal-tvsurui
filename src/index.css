@@ -521,24 +521,8 @@ p, .text {
   }
 }
 
-/* Modo escuro (se suportado) */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #0f172a;
-    color: #327cf3;
-  }
-  
-  .card {
-    background: #1e293b;
-    border-color: #334155;
-  }
-  
-  .form-input {
-    background: #1e293b;
-    border-color: #334155;
-    color: #e2e8f0;
-  }
-}
+/* Dark mode styles are now handled by ThemeContext */
+/* The theme is applied via CSS variables in ThemeProvider */
 
 /* Acessibilidade */
 @media (prefers-reduced-motion: reduce) {
