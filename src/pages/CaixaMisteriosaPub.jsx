@@ -744,8 +744,14 @@ E aí, qual você prefere?
     // Determinar a classe de tema com base no tema atual
     const themeClass = `theme-${currentThemeData.name.toLowerCase()}`;
     
+    // Aplicar o gradiente de fundo diretamente no estilo do main
+    const mainStyles = {
+        ...styles.main,
+        background: currentTheme === 'verde' ? 'linear-gradient(135deg, #022c22 0%, #064e3b 100%)' : styles.main.background
+    };
+    
     return (
-        <main style={styles.main} className={`caixa-misteriosa-pub-container ${themeClass}`}>
+        <main style={mainStyles} className={`caixa-misteriosa-pub-container ${themeClass}`}>
             {/* Seletor de Tema */}
             <div style={{
                 position: 'absolute',
@@ -865,11 +871,22 @@ E aí, qual você prefere?
                                 <li key={index} style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', border: `2px solid ${currentThemeData.primary}`, color: '#e5e7eb' }}>
                                     <strong style={{ color: currentThemeData.primary }}>Dica {index + 1}:</strong> {clue}
                                 </li>
-                            )) : (
-                                <li style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center', color: '#94a3b8', border: `1px solid rgba(148, 163, 184, 0.2)` }}>
-                                    Nenhuma dica revelada ainda.
-                                </li>
-                            )
+                            ))
+                        : (
+                            <li style={{ 
+                                background: 'rgba(30, 41, 59, 0.9)', 
+                                padding: '1rem', 
+                                borderRadius: '0.5rem', 
+                                textAlign: 'center', 
+                                color: '#94a3b8', 
+                                border: '1px solid rgba(148, 163, 184, 0.2)' 
+                            }}>
+                                Nenhuma dica revelada ainda.
+                            </li>
+                        )}
+                    </ul>
+                    
+                    <div style={{
                         background: currentThemeData.gradient,
                         padding: '1.5rem',
                         borderRadius: '0.75rem',
@@ -899,7 +916,7 @@ E aí, qual você prefere?
                             </>
                         )}
                     </div>
-                )}
+                </div>
 
                 {liveGame.status === 'closed' && (
                     <div style={{ textAlign: 'center', color: currentThemeData.warning, fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
@@ -908,8 +925,8 @@ E aí, qual você prefere?
                 )}
 
                 {liveGame.status === 'accepting' && participant && (
-                    <div style={{ 
-                        background: currentThemeData.gradient, 
+                    <div className="game-status" style={{ 
+                        background: currentTheme === 'verde' ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : currentThemeData.gradient,
                         padding: '0.75rem 1rem', 
                         borderRadius: '0.5rem 0.5rem 0 0', 
                         marginBottom: '1rem' 
