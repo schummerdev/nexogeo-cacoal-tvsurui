@@ -1386,12 +1386,12 @@ E aí, qual você prefere?
                 textAlign: 'center'
             }}>
                 <div style={{
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: currentThemeData.surface,
                     backdropFilter: 'blur(10px)',
                     padding: '1.5rem',
                     borderRadius: '15px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    boxShadow: `0 4px 20px ${currentThemeData.primary}22`,
+                    border: `1px solid ${currentThemeData.border}`,
                     maxWidth: '350px',
                     margin: '0 auto'
                 }}>
@@ -1414,7 +1414,7 @@ E aí, qual você prefere?
                         />
                     </div>
                     <p style={{
-                        color: '#64748b',
+                        color: currentThemeData.secondary,
                         fontSize: '0.875rem',
                         margin: '0 0 1rem 0',
                         lineHeight: '1.4'
@@ -1427,7 +1427,7 @@ E aí, qual você prefere?
                         rel="noopener noreferrer"
                         style={{
                             display: 'inline-block',
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            background: currentThemeData.gradient,
                             color: 'white',
                             textDecoration: 'none',
                             padding: '0.75rem 1.5rem',
@@ -1435,7 +1435,7 @@ E aí, qual você prefere?
                             fontSize: '0.875rem',
                             fontWeight: '600',
                             transition: 'all 0.2s ease',
-                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)'
+                            boxShadow: `0 2px 8px ${currentThemeData.primary}33`
                         }}
                     >
                         📦 Conheça a NexoGeo
