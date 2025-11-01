@@ -1,19 +1,23 @@
 /* CaixaMisteriosaPub.css - Estilo PREMIUM para a página pública da Caixa Misteriosa */
 
-/* Forçar o tema escuro em todos os elementos */
-html, body, #root, .caixa-misteriosa-pub-container {
-  color-scheme: dark !important;
-}
-
+/* Tema base - fundo escuro padrão */
 .caixa-misteriosa-pub-container {
-  background: #0f172a !important; /* slate-900 */
-  color: #f1f5f9 !important; /* slate-100 - mais claro para melhor legibilidade */
+  background: #0f172a; /* slate-900 */
+  color: #f1f5f9; /* slate-100 - mais claro para melhor legibilidade */
   min-height: 100vh;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Aplicar tema escuro apenas quando a classe dark estiver presente */
+html.dark, 
+html.dark body, 
+html.dark #root, 
+.dark .caixa-misteriosa-pub-container {
+  color-scheme: dark;
 }
 
 /* CAMADA 1: Fundo com gradiente intenso */
@@ -33,12 +37,13 @@ html, body, #root, .caixa-misteriosa-pub-container {
   animation: caixa-page-glow-intense 12s ease-in-out infinite;
 }
 
-/* Fundo para tema vermelho */
+/* Fundo para tema vermelho - mais suave como o verde */
 .theme-vermelho .caixa-misteriosa-pub-container::before {
   background:
-    radial-gradient(circle at 15% 25%, rgba(255, 200, 200, 0.15) 0%, transparent 30%),
-    radial-gradient(circle at 85% 75%, rgba(150, 0, 0, 0.2) 0%, transparent 35%),
-    radial-gradient(ellipse at 50% 100%, rgba(255, 150, 150, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 15% 25%, rgba(255, 200, 200, 0.08) 0%, transparent 25%),
+    radial-gradient(circle at 85% 75%, rgba(200, 0, 0, 0.1) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 200, 200, 0.05) 0%, transparent 40%);
+  opacity: 0.8;
 }
 
 /* CAMADA 2: Efeito de partículas/movimento */
@@ -57,11 +62,13 @@ html, body, #root, .caixa-misteriosa-pub-container {
   animation: rotate-glow 25s linear infinite;
 }
 
-/* Efeito de partículas para tema vermelho */
+/* Efeito de partículas para tema vermelho - mais suave */
 .theme-vermelho .caixa-misteriosa-pub-container::after {
   background:
-    radial-gradient(circle at 20% 50%, rgba(255, 200, 200, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(200, 100, 100, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(255, 200, 200, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(200, 100, 100, 0.03) 0%, transparent 45%);
+  opacity: 0.7;
+  animation: rotate-glow 30s linear infinite;
 }
 
 @keyframes caixa-page-glow-intense {
@@ -301,7 +308,7 @@ html, body, #root, .caixa-misteriosa-pub-container {
 
 .caixa-misteriosa-pub-container .card:hover,
 .caixa-misteriosa-pub-container > div > div:hover {
-  /* Sem mudança de cor - mantém consistência */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Botões com efeito */
@@ -324,11 +331,13 @@ html, body, #root, .caixa-misteriosa-pub-container {
 }
 
 .caixa-misteriosa-pub-container button:hover::before {
-  /* Sem efeito shimmer */
+  left: 100%;
 }
 
 .caixa-misteriosa-pub-container button:hover {
-  /* Sem mudança de cor no hover */
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Inputs com melhor contraste - sem transições */
@@ -379,25 +388,145 @@ html, body, #root, .caixa-misteriosa-pub-container {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Tema Vermelho */
-.theme-vermelho .caixa-misteriosa-pub-container {
-  --primary-color: #dc2626; /* red-600 */
-  --primary-dark: #b91c1c; /* red-700 */
-  --primary-light: #f87171; /* red-400 */
+/* Tema Verde - Estilo padrão */
+.theme-verde .caixa-misteriosa-pub-container {
+  --primary-color: #10B981; /* emerald-500 */
+  --primary-dark: #059669;  /* emerald-600 */
+  --primary-light: #6EE7B7; /* emerald-300 */
   --text-on-primary: #ffffff;
-  --background: #1a0a0a; /* Fundo mais escuro para melhor contraste */
-  --surface: #2a0f0f; /* Superfície um pouco mais clara que o fundo */
-  --text: #f8fafc; /* slate-50 - texto claro para melhor legibilidade */
+  --background: #022c22; /* Fundo verde escuro */
+  --surface: #064e3b;    /* Superfície verde mais clara */
+  --text: #f8fafc;       /* slate-50 - texto claro para melhor legibilidade */
   --text-secondary: #e2e8f0; /* slate-200 - texto secundário */
-  --border: #7f1d1d; /* red-900 - bordas escuras */
-  background: linear-gradient(135deg, #1a0a0a 0%, #2a0f0f 100%) !important;
+  --border: #065f46;     /* emerald-800 - bordas escuras */
+  background: linear-gradient(135deg, #022c22 0%, #064e3b 100%) !important;
+}
+
+/* Aplicar fundo verde aos cabeçalhos e seções */
+.theme-verde .caixa-misteriosa-pub-container > div[style*="gradient"],
+.theme-verde .caixa-misteriosa-pub-container .card,
+.theme-verde .caixa-misteriosa-pub-container .status-title,
+.theme-verde .caixa-misteriosa-pub-container .section-header {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important;
+  border: 1px solid #065f46 !important;
+  color: white !important;
+}
+
+/* Estilo para o título "Aceitando Palpites" */
+.theme-verde .caixa-misteriosa-pub-container .game-status {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: white !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+/* Ajustar gradiente para elementos internos no tema verde */
+.theme-verde .caixa-misteriosa-pub-container > div[style*="gradient"],
+.theme-verde .caixa-misteriosa-pub-container .card {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important;
+  border: 1px solid #065f46 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Botões no tema verde */
+.theme-verde .caixa-misteriosa-pub-container button.primary,
+.theme-verde .caixa-misteriosa-pub-container button[type="submit"] {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  border: none !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.theme-verde .caixa-misteriosa-pub-container button.primary:hover,
+.theme-verde .caixa-misteriosa-pub-container button[type="submit"]:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Título do status no tema verde */
+.theme-verde .caixa-misteriosa-pub-container .status-title {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: white !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+/* Tema Vermelho - Estilo similar ao verde */
+.theme-vermelho .caixa-misteriosa-pub-container {
+  --primary-color: #ef4444; /* red-500 - mais brilhante que o vermelho original */
+  --primary-dark: #dc2626;  /* red-600 */
+  --primary-light: #fca5a5; /* red-300 - mais claro para efeitos */
+  --text-on-primary: #ffffff;
+  --background: #0f0a0a; /* Fundo mais escuro para melhor contraste */
+  --surface: #1f0f0f;    /* Superfície um pouco mais clara que o fundo */
+  --text: #f8fafc;       /* slate-50 - texto claro para melhor legibilidade */
+  --text-secondary: #e2e8f0; /* slate-200 - texto secundário */
+  --border: #991b1b;     /* red-800 - bordas escuras */
+  background: linear-gradient(135deg, #0f0a0a 0%, #1f0f0f 100%) !important;
 }
 
 /* Ajustar gradiente para elementos internos */
-.theme-vermelho .caixa-misteriosa-pub-container > div[style*="gradient"] {
-  background: linear-gradient(135deg, #2a0f0f 0%, #3a1414 100%) !important;
-  border: 1px solid #7f1d1d !important;
+.theme-vermelho .caixa-misteriosa-pub-container > div[style*="gradient"],
+.theme-vermelho .caixa-misteriosa-pub-container .card {
+  background: linear-gradient(135deg, #1f0f0f 0%, #2f1414 100%) !important;
+  border: 1px solid #991b1b !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Botões no tema vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container button.primary,
+.theme-vermelho .caixa-misteriosa-pub-container button[type="submit"] {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  border: none !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container button.primary:hover,
+.theme-vermelho .caixa-misteriosa-pub-container button[type="submit"]:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Inputs no tema vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container input,
+.theme-vermelho .caixa-misteriosa-pub-container select,
+.theme-vermelho .caixa-misteriosa-pub-container textarea {
+  background-color: rgba(31, 15, 15, 0.9) !important;
+  border: 1px solid #7f1d1d !important;
+  color: #f8fafc !important;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container input:focus,
+.theme-vermelho .caixa-misteriosa-pub-container select:focus,
+.theme-vermelho .caixa-misteriosa-pub-container textarea:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Links no tema vermelho */
+.theme-vermelho .caixa-misteriosa-pub-container a {
+  color: #fca5a5 !important; /* red-300 */
+  text-decoration: none;
+}
+
+.theme-vermelho .caixa-misteriosa-pub-container a:hover {
+  color: #f87171 !important; /* red-400 */
+  text-decoration: underline;
 }
 
 /* Aplicar cores do tema vermelho */

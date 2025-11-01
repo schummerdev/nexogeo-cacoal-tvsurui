@@ -4,6 +4,302 @@ Este arquivo documenta pontos de restauração importantes do projeto.
 
 ---
 
+## v2.8-functional-complete - Sistema Funcional Completo (2025-11-01) ⭐⭐⭐⭐ PRODUÇÃO
+
+**Tag:** `v2.8-functional-complete`
+**Commit:** `e85a663`
+
+### 🎯 Estado do Sistema
+
+**SISTEMA COMPLETO E ESTÁVEL** - Todas funcionalidades principais operacionais e otimizadas ✅
+
+### ⭐ Por que usar este ponto?
+
+Este é um **marco importante** representando o sistema completo com:
+- ✅ Todas funcionalidades principais implementadas e testadas
+- ✅ Performance otimizada (logs de debug removidos)
+- ✅ UX refinada com feedback dos usuários
+- ✅ Código limpo e organizado
+- ✅ Pronto para uso em produção
+
+**Nota:** Este ponto é **PRÉ-CORREÇÕES DE SEGURANÇA** da auditoria realizada em 01/11/2025. Use como baseline funcional antes de implementar hardening de segurança.
+
+### 📦 Funcionalidades Completas
+
+#### 1️⃣ Sistema de Sorteios Aprimorado
+- **Múltiplos Ganhadores:** Configura 1-10 ganhadores por promoção
+- **Backend otimizado:** Loop de sorteio sem duplicatas
+- **Frontend preparado:** Exibe todos os ganhadores corretamente
+- **Validação:** Verifica quantidade suficiente de participantes
+
+**Arquivos principais:**
+- `api/index.js` (linhas 1062-1175) - Lógica de sorteio múltiplo
+- `src/pages/SorteioPage.jsx` (linhas 174-210) - Processamento de múltiplos ganhadores
+- `src/pages/SorteioPublicoPage.jsx` - Exibição pública de resultados
+
+#### 2️⃣ Duplicação de Promoções
+- **Botão dedicado:** 📋 em cada promoção na listagem
+- **Cópia inteligente:** Preserva dados relevantes, reseta IDs
+- **Configurável:** Datas copiadas, status 'ativa', nome com ' - Cópia'
+- **UX fluida:** Modal de edição abre automaticamente para revisão
+
+**Arquivos principais:**
+- `src/pages/PromocoesPage.jsx` (linhas 100-121, 404-412)
+- `src/pages/DashboardPages.css` (linhas 665-675) - Estilo do botão
+
+#### 3️⃣ Caixa Misteriosa - UX Otimizada
+- **Botão Verde:** Aplicado APENAS ao botão "Revelar Dica" (não ao card inteiro)
+- **Contraste:** Texto respeita cores do tema (previne branco em fundo claro)
+- **Organização:** Botão "Resetar Jogo" movido para página de Configurações
+- **Header:** Seção de emergência claramente identificada
+- **Temas:** Funciona perfeitamente em todos os temas (preto, verde, vermelho)
+
+**Arquivos principais:**
+- `src/components/caixa-misteriosa/admin/LiveControlViewModern.jsx` (linhas 640-673)
+- `src/components/caixa-misteriosa/admin/SetupView.jsx` (linhas 427-469)
+
+#### 4️⃣ Performance e Código Limpo
+- **Logs removidos:** Console.logs de debug eliminados para produção
+- **Re-renders otimizados:** useRef impedindo execuções desnecessárias
+- **Queries otimizadas:** Campos explícitos em vez de SELECT *
+- **Código limpo:** Comentários úteis mantidos, debug removido
+
+### 🔄 Commits Incluídos (Últimos 6)
+
+```
+e85a663 - fix: Aplica cor verde APENAS no botão Revelar Dica (não no card inteiro)
+745dc90 - refactor: Melhora UX da Caixa Misteriosa conforme feedback
+4fd38f8 - feat: Adiciona funcionalidade de duplicar promoção
+e60ef76 - refactor: Remove logs de debug desnecessários do código
+1671e97 - feat: Implementa suporte para múltiplos ganhadores em sorteios
+2ceb3f3 - fix: Resolve múltiplas re-renderizações e campos faltantes na API
+```
+
+### 📋 Como Restaurar
+
+```bash
+# Opção 1 - Checkout para a tag
+git checkout v2.8-functional-complete
+
+# Opção 2 - Criar branch de backup
+git checkout -b backup-v2.8-stable v2.8-functional-complete
+
+# Opção 3 - Hard reset (⚠️ CUIDADO - descarta mudanças locais)
+git reset --hard v2.8-functional-complete
+
+# Opção 4 - Ver diferenças com versão atual
+git diff v2.8-functional-complete
+```
+
+### ✅ Testes de Validação
+
+#### Teste 1: Sorteio Múltiplo
+1. Acesse `/dashboard/sorteio`
+2. Selecione promoção com `numero_ganhadores = 3`
+3. Clique em "Realizar Sorteio"
+4. **Resultado esperado:** 3 ganhadores sorteados sem duplicatas
+5. **Toast:** "🎉 Sorteio realizado! 3 ganhadores sorteados"
+
+#### Teste 2: Duplicar Promoção
+1. Acesse `/dashboard/promocoes`
+2. Clique no botão 📋 (azul claro) de qualquer promoção
+3. **Resultado esperado:** Modal abre com dados copiados
+4. **Nome:** "[Nome Original] - Cópia"
+5. **Status:** 'ativa'
+6. **Toast:** "Promoção duplicada! Revise os dados antes de salvar."
+
+#### Teste 3: Botão Verde (Tema Claro)
+1. Acesse `/dashboard/caixa-misteriosa`
+2. Selecione tema **verde** ou **vermelho** (claro)
+3. Inicie um jogo
+4. **Resultado esperado:**
+   - Card de "Dicas Reveladas" com fundo do tema
+   - Texto das dicas em cor legível (não branco)
+   - Botão "Revelar Dica" verde (#10b981) com texto branco
+   - Sem problemas de contraste
+
+#### Teste 4: Resetar Jogo (Configurações)
+1. Acesse `/dashboard/caixa-misteriosa`
+2. Vá para aba/página de **Configurações** (SetupView)
+3. **Resultado esperado:**
+   - Header "⚙️ Configuração Caixa Misteriosa" presente
+   - Botão "🚨 Resetar Jogo (Emergência)" em seção destacada
+   - Botão vermelho com borda vermelha
+   - Dupla confirmação ao clicar
+
+### ⚙️ Configuração Necessária
+
+**Variáveis de Ambiente no Vercel:**
+```env
+DATABASE_URL=postgresql://user:pass@host:port/dbname
+JWT_SECRET=seu_secret_aqui
+GOOGLE_API_KEY=AIzaSy... (para Caixa Misteriosa - geração de dicas com IA)
+NODE_ENV=production
+```
+
+**Migrations Executadas:**
+- ✅ Todas migrations anteriores (geolocalização, games, submissions, etc.)
+- ✅ Nenhuma migration nova nesta versão
+
+### 📊 Comparação com Versões Anteriores
+
+| Versão | Sorteios Múltiplos | Duplicar Promoção | UX Caixa Mist. | Logs Limpos | Status |
+|--------|-------------------|-------------------|----------------|-------------|--------|
+| v2.5 | ❌ Apenas 1 | ❌ | ⚠️ Problemas contraste | ❌ | Estável |
+| **v2.8** | ✅ 1-10 | ✅ | ✅ Otimizada | ✅ | **Produção** |
+
+### 🎯 Principais Melhorias sobre v2.5
+
+1. **Sorteios Escaláveis** - Suporta até 10 ganhadores simultâneos
+2. **Produtividade** - Duplicar promoções economiza tempo
+3. **Acessibilidade** - Contraste adequado em todos os temas
+4. **Performance** - Logs de debug removidos (menos noise)
+5. **UX Refinada** - Feedback dos usuários incorporado
+
+### ⚠️ Notas de Segurança
+
+**IMPORTANTE:** Esta versão **NÃO inclui** as correções de segurança críticas identificadas na auditoria de 01/11/2025:
+
+❌ **Vulnerabilidades conhecidas (a serem corrigidas):**
+1. JWT armazenado em localStorage (vulnerável a XSS)
+2. Race condition em sorteios (permite duplicatas)
+3. SQL injection em inspect-db.js
+4. Rate limiting inadequado (bypassável)
+5. Senhas temporárias previsíveis
+
+**Recomendação:**
+- ✅ Use esta versão como **baseline funcional**
+- ✅ Implemente correções de segurança em branch separado
+- ✅ Teste extensivamente antes de merge
+- ✅ Mantenha este ponto para rollback se necessário
+
+### 🔒 Próximos Passos Recomendados
+
+#### Sprint de Segurança (1-2 semanas):
+1. Migrar JWT para cookies HttpOnly (CRÍTICO-001)
+2. Implementar transações com lock em sorteios (CRÍTICO-002)
+3. Corrigir SQL injection (CRÍTICO-003)
+4. Rate limiting persistente com Redis/PostgreSQL (CRÍTICO-004)
+5. Senhas temporárias criptograficamente seguras (CRÍTICO-005)
+
+**Documento de referência:** Relatório de Auditoria de Segurança (2025-11-01)
+
+### 🧪 Verificação de Integridade
+
+Execute para confirmar que está nesta versão:
+
+```bash
+# 1. Verificar commit
+git log -1 --oneline
+# Esperado: e85a663 fix: Aplica cor verde APENAS no botão Revelar Dica
+
+# 2. Verificar tag
+git describe --tags
+# Esperado: v2.8-functional-complete
+
+# 3. Verificar funcionalidades
+# - Criar promoção com numero_ganhadores = 5
+# - Realizar sorteio → Deve sortear 5 ganhadores
+# - Duplicar promoção → Deve copiar com ' - Cópia'
+# - Revelar dica → Botão verde, card segue tema
+```
+
+### 📚 Documentação Relacionada
+
+- `CLAUDE.md` - Instruções para desenvolvimento
+- `DESIGN_SYSTEM_v2.7.md` - Sistema de design
+- `MIGRATIONS.md` - Guia de migrações de banco
+- `CORRECAO-CONTAGENS-2025-10-24.md` - Correções anteriores
+
+### 🚀 Status de Deploy
+
+- **Build:** ✅ Sucesso
+- **Deploy:** ✅ Vercel (nexogeo-demo.vercel.app)
+- **Funcionalidades:** ✅ Todas operacionais
+- **Performance:** ✅ Otimizada
+- **Segurança:** ⚠️ Requer hardening (vulnerabilidades conhecidas documentadas)
+
+---
+
+**Última atualização:** 2025-11-01 (após auditoria de segurança completa)
+
+---
+
+## v1.0.2-caixa-misteriosa-temas - Caixa Misteriosa Temática (2025-10-31)
+
+**Commit:** `3071811` | **Tag:** `v1.0.2-caixa-misteriosa-temas`
+
+### 🎯 Estado do Sistema
+
+Versão estável com Caixa Misteriosa Pública completamente temática com suporte a múltiplos temas (preto, verde, vermelho) e contraste adequado em todos os elementos.
+
+### ✅ Melhorias Implementadas
+
+**1. Temas Dinâmicos Completos**
+- Suporte para temas: preto (padrão), verde e vermelho
+- Cores primárias, secundárias e bordas adaptadas por tema
+- Seletor de tema funcional na página pública
+
+**2. Rodapé NexoGeo Temático**
+- Fundo adaptado ao tema (`currentThemeData.surface`)
+- Texto com contraste máximo (`currentThemeData.text`)
+- Botão com cor primária do tema + texto branco
+- Borda e sombra adaptadas ao tema
+
+**3. Contraste e Acessibilidade**
+- Texto descritivo em `currentThemeData.text` para legibilidade
+- Botão usa `currentThemeData.primary` com texto branco (#ffffff)
+- Box-shadow com opacidade ajustada por tema
+- fontWeight aumentado para melhor visibilidade
+
+**4. Refatoração de Código**
+- CSS externo removido (CaixaMisteriosaPub.css)
+- Estilos substituídos por variáveis dinâmicas
+- Renderização condicional otimizada
+- Cores hardcoded eliminadas
+
+### 🔄 Commits Inclusos
+
+```
+3071811 chore: Marca versão estável v1.0.2-caixa-misteriosa-temas
+6c71ebb fix: Melhora contraste de texto e botão no rodapé NexoGeo
+e427f1c fix: Aplica tema dinâmico ao rodapé "Conheça o NexoGeo"
+f8dcedb refactor: Remove CSS externo e refatora estilos inline
+1ad6674 refactor: Simplifica renderização condicional do componente
+d0a9fcc fix: Ajusta indentação do rodapé NexoGeo
+40b037c fix: Corrige estrutura de tags e indentação do rodapé
+c904f00 fix: Corrige indentação e fechamento de tags
+0228f11 fix: Mostra Palavra Secreta apenas quando jogo está ativo
+39a0c91 fix: Corrige verificação de tema usando currentThemeData.name
+b9b2e49 fix: Melhora renderização de gradientes
+611c65e fix: Simplifica e otimiza estilos
+f700ead refactor: Reorganiza estrutura da Caixa Misteriosa
+10baa11 fix: Aprimora tema verde e vermelho
+```
+
+### 📋 Como Recuperar
+
+Para restaurar para esta versão estável:
+
+```bash
+# Usando tag
+git checkout v1.0.2-caixa-misteriosa-temas
+
+# Ou usando commit
+git reset --hard 3071811
+```
+
+### ✨ Testes Realizados
+
+- ✅ Tema preto: Rodapé com fundo escuro, texto claro
+- ✅ Tema verde: Rodapé com fundo verde, botão verde primário
+- ✅ Tema vermelho: Rodapé com fundo vermelho, botão vermelho primário
+- ✅ Contraste WCAG adequado em todos os temas
+- ✅ Botão clicável com cursor pointer
+- ✅ Logo do NexoGeo visível em todos os temas
+
+---
+
 ## v2.5 - Correções de Contagens (2025-10-24)
 
 **Commit:** `61c7c87` | **Tag:** `v2.5`

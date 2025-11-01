@@ -97,11 +97,34 @@ const PromocoesPage = () => {
     setEditingPromo(null);
   };
 
+  const handleDuplicatePromo = (promo) => {
+    // Formatar datas para formato yyyy-MM-dd
+    const formatDateForInput = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    };
+
+    const duplicatedData = {
+      nome: `${promo.nome} - Cópia`,
+      descricao: promo.descricao,
+      data_inicio: formatDateForInput(promo.data_inicio),
+      data_fim: formatDateForInput(promo.data_fim),
+      status: 'ativa',
+      numero_ganhadores: promo.numero_ganhadores || 3
+    };
+
+    setEditingPromo(null); // Modo criação
+    setPromoData(duplicatedData);
+    setIsModalOpen(true);
+    showToast('Promoção duplicada! Revise os dados antes de salvar.', 'info');
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setPromoData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'numero_ganhadores' ? parseInt(value, 10) : value
     }));
   };
 
@@ -378,6 +401,15 @@ const PromocoesPage = () => {
                     <td>{promo.numero_ganhadores || 3}</td>
                     <td>
                       <div className="action-buttons">
+                        {canCreatePromotion() && (
+                          <button
+                            className="btn-icon-small btn-duplicate"
+                            onClick={() => handleDuplicatePromo(promo)}
+                            title="Duplicar Promoção"
+                          >
+                            <span className="icon">📋</span>
+                          </button>
+                        )}
                         <button
                           className="btn-icon-small btn-social-facebook"
                           onClick={() => handleSocialNetworkLink(promo, 'facebook')}

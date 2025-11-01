@@ -2,573 +2,378 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-NexoGeo is a complete promotion management platform with interactive features, real-time analytics, and advanced AI integration. This document covers development commands, architecture patterns, and key implementation guidelines.
+## Instruções do Task Master AI
+**Importar comandos e diretrizes do workflow de desenvolvimento do Task Master, tratar como se a importação estivesse no arquivo CLAUDE.md principal.**
+@./.taskmaster/CLAUDE.md
 
-## Project Overview
+## ⚠️ Regras Importantes do Cursor
+Este projeto possui regras específicas em `.cursor/rules/`. Principais diretrizes:
+- Estrutura de regras: descrição clara, globs específicos, código com ✅/❌ exemplos
+- Referências a arquivos: `[filename](mdc:path/to/file)`
+- Manter regras DRY e cross-referenciadas
+- Ver `.cursor/rules/cursor_rules.mdc` para detalhes completos
 
-**Project Name:** NexoGeo
-**Current Version:** 2.5 (Stable)
-**Status:** Production-ready
-**Deploy:** Vercel Serverless Functions
-**Database:** PostgreSQL (Neon)
+## Comandos de Desenvolvimento
 
-**Key Stack:**
-- Frontend: React 18.2 + React Router (SPA with lazy loading)
-- Backend: Express.js on Vercel (consolidated handler pattern)
-- Database: PostgreSQL with node-pg-migrate
-- Testing: Jest + React Testing Library (97+ tests)
-- AI Integration: Google Generative AI (Gemini)
-
-## Development Commands
-
-### Development & Running
+### Build & Desenvolvimento
 ```bash
-npm start              # Frontend only (React dev server on port 3000)
-npm run dev:api        # Backend only (Express API on port 3002)
-npm run dev:full       # Frontend + Backend simultaneously (recommended)
-npm run build          # Production build of React frontend
+npm start              # Inicia apenas o frontend (servidor de desenvolvimento React na porta 3000)
+npm run dev:api        # Inicia apenas o servidor de API backend (porta 3002)
+npm run dev:full       # Inicia frontend e backend simultaneamente
+npm run build          # Build do frontend React para produção
 ```
 
-### Testing
+### Testes
 ```bash
-npm test                    # Run tests interactively
-npm run test:watch         # Run tests in watch mode
-npm run test:coverage      # Run tests with coverage report
-npm run test:ci            # CI mode (coverage + no watch)
-npm run test:sprite        # TestSprite MCP testing tool
+npm test                    # Executa testes interativamente
+npm run test:watch         # Executa testes em modo watch
+npm run test:coverage      # Executa testes com relatório de cobertura
+npm run test:ci            # Executa testes em modo CI (cobertura + sem watch)
+npm run test:sprite        # Executa ferramenta de teste TestSprite MCP
 ```
 
-### Performance & Bundle Analysis
+### Performance & Análise
 ```bash
-npm run analyze            # Analyze bundle size with source-map-explorer
-npm run analyze:bundle     # Analyze bundle with webpack-bundle-analyzer
-npm run performance:audit  # Run Lighthouse performance audit
+npm run analyze            # Analisa tamanho do bundle com source-map-explorer
+npm run analyze:bundle     # Analisa bundle com webpack-bundle-analyzer
+npm run performance:audit  # Executa auditoria de performance Lighthouse
 ```
 
-### Database Migrations
+### Migrações de Banco de Dados
 ```bash
-npm run migrate                    # Run all pending migrations
-npx node-pg-migrate create NAME    # Create new migration
-npx node-pg-migrate down           # Revert last migration
+npm run migrate                    # Executa todas as migrações pendentes
+npx node-pg-migrate create nome    # Cria nova migração
+npx node-pg-migrate down           # Reverte última migração
 ```
 
-**Location:** Migration files in `api/migrations/`
+Localização: arquivos em `api/migrations/`
+**Importante**: Após deploy na Vercel, migrações devem ser executadas manualmente (ver `MIGRATIONS.md`)
 
-**Important:** After Vercel deploy, migrations must be run manually (see `MIGRATIONS.md`)
+## Visão Geral da Arquitetura
 
-## Architecture Overview
+### Stack Tecnológico
+- **Frontend**: React 18.2.0 SPA com React Router
+- **Backend**: Express.js API servindo de `/api`
+- **Banco de Dados**: PostgreSQL com `node-pg-migrate`
+- **Deploy**: Vercel Serverless Functions
+- **Testes**: Jest + React Testing Library (97+ testes)
 
-### Directory Structure
+### Estrutura de Diretórios
 ```
 nexogeo/
-├── src/                        # React frontend SPA
-│   ├── components/             # Reusable components
-│   │   ├── DashboardLayout/    # Main dashboard wrapper (Header, Sidebar)
-│   │   ├── LoginForm/          # Authentication form
-│   │   ├── ThemeSelector/      # Light/dark mode toggle
-│   │   ├── InteractiveMap/     # Leaflet map integration
-│   │   ├── ConfirmModal/       # Confirmation dialogs
-│   │   └── ...other components
-│   ├── pages/                  # Lazy-loaded route pages
-│   │   ├── AdminDashboardPage.jsx
-│   │   ├── ParticipantesPage.jsx
-│   │   ├── CaixaMisteriosaPage.jsx (admin panel)
-│   │   ├── CaixaMisteriosaPubPage.jsx (public game)
-│   │   ├── MapasPage.jsx
-│   │   ├── GeradorLinksPage.jsx
-│   │   ├── SorteioPage.jsx
-│   │   ├── AuditLogsPage.jsx
-│   │   └── ...other pages
-│   ├── contexts/               # Global state management
-│   │   ├── AuthContext.js      # User auth, roles, permissions
-│   │   ├── ThemeContext.jsx    # Theme light/dark
-│   │   ├── ToastContext.js     # Notification system
-│   │   └── LayoutContext.js    # Sidebar open/closed state
-│   ├── services/               # API communication layer
-│   │   ├── authService.js
-│   │   ├── participanteService.js
-│   │   ├── promocaoService.js
-│   │   ├── sorteioService.js
-│   │   ├── dashboardService.js
-│   │   ├── auditService.js
-│   │   └── ...other services
-│   ├── hooks/                  # Custom React hooks
-│   │   └── useCaixaMisteriosa.js
-│   ├── utils/                  # Utilities
-│   │   ├── formatters.js       # Data formatting functions
-│   │   └── validators.js       # Validation functions
-│   └── App.jsx                 # Root component with routes
-│
-├── api/                        # Backend (Express on Vercel)
-│   ├── index.js                # Main consolidated handler (router)
-│   ├── caixa-misteriosa.js     # Dedicated handler for mystery box game
-│   ├── _handlers/              # Modular endpoint handlers
-│   │   ├── participantes.js    # Participants endpoint
-│   │   ├── auth.js             # Authentication endpoint
-│   │   ├── audit.js            # Audit logs endpoint
-│   │   ├── dashboard.js        # Dashboard metrics
-│   │   ├── authHelper.js       # JWT validation utility
-│   │   └── ...other handlers
-│   ├── _lib/                   # Shared utilities
-│   │   ├── security.js         # Rate limiting, CORS, headers
-│   │   └── database.js         # Connection pooling
-│   └── migrations/             # PostgreSQL migrations
-│
-├── lib/                        # Shared utilities (frontend + backend)
-│   └── db.js                   # PostgreSQL connection management
-│
-├── public/                     # Static assets
-└── package.json               # Dependencies and scripts
+├── src/                    # Frontend React
+│   ├── components/        # Componentes reutilizáveis
+│   ├── pages/            # Páginas da aplicação (lazy loaded)
+│   ├── contexts/         # Contextos globais (Auth, Theme, Toast, Layout)
+│   ├── services/         # Camada de serviços para API
+│   └── utils/            # Utilitários (formatação, validação)
+├── api/                   # Backend Express (Vercel serverless)
+│   ├── index.js          # Handler consolidado (roteador principal)
+│   ├── caixa-misteriosa.js  # Handler dedicado para jogo ao vivo
+│   ├── migrations/       # Migrações PostgreSQL
+│   └── _lib/            # Bibliotecas compartilhadas (security, etc)
+├── lib/                   # Libs compartilhadas (db.js para conexão PostgreSQL)
+└── public/               # Arquivos estáticos
 ```
 
-### Technology Stack
-- **Frontend**: React 18.2.0 SPA with React Router v6
-- **Backend**: Express.js API on Vercel Serverless Functions
-- **Database**: PostgreSQL with node-pg-migrate for schema management
-- **Deploy**: Vercel (consolidate handler pattern due to 12-function limit)
-- **Testing**: Jest + React Testing Library
-- **AI**: Google Generative AI (Gemini) for hint generation
-- **Mapping**: Leaflet + react-leaflet for interactive maps
-- **Auth**: JWT (jsonwebtoken) with bcrypt password hashing
-- **Data Export**: ExcelJS for Excel file generation
+### Principais Padrões Arquiteturais
 
+#### 1. Estratégia de Lazy Loading
+Todas as páginas são carregadas sob demanda usando `React.lazy()` e `Suspense`:
+- Componentes críticos (LoginForm, DashboardLayout) carregam imediatamente
+- Páginas carregam sob demanda com spinners de loading
+- Rotas externas (`/external/*`) contornam o layout principal para popups
 
-### Key Architectural Patterns
+#### 2. Arquitetura de Contextos
+Quatro contextos principais fornecem estado global:
+- **AuthContext**: Autenticação de usuário, papéis, permissões
+- **ThemeContext**: Alternância de temas (modos claro/escuro)
+- **ToastContext**: Sistema global de notificações
+- **LayoutContext**: Estado do layout do dashboard (sidebar aberta/fechada)
 
-#### 1. Page Lazy Loading Strategy
-All pages are code-split and lazy-loaded on demand using `React.lazy()` and `Suspense`:
-- Critical components (LoginForm, DashboardLayout) load immediately
-- Pages load on-demand with loading spinners
-- External routes (`/external/*`) bypass main layout for popups
-- Benefits: Reduces initial bundle size, improves FCP/LCP metrics
+#### 3. Camada de Serviços
+Serviços em `src/services/` lidam com toda comunicação de API:
+- **authService.js**: Autenticação, gerenciamento de tokens JWT
+- **promocaoService.js**: Gerenciamento de promoções
+- **participanteService.js**: Dados de participantes
+- **sorteioService.js**: Funcionalidade de sorteios/draws
+- **dashboardService.js**: Analytics do dashboard
+- **auditService.js**: Logging de auditoria e segurança
 
-#### 2. Context-Based Global State
-Four main contexts provide global state management:
-- **AuthContext** (`src/contexts/AuthContext.js`): User authentication, roles, permissions
-- **ThemeContext** (`src/contexts/ThemeContext.jsx`): Light/dark theme toggle with persistence
-- **ToastContext** (`src/contexts/ToastContext.js`): Global notification system
-- **LayoutContext** (`src/contexts/LayoutContext.js`): Sidebar open/closed state
+#### 4. Controle de Acesso Baseado em Papéis
+Rotas são protegidas com permissões granulares via `ProtectedRoute`:
+- `admin`: Acesso completo ao sistema
+- `moderator`: Gerenciamento de conteúdo
+- `editor`: Edição de conteúdo
+- `viewer`: Acesso somente leitura
+- `user`: Acesso básico de participante
 
-Usage example:
+### Arquitetura Backend
+
+#### Limite de Funções Serverless Vercel
+- **Vercel Free Tier**: Máximo 12 funções serverless
+- **Solução implementada**: Handler consolidado em `api/index.js`
+- **Roteamento**: Via query params `?route=RESOURCE&endpoint=ACTION` OU path `/api/RESOURCE`
+- **Handlers dedicados**: Apenas para funcionalidades complexas (ex: `api/caixa-misteriosa.js`)
+
+#### Exemplo de Roteamento
 ```javascript
-const { user, userRole, canExport } = useAuth();
-const { theme, toggleTheme } = useTheme();
-const { showToast } = useToast();
+// Query params (explícito)
+/api/?route=promocoes&endpoint=list
+
+// Path-based (implícito - extraído automaticamente)
+/api/promocoes  // → route=promocoes
+/api/participantes  // → route=participantes
+
+// Handlers dedicados (bypass do index.js)
+/api/caixa-misteriosa/*  // → api/caixa-misteriosa.js
 ```
 
-#### 3. Service Layer Architecture
-Services in `src/services/` abstract all API communication:
-- **authService.js**: User login/logout, JWT token management
-- **participanteService.js**: Participant CRUD and list queries
-- **promocaoService.js**: Promotion management
-- **sorteioService.js**: Draw/raffle functionality
-- **dashboardService.js**: Dashboard analytics and metrics
-- **auditService.js**: Security audit logging
-- **logService.js**: General application logging
+#### Segurança
+- Rate limiting global (60 req/min por IP)
+- CORS whitelist para origens permitidas
+- Headers de segurança (CSP, X-Frame-Options, HSTS)
+- Autenticação JWT com verificação de expiração
+- Logging de auditoria para operações críticas
 
-Each service handles:
-- API endpoint construction
-- Authorization header management
-- Request/response transformation
-- Error handling and user feedback
+### Banco de Dados PostgreSQL
+- Conexão gerenciada via `lib/db.js` com connection pooling
+- Migrações com `node-pg-migrate` em `api/migrations/`
+- Trilhas de auditoria para compliance
+- **Variáveis requeridas**: `DATABASE_URL`, `JWT_SECRET`
 
-#### 4. Role-Based Access Control (RBAC)
-Routes are protected with granular permissions via `ProtectedRoute` component:
-- **admin**: Full system access
-- **moderator**: Content management
-- **editor**: Content editing
-- **viewer**: Read-only access
-- **user**: Basic participant access
+## Principais Funcionalidades & Componentes
 
-Example usage:
-```javascript
-<ProtectedRoute requiredRole="admin">
-  <AdminDashboard />
-</ProtectedRoute>
-```
+### Funcionalidades Especiais
 
-### Backend Architecture
+#### 1. Caixa Misteriosa (`/dashboard/caixa-misteriosa`)
+Sistema de jogo ao vivo interativo tipo "adivinhação de produto":
+- **Painel Admin**: Gerenciamento de jogos, patrocinadores, produtos e dicas
+- **Página Pública** (`/caixa-misteriosa-pub`): Interface para participantes enviarem palpites
+- **Geração de Dicas com IA**: Integração com Google Gemini AI
+  - Modelo: `gemini-2.0-flash-exp` (fallback automático entre 9 modelos)
+  - Prompt dual: base técnico + complemento customizado
+  - Moderação automática de conteúdo ofensivo
+  - Requer `GOOGLE_API_KEY` em variáveis de ambiente
+- **Recursos**: Revelação progressiva de dicas, sistema de referência, palpites extras
+- **API dedicada**: `api/caixa-misteriosa.js` (handler separado por complexidade)
 
-#### Vercel Serverless Function Constraint
-- **Vercel Free Tier Limit**: Maximum 12 serverless functions
-- **Solution**: Consolidated handler pattern in `api/index.js` with query-param routing
-- **Dedicated handlers**: Only for complex features (e.g., `api/caixa-misteriosa.js`)
-- **Modular organization**: Handler logic split across `api/_handlers/` for clarity
+#### 2. Mapas Interativos (`/dashboard/mapas`)
+Visualização geográfica de participantes usando Leaflet:
+- Heatmaps de densidade de participantes
+- Markers com informações detalhadas
+- Filtros por promoção, cidade, bairro
 
-#### Request Routing Strategy
-Routes can be accessed via:
-1. **Query parameters** (explicit): `/api/?route=promocoes&endpoint=list`
-2. **Path-based** (automatic): `/api/promocoes` → extracts to `route=promocoes`
-3. **Dedicated handlers** (bypass main router): `/api/caixa-misteriosa/*`
+#### 3. Gerador de Links (`/dashboard/gerador-links`)
+Sistema completo de tracking e atribuição:
+- Geração automática de links com parâmetros UTM
+- QR Codes para campanhas offline
+- Tracking de origem (source, medium, campaign)
+- Dashboard de análise de tráfego (`/dashboard/mapa-participantes`)
 
-Backend flow:
-```
-Request → api/index.js
-  ├─ Security checks (rate limit, CORS, headers)
-  ├─ Route extraction (from query or path)
-  ├─ Main handler switch statement
-  │   ├─ route=auth → _handlers/auth.js
-  │   ├─ route=participantes → _handlers/participantes.js
-  │   ├─ route=audit → _handlers/audit.js
-  │   ├─ route=dashboard → _handlers/dashboard.js
-  │   └─ ...other routes
-  └─ Dedicated handler (caixa-misteriosa only)
-```
+#### 4. Sorteios & Promoções
+- **Página de Sorteio Público** (`/sorteio-publico`): Resultados voltados ao público
+- **Gerenciamento automático de status**: Promoções marcadas como "encerrada" após sorteio
+- **Reversibilidade**: Cancelamento de ganhador restaura status "ativa"
+- **Logs de Auditoria** (`/dashboard/audit-logs`): Monitoramento de segurança exclusivo para admins
 
-#### Security Implementation (`api/_lib/security.js`)
-- **Rate Limiting**: 60 requests/minute per IP (200 in development to prevent React Strict Mode issues)
-- **CORS**: Whitelist of allowed origins (production domains + localhost)
-- **Security Headers**:
-  - `X-Frame-Options: DENY`
-  - `X-Content-Type-Options: nosniff`
-  - `Content-Security-Policy: default-src 'self'`
-  - `Strict-Transport-Security: max-age=31536000`
-- **Authentication**: JWT validation on protected endpoints
-- **Audit Logging**: Security-critical operations logged for compliance
+### Componentes Críticos
 
-#### Database Management
-- **Connection**: Managed via `lib/db.js` with connection pooling
-- **Migrations**: PostgreSQL migrations in `api/migrations/` using node-pg-migrate
-- **Deduplication**: Automatic participant deduplication by phone across multiple tables
-- **Audit Trail**: Complete logging of sensitive operations (draw results, user actions)
-- **Required Env Vars**: `DATABASE_URL`, `JWT_SECRET`
+#### Layout & Navegação
+- **DashboardLayout**: Wrapper principal com Header/Sidebar responsivo mobile
+- **Header**: Componente reutilizável com menu hamburger, aceita children para botões customizados
+- **ProtectedRoute**: Guarda de rota com acesso baseado em papel
 
-## Key Features & Special Functionality
+#### Formulários & Visualização
+- **CapturaForm**: Formulário público de registro de participantes
+- **InteractiveMap**: Integração Leaflet para funcionalidades de geolocalização
+- **ThemeSelector**: Alternância de tema com persistência (modos dropdown/inline)
 
-### 1. Mystery Box Game (Caixa Misteriosa)
-**Files**: `src/pages/CaixaMisteriosaPage.jsx`, `src/pages/CaixaMisteriosaPubPage.jsx`, `api/caixa-misteriosa.js`
+## Diretrizes de Desenvolvimento
 
-Interactive live guessing game where participants guess a product based on AI-generated hints:
-- **Admin Panel** (`/dashboard/caixa-misteriosa`): Game management, sponsors, products, hints
-- **Public Page** (`/caixa-misteriosa-pub`): Participant interface for submitting guesses
-- **AI Hint Generation**: Google Gemini AI integration
-  - Primary model: `gemini-2.0-flash-exp` (automatic fallback to 8 other models)
-  - Dual-prompt system: Fixed technical base + customizable context
-  - Automatic content moderation (filters offensive responses)
-  - Requires: `GOOGLE_API_KEY` environment variable
-- **Game Features**: Progressive hint revelation, referral system, bonus guesses
-- **Dedicated API**: `api/caixa-misteriosa.js` (separate handler due to complexity)
+### Comunicação da API
+- **URL base**: `/api` (proxy configurado para desenvolvimento)
+- **Autenticação**: Token JWT via header `Authorization: Bearer <token>`
+- **Formato de resposta**: JSON com estrutura `{ success: boolean, data?: any, error?: string }`
+- **CORS**: Configurado apenas para origens permitidas (localhost:3000-3002, domínios de produção)
 
-**3-Layer Guess Validation**:
-1. **Keywords**: Normalized stemming for exact matches
-2. **Levenshtein Distance**: Typo tolerance (edit distance ≤ 1)
-3. **AI Validation**: Contextual synonym recognition via Gemini
+### Padrões de Código
 
-### 2. Interactive Maps
-**Files**: `src/pages/MapasPage.jsx`, `src/components/InteractiveMap.jsx`
-
-Geographic visualization of participant distribution using Leaflet:
-- Heatmaps showing participant density by region
-- Clickable markers with detailed participant information
-- Real-time filters (promotion, city, neighborhood)
-- Browser geolocation support
-- Built with: react-leaflet, leaflet.heat, OpenStreetMap tiles
-
-### 3. Link Generator & UTM Tracking
-**Files**: `src/pages/GeradorLinksPage.jsx`
-
-Complete tracking and attribution system:
-- Automatic link generation with UTM parameters
-- QR code generation for offline campaigns
-- Origin tracking (source, medium, campaign)
-- Traffic analysis dashboard (`/dashboard/mapa-participantes`)
-- Social media auto-generation (WhatsApp, Instagram, Facebook)
-
-### 4. Draws & Promotions
-**Files**: `src/pages/SorteioPage.jsx`, `src/pages/SorteioPublicoPage.jsx`
-
-Smart raffle system with complete lifecycle management:
-- **Admin Panel** (`/dashboard/sorteio`): Manage draws, select winners
-- **Public Results** (`/sorteio-publico`): Public-facing results display
-- **Auto-Status Management**: Promotions auto-marked as "ended" after draw
-- **Reversibility**: Canceling a winner restores promotion to "active" status
-- **Complete Audit Trail** (`/dashboard/audit-logs`): Admin-only security monitoring
-
-### Critical Components
-
-#### Layout System
-- **DashboardLayout**: Main dashboard wrapper with responsive mobile sidebar
-- **Header**: Reusable header with hamburger menu, accepts children for custom buttons
-  - Includes: user info, logout, theme selector
-  - Mobile-responsive navigation toggle
-- **ProtectedRoute**: Route guard with role-based access control
-- **Sidebar**: Context-managed sidebar state (open/closed)
-
-#### Forms & Visualization
-- **LoginForm** (`src/components/LoginForm/`): Authentication form with JWT handling
-- **CapturaForm** (`src/pages/`): Public participant registration form
-- **InteractiveMap** (`src/components/InteractiveMap/`): Leaflet map integration component
-- **ThemeSelector** (`src/components/ThemeSelector/`): Light/dark mode toggle (persistent)
-- **ConfirmModal**: Reusable confirmation dialogs for destructive actions
-- **EditParticipanteModal**: Inline participant editing with API sync
-
-## Development Guidelines
-
-### API Communication Conventions
-- **Base URL**: `/api` (proxy configured in development)
-- **Authentication**: JWT token via `Authorization: Bearer <token>` header
-- **Response Format**: JSON with structure `{ success: boolean, data?: any, error?: string }`
-- **CORS**: Whitelist allows localhost:3000-3002 and production domains
-- **Error Handling**: Services should parse responses and display user-friendly toast messages
-
-### Frontend Code Patterns
-
-**✅ DO: Use lazy loading for pages**
+#### Frontend
 ```jsx
-const CaixaMisteriosaPage = React.lazy(() => import('./pages/CaixaMisteriosaPage'));
+// ✅ DO: Lazy loading de páginas
+const MyPage = React.lazy(() => import('./pages/MyPage'));
 
-<Suspense fallback={<LoadingSpinner />}>
-  <Routes>
-    <Route path="/dashboard/caixa-misteriosa" element={<CaixaMisteriosaPage />} />
-  </Routes>
-</Suspense>
-```
-
-**✅ DO: Use standard Header component for consistency**
-```jsx
+// ✅ DO: Usar Header padrão para consistência
 import Header from '../DashboardLayout/Header';
-
-<Header title="Participants" subtitle="Manage and export participants">
-  <button onClick={handleExport}>Export</button>
+<Header title="Título" subtitle="Subtítulo">
+  {/* Botões customizados opcionais */}
 </Header>
-```
 
-**✅ DO: Use formatting utilities**
-```jsx
+// ✅ DO: Usar utilitários de formatação
 import { formatUserName, formatPhonePreview } from '../utils/formatters';
-
 formatUserName('João Silva') // → "João S."
 formatPhonePreview('11999999999') // → "****9999"
+
+// ❌ DON'T: Aplicar .reverse() em listas da API (já vêm ordenadas)
+// API retorna ORDER BY created_at DESC - usar ordem direta
 ```
 
-**✅ DO: Use context hooks for global state**
-```jsx
-const { user, userRole, canExport } = useAuth();
-const { showToast } = useToast();
-const { sidebarOpen, toggleSidebar } = useLayout();
-```
-
-**❌ DON'T: Reverse API lists**
-```jsx
-// ❌ WRONG - API already returns ORDER BY created_at DESC
-const reversed = data.reverse();
-
-// ✅ RIGHT - Use data as-is
-return <ul>{data.map(item => ...)}</ul>
-```
-
-**❌ DON'T: Make direct fetch calls**
-```jsx
-// ❌ WRONG
-const resp = await fetch('/api/participants');
-
-// ✅ RIGHT - Use service layer
-import { fetchParticipants } from '../services/participanteService';
-const participants = await fetchParticipants();
-```
-
-### Backend Code Patterns
-
-**✅ DO: Audit security-critical operations**
+#### Backend
 ```javascript
-const { logAudit } = require('../_handlers/audit');
+// ✅ DO: Auditar operações sensíveis
+const { logAudit } = require('./auditService');
+await logAudit(userId, 'SORTEIO_REALIZADO', { promocao_id });
 
-// In draw endpoint
-await logAudit(userId, 'DRAW_EXECUTED', { promocao_id, winner_id });
+// ✅ DO: Usar handler consolidado para novas rotas
+// Em api/index.js, adicionar case no switch (route)
+
+// ❌ DON'T: Criar novas funções serverless (limite de 12)
+// Use api/index.js com query params route/endpoint
 ```
 
-**✅ DO: Use consolidated handler for new routes**
-```javascript
-// In api/index.js switch statement
-case 'myroutehandler':
-  const handler = require('./_handlers/myroutehandler');
-  return await handler(req, res, getAuthenticatedUser);
-```
-
-**✅ DO: Validate JWT before processing**
-```javascript
-const user = await getAuthenticatedUser(req);
-if (!user) return res.status(401).json({ success: false, error: 'Unauthorized' });
-```
-
-**❌ DON'T: Create new serverless functions**
-```javascript
-// ❌ WRONG - Vercel free tier limit is 12 functions
-// Don't create api/mynewfunction.js
-
-// ✅ RIGHT - Use api/index.js with route parameter
-// POST /api/?route=mynewfunction&endpoint=list
-```
-
-### Environment Variables (Required)
+### Variáveis de Ambiente Requeridas
 ```env
-# Database (required)
-DATABASE_URL=postgresql://user:password@host:5432/dbname
+# Banco de Dados
+DATABASE_URL=postgresql://user:pass@host:port/dbname
 
-# Authentication (required)
-JWT_SECRET=your_very_long_and_secure_secret_key
+# Autenticação
+JWT_SECRET=seu_secret_aqui
 
-# AI Integration (optional, enables Gemini hints)
+# Google AI (Caixa Misteriosa)
 GOOGLE_API_KEY=AIzaSy...
 
-# Environment (optional, defaults to development)
+# Opcional
 NODE_ENV=production|development
 ```
 
-### Testing Strategy
-- **Framework**: Jest + React Testing Library
-- **Coverage**: 97+ tests covering components, services, contexts, pages
-- **Focus**: User-critical flows (login, draw, participation)
-- **Run Tests**:
-  ```bash
-  npm test              # Interactive
-  npm run test:coverage # With coverage report
-  npm run test:ci       # CI mode (no watch)
-  ```
+### Estratégia de Testes
+- **Jest + React Testing Library** para testes de componentes
+- **97+ testes** com foco em fluxos críticos de usuário
+- **Cobertura**: Componentes, serviços, contextos e páginas principais
+- **Executar testes**: `npm test` (interativo) ou `npm run test:coverage`
 
-### Database Operations
-- **Always use migrations** for schema changes (`api/migrations/`)
-- **Connection pooling**: Managed via `lib/db.js`
-- **Audit logging**: Track sensitive operations (draws, user actions, deletions)
-- **Post-Vercel Deploy**: Manually run migrations (see `MIGRATIONS.md`)
-- **Deduplication**: Automatic participant deduplication by phone number across tables
+### Operações de Banco de Dados
+- **Sempre usar migrações** para mudanças de schema em `api/migrations/`
+- **Connection pooling** gerenciado via `lib/db.js`
+- **Auditar operações sensíveis** via `auditService.js`
+- **Após deploy na Vercel**: Executar migrações manualmente (ver `MIGRATIONS.md`)
 
-## Environment Setup
-1. Copy `.env.example` to `.env` in project root
-2. Set `DATABASE_URL` to your PostgreSQL connection string
-3. Set `JWT_SECRET` to a long random string
-4. (Optional) Set `GOOGLE_API_KEY` to enable Gemini AI hints
-5. For Vercel deploy: Add environment variables in dashboard Settings → Environment Variables
+## Configuração do Ambiente
+1. Copie `.env.example` para `.env` no diretório raiz
+2. Configure `DATABASE_URL` e `JWT_SECRET`
+3. (Opcional) Configure `GOOGLE_API_KEY` para Caixa Misteriosa
+4. Deploy na Vercel requer variáveis de ambiente no dashboard
 
-## Performance Optimizations
-- **Code Splitting**: Pages lazy-loaded reduce initial bundle size
-- **Conditional Loading**: Chart.js and Leaflet only load when pages render
-- **PWA Support**: Service Worker registered for offline capabilities
-- **Bundle Analysis**: Run `npm run analyze` or `npm run analyze:bundle` to inspect size
+## Otimizações de Performance
+- Lazy loading de componentes reduz tamanho do bundle inicial
+- Chart.js e Leaflet carregados apenas quando necessário
+- Service Worker registrado para capacidades PWA
+- Ferramentas de análise: `npm run analyze` ou `npm run analyze:bundle`
 
-## Important Documentation Files
-- **`CLAUDE.md`**: This file - development guidance
-- **`README.md`**: Full project documentation
-- **`MIGRATIONS.md`**: Database migration guide
-- **`RESTORE_POINTS.md`**: Documented Git restore points
-- **`DESIGN_SYSTEM_v2.7.md`**: CSS classes and animations available
-- **`TESTING.md`**: Test strategy and examples
-- **`AUDITORIA_SEGURANCA_2025.md`**: Security audit report
+## Pontos de Restauração
+Consulte `RESTORE_POINTS.md` para pontos de restauração Git documentados:
+- **v1.0.1-google-ai-fixed**: Google AI Integration funcionando (commit: fab0da6)
+  - Detecção automática de modelos Gemini disponíveis
+  - Suporte para Gemini 2.0, 1.5 e 1.0
+  - Prompt dual: base técnico + complemento customizado
 
-## Known Stable Versions
-### v2.5 (Current - Stable)
-**Commit**: `61c7c87` | **Date**: 2025-10-24
-- ✅ Unified dashboard with phone-based deduplication
-- ✅ Automatic Caixa Misteriosa participant inclusion
-- ✅ Fixed participant counts (0 → 45 unique)
-- ✅ Optimized SQL with CTE queries
+## Padrões de UX/UI Específicos do Projeto
 
-### v1.0.1 (Google AI Fixed)
-**Commit**: `fab0da6` | **Date**: 2025-10-03
-- ✅ Google Gemini AI integrated and working
-- ✅ Automatic model detection and fallback
-- ✅ Supports Gemini 2.0, 1.5, and 1.0 models
-
-## Project-Specific UX/UI Patterns
-
-### Dashboard Header (Mobile-First)
-All dashboard modules **must use** the standard `Header` component:
+### Menu Mobile
+Todos os módulos do dashboard **devem usar** o componente `Header` padrão:
 ```jsx
 import Header from '../DashboardLayout/Header';
 
-<Header title="Participants" subtitle="Manage and export participants">
-  {/* Custom action buttons (optional) */}
+<Header title="Título" subtitle="Subtítulo">
+  {/* Botões customizados opcionais */}
 </Header>
 ```
-Features:
-- Automatic hamburger menu (☰)
-- Responsive sidebar toggle via LayoutContext
-- Integrated theme selector (light/dark)
-- User info and logout button
+- Menu hamburger automático (☰)
+- Sidebar responsiva via LayoutContext
+- ThemeSelector integrado
+- User info e logout
 
-### Data Formatting Utilities
-Located in `src/utils/formatters.js`:
-- **Names**: `formatUserName(nome)` → "João Silva" becomes "João S."
-- **Phones**: `formatPhonePreview(telefone)` → "11999999999" becomes "****9999"
+### Formatação de Dados
+Use utilitários em `src/utils/`:
+- **Nomes**: `formatUserName(nome)` - "João Silva" → "João S."
+- **Telefones**: `formatPhonePreview(telefone)` - "11999999999" → "****9999"
 
-### API List Ordering Convention (Caixa Misteriosa)
-- **Backend Returns**: `ORDER BY created_at DESC` (newest first)
-- **Frontend**: **DO NOT apply `.reverse()`** - use API order as-is
-- **Display Format**: `HH:MM - Name - District - Guess ✅`
+### Ordem de Listas (Caixa Misteriosa)
+- **API retorna**: `ORDER BY created_at DESC` (mais recentes primeiro)
+- **Frontend**: NÃO aplicar `.reverse()` - usar ordem direta da API
+- **Formato de exibição**: `HH:MM - Nome - Bairro - Palpite ✅`
 
-## Design System v2.7
+## 🎨 Design System v2.7 (Novo!)
 
-Enhanced CSS animation and color system. See `DESIGN_SYSTEM_v2.7.md` for complete reference.
+O projeto agora possui um Design System aprimorado com novos efeitos visuais e cores. Consulte `DESIGN_SYSTEM_v2.7.md` para documentação completa.
 
-### Extended Color Palette
+### Paleta de Cores Extendida
 ```css
-/* Primary gradient colors */
---color-purple: #8b5cf6
---color-pink: #ec4899
---color-indigo: #6366f1
---color-cyan: #06b6d4
---color-teal: #14b8a6
---color-lime: #84cc16
+/* Cores Complementares */
+--color-purple: #8b5cf6       /* Roxo */
+--color-pink: #ec4899         /* Rosa */
+--color-indigo: #6366f1       /* Índigo */
+--color-cyan: #06b6d4         /* Ciano */
+--color-teal: #14b8a6         /* Teal */
+--color-lime: #84cc16         /* Lima */
 ```
 
-### Common CSS Classes
+### Novos Efeitos Disponíveis
 
-**Animations**: `.float`, `.pulse-glow`, `.shimmer`, `.bounce-in`, `.slide-in-left`
+#### Animações
+- `.float` / `.float-slow`: Flutuação suave
+- `.pulse-glow`: Pulso de luminosidade
+- `.shimmer`: Efeito brilho (skeleton loading)
+- `.bounce-in`: Entrada com salto
+- `.slide-in-left` / `.slide-in-right`: Entradas laterais
+- `.color-shift`: Rotação contínua de cores
 
-**Visual Effects**: `.gradient-border`, `.neon`, `.blur-bg`, `.text-gradient`
+#### Estilos Visuais
+- `.gradient-border`: Borda com gradiente vibrante
+- `.glow-border`: Borda com efeito luminoso
+- `.neon`: Texto neon com brilho
+- `.blur-bg` / `.blur-bg-dark`: Glassmorphism
+- `.btn-gradient`: Botão com gradiente aprimorado
+- `.text-gradient`: Texto com gradiente de cor
+- `.underline-hover`: Sublinha animada ao hover
 
-**States**: `.loading-card`, `.success-state`, `.error-state`, `.warning-state`
+#### Efeitos de Ícones
+- `.icon-rotate`: Rotação ao hover
+- `.icon-scale`: Escala ao hover
+- `.icon-bounce`: Salto ao hover
 
-See `DESIGN_SYSTEM_v2.7.md` for complete class reference and examples.
+#### Estados Visuais
+- `.loading-card`: Animação de carregamento
+- `.success-state`: Estado de sucesso
+- `.error-state`: Estado de erro (shake)
+- `.warning-state`: Estado de aviso (pulsante)
 
-## Troubleshooting & Common Issues
+### Como Usar
 
-### Rate Limit (429 Error)
-- **Dev**: Increased to 200 req/min to accommodate React Strict Mode double-rendering
-- **Production**: 60 req/min per IP
-- **Solution**: Space out requests or wait for rate limit reset
+```jsx
+// Exemplo: Card flutuante com brilho
+<div class="card-modern float pulse-glow">
+  <h2 class="text-gradient">Título Especial</h2>
+  <button class="btn btn-gradient">Ação</button>
+</div>
 
-### JWT Token Expired
-- Frontend automatically clears localStorage and redirects to login
-- AuthContext catches token errors and triggers logout
-- Check `JWT_SECRET` matches between frontend and backend
+// Exemplo: Texto neon com entrada animada
+<h1 class="neon slide-in-left">Bem-vindo</h1>
 
-### Database Connection Failed
-- Verify `DATABASE_URL` environment variable
-- Test with: `curl http://localhost:3002/api/?route=db&endpoint=test`
-- Check PostgreSQL credentials and network access
+// Exemplo: Link com sublinha animada
+<a href="#" class="underline-hover">Clique aqui</a>
 
-### Gemini AI Hints Not Generating
-- Verify `GOOGLE_API_KEY` is set and valid
-- Check API quota limits in Google Cloud Console
-- Fallback models automatically attempt if primary fails
-- Check logs for error details
-
-## Helpful Commands for Development
-
-```bash
-# Debug database connection
-curl http://localhost:3002/api/?route=db&endpoint=test
-
-# Check current git branch and status
-git status
-
-# View recent commits
-git log --oneline -10
-
-# Run specific test file
-npm test -- LoginForm.test.jsx
-
-# Build and analyze bundle
-npm run analyze
-
-# Create a new database migration
-npx node-pg-migrate create migration_name
+// Exemplo: Ícone com rotação
+<i class="icon-rotate">⚙️</i>
 ```
 
-## Getting Help
-- Check `README.md` for comprehensive documentation
-- Review `TESTING.md` for test patterns and examples
-- See `MIGRATIONS.md` for database schema changes
-- Refer to `DESIGN_SYSTEM_v2.7.md` for available CSS animations
-- Check existing tests in `src/**/*.test.js` for usage patterns
+### Tema Escuro Automático
+Todos os efeitos se adaptam automaticamente ao tema escuro do usuário via `@media (prefers-color-scheme: dark)`.
+
+### Performance
+- ✅ CSS-only (sem JavaScript)
+- ✅ GPU Accelerated
+- ✅ Acessibilidade (respeita `prefers-reduced-motion`)
+- ✅ ~15KB adicional apenas
+- ✅ Compatível com v2.6

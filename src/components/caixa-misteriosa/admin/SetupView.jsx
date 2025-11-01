@@ -424,6 +424,50 @@ const SetupView = ({
 
     return (
         <div>
+            {/* Seção de Configurações de Emergência */}
+            <div style={{
+                marginBottom: '2rem',
+                background: currentThemeData.surface,
+                padding: '1.5rem',
+                borderRadius: '0.75rem',
+                border: `2px solid ${currentThemeData.danger}`,
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)'
+            }}>
+                <h2 style={{...styles.h2, color: currentThemeData.danger, borderColor: currentThemeData.danger, marginBottom: '0.75rem'}}>
+                    ⚙️ Configuração Caixa Misteriosa
+                </h2>
+                <p style={{color: currentThemeData.textSecondary, marginBottom: '1rem', fontSize: '0.95rem'}}>
+                    Ações de emergência e configurações críticas do sistema.
+                </p>
+
+                <button
+                    style={{
+                        background: currentThemeData.danger,
+                        color: 'white',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: '0.5rem',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '1rem',
+                        boxShadow: `0 2px 8px ${currentThemeData.danger}4D`,
+                        transition: 'all 0.2s'
+                    }}
+                    onClick={() => {
+                        if (window.confirm('⚠️ ATENÇÃO - RESETAR JOGO (EMERGÊNCIA)\n\nIsso irá DELETAR PERMANENTEMENTE:\n❌ O jogo atual do banco de dados\n❌ Todos os palpites enviados\n❌ Dados do ganhador (se houver)\n\n⚠️ ESTA AÇÃO NÃO PODE SER DESFEITA!\n\nTem certeza absoluta?')) {
+                            if (window.confirm('🔴 ÚLTIMA CONFIRMAÇÃO\n\nVocê está prestes a DELETAR PERMANENTEMENTE todos os dados do jogo.\n\nConfirma RESETAR o jogo?')) {
+                                actions.resetGame();
+                            }
+                        }
+                    }}
+                    disabled={loading}
+                    onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                    onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                >
+                    🚨 Resetar Jogo (Emergência)
+                </button>
+            </div>
+
             {/* Formulários de edição aparecem no topo se ativos */}
             {editingSponsor && (
                 <div style={{

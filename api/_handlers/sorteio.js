@@ -121,7 +121,17 @@ async function realizarSorteio(req, res) {
       });
     }
 
-    const quantidade = promocaoInfo.rows[0].numero_ganhadores || 3;
+    let quantidade = parseInt(promocaoInfo.rows[0].numero_ganhadores, 10) || 3;
+
+    // Validar que quantidade está entre 1 e 3
+    if (isNaN(quantidade) || quantidade < 1) {
+      quantidade = 1;
+    } else if (quantidade > 3) {
+      quantidade = 3;
+    }
+
+    console.log(`📊 [SORTEIO] Promo ${promocaoId} - numero_ganhadores do BD: ${promocaoInfo.rows[0].numero_ganhadores} (tipo: ${typeof promocaoInfo.rows[0].numero_ganhadores})`);
+    console.log(`📊 [SORTEIO] Quantidade após parseInt: ${quantidade} (tipo: ${typeof quantidade})`);
 
     // Verificar se já existem ganhadores para esta promoção e cancelá-los automaticamente
     const existingWinners = await databasePool.query(`
@@ -141,56 +151,74 @@ async function realizarSorteio(req, res) {
     }
 
     // Buscar participantes disponíveis para o sorteio
+    console.log(`📊 [SORTEIO] Buscando ${quantidade} participantes para promo ${promocaoId}`);
     const participantesResult = await databasePool.query(`
-      SELECT p.* 
-      FROM participantes p 
-      WHERE p.promocao_id = $1 
+      SELECT p.*
+      FROM participantes p
+      WHERE p.promocao_id = $1
       ORDER BY RANDOM()
       LIMIT $2
     `, [promocaoId, quantidade]);
 
+    console.log(`📊 [SORTEIO] Participantes retornados: ${participantesResult.rows.length}`);
+
     if (participantesResult.rows.length === 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Nenhum participante encontrado para esta promoção' 
+        message: 'Nenhum participante encontrado para esta promoção'
       });
     }
 
     // Criar os ganhadores
     const ganhadores = [];
     const premios = ['1º Lugar - R$ 10.000', '2º Lugar - R$ 5.000', '3º Lugar - R$ 2.000'];
-    
+
+    // Loop para criar ganhadores
     for (let i = 0; i < participantesResult.rows.length && i < quantidade; i++) {
       const participante = participantesResult.rows[i];
       const premio = premios[i] || `${i + 1}º Lugar`;
-      
-      // Inserir ganhador na tabela
-      const insertResult = await databasePool.query(`
-        INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio)
-        VALUES ($1, $2, $3, $4)
-        RETURNING *
-      `, [participante.id, promocaoId, i + 1, premio]);
 
-      ganhadores.push({
-        id: `winner_${participante.id}`,
-        participante_id: participante.id,
-        promocao_id: promocaoId,
-        nome: participante.nome,
-        telefone: participante.telefone,
-        cidade: participante.cidade,
-        bairro: participante.bairro,
-        posicao: i + 1,
-        premio: premio,
-        sorteado_em: insertResult.rows[0].sorteado_em,
-        status: 'sorteado'
-      });
+      try {
+        // Inserir ganhador na tabela
+        const insertResult = await databasePool.query(`
+          INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio, cancelado)
+          VALUES ($1, $2, $3, $4, false)
+          ON CONFLICT (participante_id, promocao_id)
+          DO UPDATE SET posicao = $3, premio = $4, cancelado = false, sorteado_em = CURRENT_TIMESTAMP
+          RETURNING *
+        `, [participante.id, promocaoId, i + 1, premio]);
+
+        ganhadores.push({
+          id: `winner_${participante.id}`,
+          participante_id: participante.id,
+          promocao_id: promocaoId,
+          nome: participante.nome,
+          telefone: participante.telefone,
+          cidade: participante.cidade,
+          bairro: participante.bairro,
+          posicao: i + 1,
+          premio: premio,
+          sorteado_em: insertResult.rows[0].sorteado_em,
+          status: 'sorteado'
+        });
+      } catch (insertError) {
+        console.error(`ERRO ao inserir ganhador ${i + 1}:`, insertError.message);
+      }
     }
+
+    console.error(`✅✅✅ SORTEIO PROMO ${promocaoId}: ${ganhadores.length}/${quantidade} ganhadores criados ✅✅✅`);
+    console.error(`PARTICIPANTES SELECIONADOS: ${participantesResult.rows.length}`);
+    console.error(`GANHADORES NO ARRAY: ${ganhadores.length}`);
+    console.error(`QUANTIDADE CONFIGURADA: ${quantidade}`);
 
     return res.status(200).json({
       success: true,
       data: ganhadores,
       total: ganhadores.length,
-      message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`
+      message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`,
+      api_version: 'v2.0-31out2025-14h30',  // Identificador para verificar se código novo está rodando
+      quantidade_configurada: quantidade,
+      timestamp_servidor: new Date().toISOString()
     });
 
   } catch (error) {
@@ -317,9 +345,28 @@ async function processarGanhadores(req, res) {
       console.log('Coluna cancelado já existe ou erro ao criar:', error.message);
     }
 
+    // Buscar configuração de número de ganhadores da promoção
+    let numeroGanhadores = 3; // padrão
+    try {
+      const promoConfig = await databasePool.query(`
+        SELECT numero_ganhadores FROM promocoes WHERE id = $1
+      `, [promocaoId]);
+      if (promoConfig.rows.length > 0) {
+        numeroGanhadores = parseInt(promoConfig.rows[0].numero_ganhadores, 10) || 3;
+        // Validar bounds
+        if (numeroGanhadores < 1) numeroGanhadores = 1;
+        if (numeroGanhadores > 3) numeroGanhadores = 3;
+      }
+    } catch (error) {
+      console.log('Não foi possível buscar numero_ganhadores, usando padrão 3:', error.message);
+    }
+
     // Primeiro, buscar ganhadores já existentes
     let ganhadoresExistentes = await databasePool.query(`
-      SELECT g.*, p.nome, p.telefone, p.cidade, p.bairro, pr.nome as promocao_nome
+      SELECT
+        g.id, g.participante_id, g.promocao_id, g.posicao, g.premio, g.sorteado_em, g.cancelado,
+        p.nome, p.telefone, p.cidade, p.bairro,
+        pr.nome as promocao_nome
       FROM ganhadores g
       JOIN participantes p ON g.participante_id = p.id
       LEFT JOIN promocoes pr ON g.promocao_id = pr.id
@@ -327,16 +374,18 @@ async function processarGanhadores(req, res) {
       ORDER BY g.posicao
     `, [promocaoId]);
 
+    console.log(`📊 [GANHADORES] Promo ${promocaoId} - Ganhadores existentes retornados: ${ganhadoresExistentes.rows.length}`);
+
     // Se não existem ganhadores, criar alguns baseado nos participantes
     if (ganhadoresExistentes.rows.length === 0) {
       const participantesResult = await databasePool.query(`
-        SELECT p.*, pr.nome as promocao_nome 
-        FROM participantes p 
-        LEFT JOIN promocoes pr ON p.promocao_id = pr.id 
-        WHERE p.promocao_id = $1 
+        SELECT p.*, pr.nome as promocao_nome
+        FROM participantes p
+        LEFT JOIN promocoes pr ON p.promocao_id = pr.id
+        WHERE p.promocao_id = $1
         ORDER BY p.id
-        LIMIT 3
-      `, [promocaoId]);
+        LIMIT $2
+      `, [promocaoId, numeroGanhadores]);
 
       if (participantesResult.rows.length > 0) {
         // Inserir ganhadores na tabela
@@ -364,61 +413,52 @@ async function processarGanhadores(req, res) {
     }
 
     // Usar ganhadores da base de dados
-    ganhadores = ganhadoresExistentes.rows.map(ganhador => ({
-      id: `winner_${ganhador.participante_id}`,
-      participante_id: ganhador.participante_id,
-      promocao_id: ganhador.promocao_id,
-      nome: ganhador.nome,
-      telefone: ganhador.telefone,
-      cidade: ganhador.cidade,
-      bairro: ganhador.bairro,
-      promocao_nome: ganhador.promocao_nome,
-      posicao: ganhador.posicao,
-      premio: ganhador.premio,
-      sorteado_em: ganhador.sorteado_em,
-      status: 'sorteado'
-    }));
+    console.log(`📊 [GANHADORES] ganhadoresExistentes.rows.length ANTES do map: ${ganhadoresExistentes.rows.length}`);
+    ganhadores = ganhadoresExistentes.rows.map((ganhador, idx) => {
+      console.log(`📊 [GANHADORES] Mapeando ganhador ${idx}: ${ganhador.nome} - posicao: ${ganhador.posicao}`);
+      return {
+        id: `winner_${ganhador.participante_id}`,
+        participante_id: ganhador.participante_id,
+        promocao_id: ganhador.promocao_id,
+        nome: ganhador.nome,
+        telefone: ganhador.telefone,
+        cidade: ganhador.cidade,
+        bairro: ganhador.bairro,
+        promocao_nome: ganhador.promocao_nome,
+        posicao: ganhador.posicao,
+        premio: ganhador.premio,
+        sorteado_em: ganhador.sorteado_em,
+        status: 'sorteado'
+      };
+    });
+    console.log(`📊 [GANHADORES] ganhadores.length APÓS o map: ${ganhadores.length}`);
 
   } catch (queryError) {
-    // Dados mock se não conseguir buscar participantes
-    ganhadores = [
-      {
-        id: 'winner_mock_1',
-        participante_id: 1,
-        promocao_id: parseInt(promocaoId),
-        nome: 'João Silva',
-        telefone: '(11) 99999-1111',
-        cidade: 'São Paulo',
-        bairro: 'Centro',
-        promocao_nome: 'Promoção de Exemplo',
-        posicao: 1,
-        premio: '1º Lugar - R$ 10.000',
-        sorteado_em: new Date().toISOString(),
-        status: 'sorteado'
-      },
-      {
-        id: 'winner_mock_2',
-        participante_id: 2,
-        promocao_id: parseInt(promocaoId),
-        nome: 'Maria Santos',
-        telefone: '(11) 99999-2222',
-        cidade: 'São Paulo',
-        bairro: 'Vila Madalena',
-        promocao_nome: 'Promoção de Exemplo',
-        posicao: 2,
-        premio: '2º Lugar - R$ 5.000',
-        sorteado_em: new Date().toISOString(),
-        status: 'sorteado'
-      }
-    ];
+    console.error('Erro ao buscar ganhadores:', queryError);
+    // Se houver erro, retornar array vazio em vez de dados mock
+    // Isso evita exibir dados fake quando a promoção não tem ganhadores
+    ganhadores = [];
   }
+
+  console.log(`📊 [GANHADORES] Response final - total: ${ganhadores.length}, data array length: ${ganhadores.length}`);
+  ganhadores.forEach((g, idx) => {
+    console.log(`  ${idx + 1}. ${g.nome} - Posição: ${g.posicao}`);
+  });
+
+  // Desativar cache para garantir dados atualizados
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
 
   return res.status(200).json({
     success: true,
     data: ganhadores,
+    ganhadores: ganhadores,  // Também retornar em ganhadores para compatibilidade
     total: ganhadores.length,
     promocao_id: parseInt(promocaoId),
-    message: `${ganhadores.length} ganhadores encontrados para a promoção ${promocaoId}`
+    message: `${ganhadores.length} ganhadores encontrados para a promoção ${promocaoId}`,
+    api_version: 'v2.0-31out2025-14h30',  // Identificador para verificar se código novo está rodando
+    timestamp_servidor: new Date().toISOString()
   });
 }
 

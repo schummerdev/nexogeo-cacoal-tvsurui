@@ -574,14 +574,6 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
 
                         {/* Botões de Ação */}
                         <div style={styles.buttonGroup}>
-                            <button
-                                style={styles.button.primary}
-                                onClick={actions.revealClue}
-                                disabled={loading || (revealedCluesCount || 0) >= 5 || status !== 'accepting'}
-                            >
-                                {(revealedCluesCount || 0) >= 5 ? '✅ Todas as dicas reveladas' : `🔓 Revelar Dica (${(revealedCluesCount || 0) + 1}/5)`}
-                            </button>
-
                             {status === 'accepting' && (
                                 <button
                                     style={styles.button.warning}
@@ -635,25 +627,33 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                 </div>
                             )}
                         </div>
-
-                        <button
-                            style={{...styles.button.danger, marginTop: '1rem'}}
-                            onClick={() => {
-                                if (window.confirm('⚠️ ATENÇÃO - RESETAR JOGO (EMERGÊNCIA)\n\nIsso irá DELETAR PERMANENTEMENTE:\n❌ O jogo atual do banco de dados\n❌ Todos os palpites enviados\n❌ Dados do ganhador (se houver)\n\n⚠️ ESTA AÇÃO NÃO PODE SER DESFEITA!\n\nTem certeza absoluta?')) {
-                                    if (window.confirm('🔴 ÚLTIMA CONFIRMAÇÃO\n\nVocê está prestes a DELETAR PERMANENTEMENTE todos os dados do jogo.\n\nConfirma RESETAR o jogo?')) {
-                                        actions.resetGame();
-                                    }
-                                }
-                            }}
-                            disabled={loading}
-                        >
-                            🚨 Resetar Jogo (Emergência)
-                        </button>
                     </div>
 
                     {/* Dicas */}
                     <div style={styles.card}>
-                        <h3 style={styles.h3}>💡 Dicas Reveladas</h3>
+                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem'}}>
+                            <h3 style={{...styles.h3, margin: 0}}>💡 Dicas Reveladas</h3>
+                            <button
+                                style={{
+                                    background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+                                    color: 'white',
+                                    padding: '0.5rem 1rem',
+                                    fontSize: '0.875rem',
+                                    borderRadius: '0.5rem',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    fontWeight: '600',
+                                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                                    transition: 'all 0.2s'
+                                }}
+                                onClick={actions.revealClue}
+                                disabled={loading || (revealedCluesCount || 0) >= 5 || status !== 'accepting'}
+                                onMouseEnter={(e) => !e.target.disabled && (e.target.style.transform = 'translateY(-2px)')}
+                                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                            >
+                                {(revealedCluesCount || 0) >= 5 ? '✅ Todas reveladas' : `🔓 Revelar Dica (${(revealedCluesCount || 0) + 1}/5)`}
+                            </button>
+                        </div>
                         <ul style={styles.cluesList}>
                             {(giveaway?.product?.clues || []).map((clue, i) => (
                                 <li key={i} style={styles.clue(i < (revealedCluesCount || 0))}>

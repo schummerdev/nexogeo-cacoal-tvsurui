@@ -172,11 +172,15 @@ const SorteioPage = () => {
       setTimeout(async () => {
         try {
           const data = await realizarSorteio(selectedPromotion);
-          // data.data é um array de ganhadores, pegar o primeiro
-          const primeiroGanhador = Array.isArray(data.data) ? data.data[0] : data.data;
-          
-          // Registrar log do sorteio realizado
-          logSorteio(selectedPromotion, primeiroGanhador);
+          // data.data é um array de ganhadores (agora suporta múltiplos)
+          const ganhadoresSorteados = Array.isArray(data.data) ? data.data : (data.ganhador ? [data.ganhador] : []);
+
+          console.log(`✅ Sorteio realizado! ${ganhadoresSorteados.length} ganhador(es) sorteado(s)`);
+
+          // Registrar log do primeiro ganhador (principal)
+          if (ganhadoresSorteados.length > 0) {
+            logSorteio(selectedPromotion, ganhadoresSorteados[0]);
+          }
           
           // Sorteio realizado - tocar som de aplausos
           const audioAplausos = document.getElementById('sorteio-audio');
@@ -193,7 +197,13 @@ const SorteioPage = () => {
             carregarGanhadores(selectedPromotion),
             obterEstatisticas().then(stats => setStatistics(stats.data))
           ]);
-          
+
+          // Mostrar mensagem de sucesso
+          const mensagem = ganhadoresSorteados.length === 1
+            ? `🎉 Sorteio realizado! 1 ganhador sorteado`
+            : `🎉 Sorteio realizado! ${ganhadoresSorteados.length} ganhadores sorteados`;
+          showToast(mensagem, 'success');
+
           // Automaticamente abrir página pública do sorteio após realizar sorteio
           setTimeout(() => {
             handleOpenPublicView();

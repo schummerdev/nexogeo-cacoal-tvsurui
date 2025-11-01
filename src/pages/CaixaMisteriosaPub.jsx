@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
-import './CaixaMisteriosaPub.css';
 
 // Página pública da Caixa Misteriosa - sem necessidade de login
 const CaixaMisteriosaPub = () => {
@@ -610,9 +609,9 @@ E aí, qual você prefere?
             color: currentThemeData.text
         },
         card: {
-            width: '100%', maxWidth: '600px', background: 'rgba(15, 23, 42, 0.92)',
-            padding: '2rem', borderRadius: '1rem', boxShadow: `0 8px 32px rgba(2, 6, 23, 0.5)`,
-            backdropFilter: 'blur(16px)', border: '1px solid rgba(148, 163, 184, 0.2)', color: '#e5e7eb'
+            width: '100%', maxWidth: '600px', background: currentThemeData.surface,
+            padding: '2rem', borderRadius: '1rem', boxShadow: `0 8px 32px ${currentThemeData.primary}33`,
+            backdropFilter: 'blur(10px)', border: `1px solid ${currentThemeData.border}`
         },
         winnerCard: {
             width: '100%', maxWidth: '600px', background: currentThemeData.gradient,
@@ -620,15 +619,9 @@ E aí, qual você prefere?
             color: currentThemeData.text, textAlign: 'center', border: `3px solid ${currentThemeData.primary}`
         },
         input: {
-            width: '100%',
-            background: (currentThemeData.background || currentThemeData.surface),
-            border: `1.5px solid ${currentThemeData.border}`,
-            borderRadius: '0.5rem',
-            padding: '0.75rem',
-            color: currentThemeData.text,
-            marginTop: '0.25rem',
-            fontSize: '0.95rem',
-            boxShadow: `0 2px 4px ${currentThemeData.primary}14`
+            width: '100%', background: currentThemeData.surface, border: `1px solid ${currentThemeData.border}`,
+            borderRadius: '0.5rem', padding: '0.75rem', color: currentThemeData.text, marginTop: '0.25rem',
+            fontSize: '0.95rem', transition: 'all 0.2s ease'
         },
         button: {
             width: '100%', background: currentThemeData.gradient,
@@ -643,9 +636,9 @@ E aí, qual você prefere?
             cursor: 'pointer', marginTop: '1rem', boxShadow: `0 2px 8px ${currentThemeData.primary}4D`
         },
         submissionItem: {
-            background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem',
-            marginBottom: '0.75rem', border: '2px solid rgba(79, 70, 229, 0.3)',
-            color: '#e5e7eb'
+            background: currentThemeData.surface, padding: '1rem', borderRadius: '0.5rem',
+            marginBottom: '0.75rem', border: `2px solid ${currentThemeData.secondary}`,
+            color: currentThemeData.text
         },
         correctSubmission: {
             background: currentThemeData.gradient,
@@ -693,7 +686,7 @@ E aí, qual você prefere?
                             Não há nenhum jogo da Caixa Misteriosa ativo no momento.<br/>
                             Os administradores precisam configurar e iniciar um novo jogo.
                         </p>
-                        <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'left', border: '1px solid rgba(148, 163, 184, 0.2)', color: '#e5e7eb' }}>
+                        <div style={{ background: currentThemeData.surface, padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'left', border: `1px solid ${currentThemeData.border}` }}>
                             <h3 style={{ color: currentThemeData.success, marginBottom: '1rem' }}>💡 Como funciona:</h3>
                             <ul style={{ color: currentThemeData.text, listStyle: 'none', padding: 0 }}>
                                 <li style={{ marginBottom: '0.5rem' }}>• Cadastre-se para participar quando um jogo estiver ativo</li>
@@ -742,7 +735,7 @@ E aí, qual você prefere?
     const remainingGuesses = availableGuesses - usedGuessesCount;
 
     return (
-        <main style={styles.main} className="caixa-misteriosa-pub-container">
+        <main style={styles.main}>
             {/* Seletor de Tema */}
             <div style={{
                 position: 'absolute',
@@ -757,23 +750,22 @@ E aí, qual você prefere?
                 {/* Indicador de usuário logado + botão logout */}
                 {participant && (
                     <div style={{
-                        background: currentThemeData.gradient,
+                        background: currentThemeData.surface,
                         padding: '0.75rem 1rem',
                         borderRadius: '0.5rem',
                         marginBottom: '1rem',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        border: `2px solid ${currentThemeData.primary}`,
-                        color: 'white'
+                        border: `1px solid ${currentThemeData.border}`
                     }}>
                         <div>
-                            <span style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem' }}>Você está logado como:</span>
+                            <span style={{ color: currentThemeData.textSecondary, fontSize: '0.85rem' }}>Você está logado como:</span>
                             <br />
-                            <span style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                            <span style={{ color: currentThemeData.success, fontWeight: 'bold', fontSize: '1.1rem' }}>
                                 {participant.name}
                             </span>
-                            <span style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '0.9rem', marginLeft: '0.5rem' }}>
+                            <span style={{ color: currentThemeData.textSecondary, fontSize: '0.9rem', marginLeft: '0.5rem' }}>
                                 (ID: {participant.id})
                             </span>
                         </div>
@@ -799,45 +791,35 @@ E aí, qual você prefere?
                     </div>
                 )}
 
-                <div style={{ textAlign: 'center', marginBottom: '2rem', background: currentThemeData.gradient, padding: '1.5rem 1rem', borderRadius: '1rem' }}>
-                    <h1 style={{ color: '#ffffff', fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <h1 style={{ color: currentThemeData.primary, fontSize: '2.5rem', margin: '0 0 0.5rem 0', fontWeight: '900' }}>
                         🎁 Caixa Misteriosa
                     </h1>
 
-                    <p style={{ color: 'rgba(255,255,255,0.9)', marginTop: '1rem', fontSize: '1rem' }}>Um oferecimento de:</p>
+                    <p style={{ color: currentThemeData.textSecondary, marginTop: '1rem' }}>Um oferecimento de:</p>
 
                     {/* Logo do patrocinador OU texto - dependendo se logo_url existe */}
                     {console.log('🖼️ [LOGO DEBUG] sponsorLogoUrl:', liveGame.giveaway?.sponsor?.logo_url, 'sponsorName:', liveGame.giveaway?.sponsor?.name)}
                     {liveGame.giveaway?.sponsor?.logo_url ? (
-                        <div style={{
-                            margin: '1rem 0',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: '0.75rem 1rem',
-                            borderRadius: '0.75rem',
-                            background: 'rgba(0,0,0,0.25)',
-                            border: '1px solid rgba(255,255,255,0.15)'
-                        }}>
+                        <div style={{ margin: '1rem 0' }}>
                             <img
                                 src={liveGame.giveaway.sponsor.logo_url}
                                 alt={liveGame.giveaway.sponsor.name}
                                 style={{
-                                    maxWidth: '240px',
-                                    maxHeight: '100px',
+                                    maxWidth: '250px',
+                                    maxHeight: '120px',
                                     objectFit: 'contain',
-                                    filter: 'drop-shadow(0 1px 1.5px rgba(0,0,0,0.35))',
-                                    background: 'transparent'
+                                    borderRadius: '0.5rem'
                                 }}
                                 onError={(e) => {
                                     // Se a imagem falhar ao carregar, mostra o texto como fallback
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = `<h2 style="fontSize: 2rem; fontWeight: bold; color: white; margin: 0.5rem 0;">${liveGame.giveaway.sponsor.name || 'Patrocinador'}</h2>`;
+                                    e.target.parentElement.innerHTML = `<h2 style="fontSize: 2rem; fontWeight: bold; color: #A78BFA; margin: 0.5rem 0;">${liveGame.giveaway.sponsor.name || 'Patrocinador'}</h2>`;
                                 }}
                             />
                         </div>
                     ) : (
-                        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'white', margin: '0.5rem 0' }}>
+                        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: currentThemeData.primary, margin: '0.5rem 0' }}>
                             {liveGame.giveaway?.sponsor?.name || 'Patrocinador'}
                         </h2>
                     )}
@@ -851,19 +833,17 @@ E aí, qual você prefere?
                 )}
 
                 <div style={{ marginBottom: '2rem' }}>
-                    <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
-                            Dicas Reveladas:
-                        </h3>
-                    </div>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', marginBottom: '1rem', color: currentThemeData.primary }}>
+                        Dicas Reveladas:
+                    </h3>
                     <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {revealedClues.length > 0 ?
                             revealedClues.map((clue, index) => (
-                                <li key={index} style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', border: `2px solid ${currentThemeData.primary}`, color: '#e5e7eb' }}>
+                                <li key={index} style={{ background: currentThemeData.secondary, padding: '1rem', borderRadius: '0.5rem', border: `2px solid ${currentThemeData.primary}`, color: currentThemeData.text }}>
                                     <strong style={{ color: currentThemeData.primary }}>Dica {index + 1}:</strong> {clue}
                                 </li>
                             )) : (
-                                <li style={{ background: 'rgba(30, 41, 59, 0.9)', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center', color: '#94a3b8', border: `1px solid rgba(148, 163, 184, 0.2)` }}>
+                                <li style={{ background: currentThemeData.surface, padding: '1rem', borderRadius: '0.5rem', textAlign: 'center', color: currentThemeData.textSecondary, border: `1px solid ${currentThemeData.border}` }}>
                                     Nenhuma dica revelada ainda.
                                 </li>
                             )
@@ -872,36 +852,15 @@ E aí, qual você prefere?
                 </div>
 
                 {/* Status do jogo */}
-                <div style={{ 
-                    background: currentThemeData.gradient, 
-                    padding: '0.75rem 1rem', 
-                    borderRadius: '0.5rem', 
-                    marginBottom: '2rem', 
-                    textAlign: 'center',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                }}>
+                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                     <span style={{
-                        color: '#ffffff',
+                        color: liveGame.status === 'accepting' ? currentThemeData.success : currentThemeData.textSecondary,
                         fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
+                        fontWeight: 'bold'
                     }}>
-                        <span style={{
-                            display: 'inline-block',
-                            width: '12px',
-                            height: '12px',
-                            borderRadius: '50%',
-                            backgroundColor: liveGame.status === 'accepting' ? '#10B981' : 
-                                           liveGame.status === 'closed' ? '#F59E0B' : 
-                                           liveGame.status === 'finished' ? '#EF4444' : '#9CA3AF',
-                            boxShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
-                        }}></span>
-                        {liveGame.status === 'accepting' ? 'Aceitando Palpites' :
-                         liveGame.status === 'closed' ? 'Palpites Encerrados' :
-                         liveGame.status === 'finished' ? 'Jogo Finalizado' : liveGame.status}
+                        Status: {liveGame.status === 'accepting' ? 'Aceitando Palpites' :
+                                liveGame.status === 'closed' ? 'Palpites Encerrados' :
+                                liveGame.status === 'finished' ? 'Jogo Finalizado' : liveGame.status}
                     </span>
                 </div>
 
@@ -952,20 +911,10 @@ E aí, qual você prefere?
                     {/* Se não está registrado, mostrar formulário de cadastro */}
                     {!participant && liveGame.status === 'accepting' && (
                         <form onSubmit={handleRegister}>
-                            <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
-                                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
-                                    Cadastre-se para Participar!
-                                </h3>
-                            </div>
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                                gap: '1rem',
-                                marginBottom: '0',
-                                background: 'rgba(15, 23, 42, 0.85)',
-                                padding: '1rem',
-                                borderRadius: '0 0 0.5rem 0.5rem'
-                            }}>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', marginBottom: '1rem' }}>
+                                Cadastre-se para Participar!
+                            </h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                 <input
                                     style={styles.input}
                                     type="text"
@@ -1014,38 +963,34 @@ E aí, qual você prefere?
                                     readOnly
                                 />
                             )}
-                            <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '0 1rem 1rem 1rem' }}>
-                                <button
-                                    type="submit"
-                                    style={styles.button}
-                                    disabled={isRegistering}
-                                >
-                                    {isRegistering ? 'Cadastrando...' : 'Cadastrar e Participar'}
-                                </button>
-                            </div>
+                            <button
+                                type="submit"
+                                style={styles.button}
+                                disabled={isRegistering}
+                            >
+                                {isRegistering ? 'Cadastrando...' : 'Cadastrar e Participar'}
+                            </button>
                         </form>
                     )}
 
                     {/* Se está registrado, mostrar área de palpites */}
                     {participant && (
                         <div>
-                            <div style={{ background: currentThemeData.gradient, padding: '0.75rem 1rem', borderRadius: '0.5rem 0.5rem 0 0', marginBottom: '1rem' }}>
-                                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', margin: '0', color: 'white' }}>
-                                    Olá, {participant.name}!
-                                </h3>
-                            </div>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', textAlign: 'center', marginBottom: '1rem' }}>
+                                Olá, {participant.name}!
+                            </h3>
 
                             {/* Mensagem de cadastro realizado - APENAS na primeira vez (showShareLink) */}
                             {showShareLink && (
                                 <div style={{
-                                    background: currentThemeData.gradient,
+                                    background: 'linear-gradient(135deg, #10B981, #059669)',
                                     color: 'white',
                                     padding: '1rem',
                                     borderRadius: '0.5rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: `2px solid ${currentThemeData.primary}`
+                                    border: '2px solid #6EE7B7'
                                 }}>
                                     ✅ Cadastro realizado com sucesso! Compartilhe o link abaixo para ganhar palpites extras.
                                 </div>
@@ -1054,14 +999,14 @@ E aí, qual você prefere?
                             {/* Informação de palpites disponíveis - APENAS quando tem palpites */}
                             {remainingGuesses > 0 && (
                                 <div style={{
-                                    background: currentThemeData.gradient,
+                                    background: 'linear-gradient(135deg, #10B981, #059669)',
                                     color: 'white',
                                     padding: '1rem',
                                     borderRadius: '0.5rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: `2px solid ${currentThemeData.primary}`
+                                    border: '2px solid #6EE7B7'
                                 }}>
                                     ✅ Você tem <strong>{remainingGuesses} palpite{remainingGuesses !== 1 ? 's' : ''}</strong> disponíve{remainingGuesses !== 1 ? 'is' : 'l'}
                                 </div>
@@ -1070,14 +1015,14 @@ E aí, qual você prefere?
                             {/* Mensagens de erro e sucesso */}
                             {errorMessage && errorMessage !== 'Você já usou todos os seus palpites.' && (
                                 <div style={{
-                                    background: currentThemeData.danger,
+                                    background: 'linear-gradient(135deg, #EF4444, #DC2626)',
                                     color: 'white',
                                     padding: '1rem',
                                     borderRadius: '0.5rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: `2px solid ${currentThemeData.danger}`
+                                    border: '2px solid #FCA5A5'
                                 }}>
                                     ❌ {errorMessage}
                                 </div>
@@ -1092,13 +1037,13 @@ E aí, qual você prefere?
 
                                     return (
                                         <div style={{
-                                            background: currentThemeData.gradient,
+                                            background: 'linear-gradient(135deg, #10B981, #059669)',
                                             color: 'white',
                                             padding: '1.5rem',
                                             borderRadius: '0.75rem',
                                             marginBottom: '1rem',
                                             textAlign: 'center',
-                                            border: `2px solid ${currentThemeData.primary}`
+                                            border: '2px solid #6EE7B7'
                                         }}>
                                             <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
                                                 🎉 Parabéns! Seu palpite foi enviado!
@@ -1122,14 +1067,14 @@ E aí, qual você prefere?
                                 // Mensagem normal
                                 return (
                                     <div style={{
-                                        background: currentThemeData.gradient,
+                                        background: 'linear-gradient(135deg, #10B981, #059669)',
                                         color: 'white',
                                         padding: '1rem',
                                         borderRadius: '0.5rem',
                                         marginBottom: '1rem',
                                         textAlign: 'center',
                                         fontWeight: '500',
-                                        border: `2px solid ${currentThemeData.primary}`
+                                        border: '2px solid #6EE7B7'
                                     }}>
                                         {successMessage}
                                     </div>
@@ -1139,12 +1084,11 @@ E aí, qual você prefere?
                             {/* Seção de indicação antiga (código de referência) - REMOVIDA, substituída por link personalizado */}
                             {ownReferralCode && !shareUrl && (
                                 <div style={{
-                                    background: currentThemeData.gradient,
+                                    background: 'linear-gradient(135deg, #10B981, #059669)',
                                     padding: '1.5rem',
                                     borderRadius: '0.75rem',
                                     marginBottom: '1.5rem',
-                                    color: 'white',
-                                    border: `2px solid ${currentThemeData.primary}`
+                                    color: 'white'
                                 }}>
                                     <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.3rem', fontWeight: 'bold', textAlign: 'center' }}>
                                         🎁 Ganhe Palpites Extras!
@@ -1235,13 +1179,13 @@ E aí, qual você prefere?
                             {/* Link de compartilhamento personalizado - Movido para APÓS o formulário */}
                             {shareUrl && (
                                 <div style={{
-                                    background: currentThemeData.gradient,
+                                    background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
                                     padding: '1.5rem',
                                     borderRadius: '0.75rem',
                                     marginTop: '1.5rem',
                                     marginBottom: '1.5rem',
                                     color: 'white',
-                                    border: `2px solid ${currentThemeData.primary}`
+                                    border: '2px solid #60A5FA'
                                 }}>
                                     <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center' }}>
                                         📱 Compartilhe e Ganhe Palpites!
@@ -1323,12 +1267,11 @@ E aí, qual você prefere?
                             {/* Histórico de compartilhamentos */}
                             {participant && (
                                 <div style={{
-                                    background: 'rgba(15, 23, 42, 0.85)',
+                                    background: currentThemeData.surface,
                                     padding: '1.5rem',
                                     borderRadius: '0.75rem',
                                     marginTop: '2rem',
-                                    border: '1px solid rgba(148, 163, 184, 0.2)',
-                                    color: '#e5e7eb'
+                                    border: `1px solid ${currentThemeData.border}`
                                 }}>
                                     <div style={{ marginBottom: '1rem' }}>
                                         <h4 style={{ color: currentThemeData.success, margin: 0, fontSize: '1.2rem' }}>
@@ -1339,13 +1282,13 @@ E aí, qual você prefere?
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                             {referrals.map((ref, idx) => (
                                             <div key={idx} style={{
-                                                background: 'rgba(30, 41, 59, 0.7)',
+                                                background: currentThemeData.background,
                                                 padding: '0.75rem',
                                                 borderRadius: '0.5rem',
                                                 display: 'flex',
                                                 justifyContent: 'space-between',
                                                 alignItems: 'center',
-                                                border: '1px solid rgba(148, 163, 184, 0.2)'
+                                                border: `1px solid ${currentThemeData.border}`
                                             }}>
                                                 <div style={{ flex: 1 }}>
                                                     <div>
@@ -1390,12 +1333,11 @@ E aí, qual você prefere?
                     {/* Feed de últimos palpites (público) */}
                     {liveGame && recentSubmissions.length > 0 && (
                         <div style={{
-                            background: 'rgba(15, 23, 42, 0.85)',
+                            background: currentThemeData.surface,
                             padding: '1.5rem',
                             borderRadius: '0.75rem',
                             marginTop: '2rem',
-                            border: '1px solid rgba(148, 163, 184, 0.2)',
-                            color: '#e5e7eb'
+                            border: `1px solid ${currentThemeData.border}`
                         }}>
                             <h4 style={{ color: currentThemeData.primary, margin: '0 0 1rem 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 🔥 Últimos Palpites
@@ -1411,12 +1353,11 @@ E aí, qual você prefere?
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                 {recentSubmissions.map((sub, idx) => (
                                     <div key={idx} style={{
-                                        background: 'rgba(30, 41, 59, 0.7)',
+                                        background: currentThemeData.background,
                                         padding: '1rem',
                                         borderRadius: '0.5rem',
                                         borderLeft: `4px solid ${currentThemeData.primary}`,
-                                        border: '1px solid rgba(148, 163, 184, 0.2)',
-                                        color: '#e5e7eb'
+                                        border: `1px solid ${currentThemeData.border}`
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                                             <span style={{ color: currentThemeData.text, fontWeight: '600', fontSize: '1rem' }}>
@@ -1445,12 +1386,12 @@ E aí, qual você prefere?
                 textAlign: 'center'
             }}>
                 <div style={{
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: currentThemeData.surface,
                     backdropFilter: 'blur(10px)',
                     padding: '1.5rem',
                     borderRadius: '15px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    boxShadow: `0 4px 20px ${currentThemeData.primary}22`,
+                    border: `1px solid ${currentThemeData.border}`,
                     maxWidth: '350px',
                     margin: '0 auto'
                 }}>
@@ -1473,10 +1414,11 @@ E aí, qual você prefere?
                         />
                     </div>
                     <p style={{
-                        color: '#64748b',
+                        color: currentThemeData.text,
                         fontSize: '0.875rem',
                         margin: '0 0 1rem 0',
-                        lineHeight: '1.4'
+                        lineHeight: '1.4',
+                        fontWeight: '500'
                     }}>
                         Sistema completo de gestão de promoções e sorteios
                     </p>
@@ -1486,15 +1428,16 @@ E aí, qual você prefere?
                         rel="noopener noreferrer"
                         style={{
                             display: 'inline-block',
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                            color: 'white',
+                            background: currentThemeData.primary,
+                            color: '#ffffff',
                             textDecoration: 'none',
                             padding: '0.75rem 1.5rem',
                             borderRadius: '8px',
                             fontSize: '0.875rem',
                             fontWeight: '600',
                             transition: 'all 0.2s ease',
-                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)'
+                            boxShadow: `0 4px 12px ${currentThemeData.primary}44`,
+                            border: `2px solid ${currentThemeData.primary}`
                         }}
                     >
                         📦 Conheça a NexoGeo
