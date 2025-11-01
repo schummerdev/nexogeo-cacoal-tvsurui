@@ -1059,7 +1059,7 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // POST /api/sorteio?action=sortear - Realizar sorteio
+      // POST /api/sorteio?action=sortear - Realizar sorteio (suporta múltiplos ganhadores)
       if (req.method === 'POST' && action === 'sortear') {
         await getAuthenticatedUser(req, ['admin']);
         const { promocaoId } = req.body || {};
@@ -1070,6 +1070,41 @@ module.exports = async function handler(req, res) {
             message: 'ID da promoção é obrigatório',
             timestamp: new Date().toISOString()
           });
+        }
+
+        // Buscar configuração de número de ganhadores da promoção
+        const promocaoInfo = await query(`
+          SELECT numero_ganhadores FROM promocoes WHERE id = $1
+        `, [parseInt(promocaoId)]);
+
+        if (promocaoInfo.rows.length === 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Promoção não encontrada',
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        let quantidade = parseInt(promocaoInfo.rows[0].numero_ganhadores, 10) || 1;
+
+        // Validar quantidade (min: 1, max: 10)
+        if (isNaN(quantidade) || quantidade < 1) quantidade = 1;
+        if (quantidade > 10) quantidade = 10;
+
+        console.log(`📊 [SORTEIO] Promoção ${promocaoId} - Quantidade configurada: ${quantidade}`);
+
+        // Verificar se já existem ganhadores e cancelá-los automaticamente
+        const existingWinners = await query(`
+          SELECT COUNT(*) as total FROM ganhadores
+          WHERE promocao_id = $1 AND cancelado = false
+        `, [parseInt(promocaoId)]);
+
+        if (existingWinners.rows[0].total > 0) {
+          console.log(`🔄 [SORTEIO] Cancelando ${existingWinners.rows[0].total} ganhadores existentes da promoção ${promocaoId}`);
+          await query(`
+            UPDATE ganhadores SET cancelado = true
+            WHERE promocao_id = $1 AND cancelado = false
+          `, [parseInt(promocaoId)]);
         }
 
         // Buscar participantes disponíveis
@@ -1088,26 +1123,53 @@ module.exports = async function handler(req, res) {
           });
         }
 
-        // Sortear aleatoriamente
         const participantes = participantesResult.rows;
-        const ganhadorIndex = Math.floor(Math.random() * participantes.length);
-        const ganhador = participantes[ganhadorIndex];
 
-        // Registrar ganhador
-        const insertResult = await query(`
-          INSERT INTO ganhadores (participante_id, promocao_id, sorteado_em, cancelado, posicao, premio)
-          VALUES ($1, $2, NOW(), false, 1, '1º Lugar')
-          RETURNING *
-        `, [ganhador.id, parseInt(promocaoId)]);
+        // Ajustar quantidade se houver menos participantes disponíveis
+        const quantidadeFinal = Math.min(quantidade, participantes.length);
+        console.log(`📊 [SORTEIO] Sorteando ${quantidadeFinal} de ${participantes.length} participantes disponíveis`);
+
+        // Sortear múltiplos ganhadores
+        const ganhadores = [];
+        const participantesDisponiveis = [...participantes];
+
+        for (let i = 0; i < quantidadeFinal; i++) {
+          // Sortear aleatoriamente
+          const randomIndex = Math.floor(Math.random() * participantesDisponiveis.length);
+          const ganhador = participantesDisponiveis.splice(randomIndex, 1)[0];
+
+          // Definir prêmio baseado na posição
+          let premio;
+          if (i === 0) premio = '1º Lugar';
+          else if (i === 1) premio = '2º Lugar';
+          else if (i === 2) premio = '3º Lugar';
+          else premio = `${i + 1}º Lugar`;
+
+          // Registrar ganhador no banco
+          const insertResult = await query(`
+            INSERT INTO ganhadores (participante_id, promocao_id, sorteado_em, cancelado, posicao, premio)
+            VALUES ($1, $2, NOW(), false, $3, $4)
+            RETURNING *
+          `, [ganhador.id, parseInt(promocaoId), i + 1, premio]);
+
+          ganhadores.push({
+            ...ganhador,
+            posicao: i + 1,
+            premio: premio,
+            data_sorteio: insertResult.rows[0].sorteado_em,
+            ganhador_id: insertResult.rows[0].id
+          });
+        }
+
+        console.log(`✅ [SORTEIO] ${ganhadores.length} ganhador(es) sorteado(s) para promoção ${promocaoId}`);
 
         return res.status(200).json({
           success: true,
-          ganhador: {
-            ...ganhador,
-            data_sorteio: insertResult.rows[0].sorteado_em,
-            ganhador_id: insertResult.rows[0].id
-          },
-          message: 'Sorteio realizado com sucesso!',
+          data: ganhadores,
+          ganhador: ganhadores[0], // Mantido para compatibilidade com código antigo
+          total: ganhadores.length,
+          message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`,
+          api_version: '2.1.0',
           timestamp: new Date().toISOString()
         });
       }
