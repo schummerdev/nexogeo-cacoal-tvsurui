@@ -1091,8 +1091,6 @@ module.exports = async function handler(req, res) {
         if (isNaN(quantidade) || quantidade < 1) quantidade = 1;
         if (quantidade > 10) quantidade = 10;
 
-        console.log(`📊 [SORTEIO] Promoção ${promocaoId} - Quantidade configurada: ${quantidade}`);
-
         // Verificar se já existem ganhadores e cancelá-los automaticamente
         const existingWinners = await query(`
           SELECT COUNT(*) as total FROM ganhadores
@@ -1100,7 +1098,6 @@ module.exports = async function handler(req, res) {
         `, [parseInt(promocaoId)]);
 
         if (existingWinners.rows[0].total > 0) {
-          console.log(`🔄 [SORTEIO] Cancelando ${existingWinners.rows[0].total} ganhadores existentes da promoção ${promocaoId}`);
           await query(`
             UPDATE ganhadores SET cancelado = true
             WHERE promocao_id = $1 AND cancelado = false
@@ -1127,7 +1124,6 @@ module.exports = async function handler(req, res) {
 
         // Ajustar quantidade se houver menos participantes disponíveis
         const quantidadeFinal = Math.min(quantidade, participantes.length);
-        console.log(`📊 [SORTEIO] Sorteando ${quantidadeFinal} de ${participantes.length} participantes disponíveis`);
 
         // Sortear múltiplos ganhadores
         const ganhadores = [];
@@ -1160,8 +1156,6 @@ module.exports = async function handler(req, res) {
             ganhador_id: insertResult.rows[0].id
           });
         }
-
-        console.log(`✅ [SORTEIO] ${ganhadores.length} ganhador(es) sorteado(s) para promoção ${promocaoId}`);
 
         return res.status(200).json({
           success: true,

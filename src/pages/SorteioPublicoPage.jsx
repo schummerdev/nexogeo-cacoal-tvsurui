@@ -14,10 +14,8 @@ const MediaWithFallback = ({ src, fallbacks = [], alt, className, style, ...prop
       const nextIndex = fallbackIndex + 1;
       setFallbackIndex(nextIndex);
       setCurrentSrc(fallbacks[nextIndex]);
-      console.log(`🔄 Tentando fallback ${nextIndex + 1}:`, fallbacks[nextIndex]);
     } else {
       setHasErrored(true);
-      console.log('❌ Todos os fallbacks falharam, ocultando mídia');
     }
   };
 
@@ -47,7 +45,6 @@ const MediaWithFallback = ({ src, fallbacks = [], alt, className, style, ...prop
       alt={alt}
       className={className}
       style={style}
-      onLoad={() => console.log(`✅ Mídia carregada: ${currentSrc}`)}
       onError={handleError}
       {...props}
     />
@@ -86,14 +83,12 @@ const SorteioPublicoPage = () => {
 
   // Definir startCountdown antes dos useEffects para evitar Temporal Dead Zone
   const startCountdown = useCallback(() => {
-    if (countdownStarted.current || showWinners) return; // Não iniciar se já iniciou ou já está mostrando ganhadores
+    if (countdownStarted.current || showWinners) return;
     countdownStarted.current = true;
 
-    console.log('⏰ Iniciando countdown de 10 segundos...');
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
-          console.log('🎉 Countdown finalizado, mostrando ganhadores!');
           setShowWinners(true);
           clearInterval(timer);
           return 0;
@@ -108,26 +103,21 @@ const SorteioPublicoPage = () => {
   // Buscar promoção ativa como padrão se não especificada na URL
   useEffect(() => {
     const fetchActivePromotion = async () => {
-      console.log('🔍 [USEEFFECT1] promocaoIdFromUrl:', promocaoIdFromUrl, 'promocaoId atual:', promocaoId);
       if (!promocaoIdFromUrl) {
         try {
-          console.log('🔍 Buscando promoção ativa padrão...');
           const response = await fetch('/api/?route=promocoes&status=ativa');
           if (response.ok) {
             const data = await response.json();
             if (data.data && data.data.length > 0) {
               const activePromo = data.data[0];
-              console.log('✅ Promoção ativa encontrada:', activePromo.id);
-              console.log('🔄 [SETSTATE] Definindo promocaoId para:', activePromo.id.toString());
               setPromocaoId(activePromo.id.toString());
             } else {
-              console.log('⚠️ Nenhuma promoção ativa, usando ID 10 (última criada)');
-              setPromocaoId('10'); // ID da última promoção criada
+              setPromocaoId('10'); // Fallback para a última promoção criada
             }
           }
         } catch (error) {
-          console.error('❌ Erro ao buscar promoção ativa:', error);
-          setPromocaoId('10'); // Fallback para a última promoção criada
+          console.error('Erro ao buscar promoção ativa:', error);
+          setPromocaoId('10');
         }
       }
     };
@@ -137,58 +127,26 @@ const SorteioPublicoPage = () => {
 
   useEffect(() => {
     const fetchWinners = async () => {
-      if (!promocaoId) {
-        console.log('⏳ Aguardando definição do promocaoId...');
-        return;
-      }
+      if (!promocaoId || hasLoadedData.current) return;
 
-      // Prevenir múltiplas execuções usando ref
-      if (hasLoadedData.current) {
-        console.log('⏳ Dados já carregados, ignorando nova execução...');
-        return;
-      }
-
-      console.log(`🔍 Buscando dados para promoção ID: ${promocaoId}`);
-      hasLoadedData.current = true; // Marca como carregado ANTES do fetch
+      hasLoadedData.current = true;
       setLoading(true);
       try {
-        console.log(`🔍 [ATUAL] Buscando promoção com ID: ${promocaoId} (tipo: ${typeof promocaoId})`);
         const response = await fetch(`/api/?route=sorteio&action=ganhadores&id=${promocaoId}`);
         if (!response.ok) {
           throw new Error('Erro ao buscar ganhadores');
         }
         const data = await response.json();
-        console.log('📊 Dados de ganhadores recebidos:', data);
-        console.log('🔧 API VERSION:', data.api_version || 'NÃO DEFINIDA - CÓDIGO ANTIGO!');
-        console.log('🔧 QUANTIDADE CONFIGURADA NA API:', data.quantidade_configurada || 'não retornada');
-        console.log('🔧 TIMESTAMP SERVIDOR:', data.timestamp_servidor || 'não retornado');
-        console.log('📊 Chaves do objeto data:', Object.keys(data));
-        console.log('📊 data.data:', data.data);
-        console.log('📊 data.ganhadores:', data.ganhadores);
-        console.log('📊 data.data length:', data.data?.length);
-        console.log('📊 data.ganhadores length:', data.ganhadores?.length);
-        console.log('📊 data.total:', data.total);
         const winnersToSet = data.ganhadores || data.data || [];
-        console.log('📊 Winners a serem setados:', winnersToSet);
-        console.log('📊 Winners length:', winnersToSet.length);
-        if (winnersToSet.length > 0) {
-          winnersToSet.forEach((w, i) => {
-            console.log(`  ${i + 1}. ${w.participante_nome || w.nome || 'Sem nome'} - Posição: ${w.posicao || 'N/A'}`);
-          });
-        }
         setWinners(winnersToSet);
-        
+
         // Buscar informações da promoção específica
-        console.log('Buscando promoção com ID:', promocaoId);
         const promoResponse = await fetch(`/api/?route=promocoes&id=${promocaoId}`);
         if (promoResponse.ok) {
           const promoData = await promoResponse.json();
-          console.log('Dados da promoção recebidos:', promoData);
           if (promoData.success && promoData.data) {
             setPromocao(promoData.data);
-            console.log('Promoção definida:', promoData.data);
           } else {
-            console.warn('Nenhuma promoção encontrada para ID:', promocaoId);
             setPromocao({ nome: 'Promoção não encontrada', descricao: '' });
           }
         } else {
@@ -200,7 +158,6 @@ const SorteioPublicoPage = () => {
           const emissoraResponse = await fetch('/api/configuracoes');
           if (emissoraResponse.ok) {
             const emissoraData = await emissoraResponse.json();
-            console.log('Dados da emissora recebidos:', emissoraData);
             setEmissora(emissoraData.data);
           }
         } catch (emissoraErr) {
@@ -209,7 +166,7 @@ const SorteioPublicoPage = () => {
       } catch (err) {
         console.error('Erro ao carregar dados:', err);
         setError('Erro ao carregar dados do sorteio');
-        hasLoadedData.current = false; // Reset para permitir retry em caso de erro
+        hasLoadedData.current = false;
       } finally {
         setLoading(false);
       }
