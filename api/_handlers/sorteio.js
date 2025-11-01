@@ -209,12 +209,16 @@ async function realizarSorteio(req, res) {
     console.error(`✅✅✅ SORTEIO PROMO ${promocaoId}: ${ganhadores.length}/${quantidade} ganhadores criados ✅✅✅`);
     console.error(`PARTICIPANTES SELECIONADOS: ${participantesResult.rows.length}`);
     console.error(`GANHADORES NO ARRAY: ${ganhadores.length}`);
+    console.error(`QUANTIDADE CONFIGURADA: ${quantidade}`);
 
     return res.status(200).json({
       success: true,
       data: ganhadores,
       total: ganhadores.length,
-      message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`
+      message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`,
+      api_version: 'v2.0-31out2025-14h30',  // Identificador para verificar se código novo está rodando
+      quantidade_configurada: quantidade,
+      timestamp_servidor: new Date().toISOString()
     });
 
   } catch (error) {
@@ -452,7 +456,9 @@ async function processarGanhadores(req, res) {
     ganhadores: ganhadores,  // Também retornar em ganhadores para compatibilidade
     total: ganhadores.length,
     promocao_id: parseInt(promocaoId),
-    message: `${ganhadores.length} ganhadores encontrados para a promoção ${promocaoId}`
+    message: `${ganhadores.length} ganhadores encontrados para a promoção ${promocaoId}`,
+    api_version: 'v2.0-31out2025-14h30',  // Identificador para verificar se código novo está rodando
+    timestamp_servidor: new Date().toISOString()
   });
 }
 

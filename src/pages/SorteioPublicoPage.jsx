@@ -156,6 +156,9 @@ const SorteioPublicoPage = () => {
         }
         const data = await response.json();
         console.log('📊 Dados de ganhadores recebidos:', data);
+        console.log('🔧 API VERSION:', data.api_version || 'NÃO DEFINIDA - CÓDIGO ANTIGO!');
+        console.log('🔧 QUANTIDADE CONFIGURADA NA API:', data.quantidade_configurada || 'não retornada');
+        console.log('🔧 TIMESTAMP SERVIDOR:', data.timestamp_servidor || 'não retornado');
         console.log('📊 Chaves do objeto data:', Object.keys(data));
         console.log('📊 data.data:', data.data);
         console.log('📊 data.ganhadores:', data.ganhadores);
