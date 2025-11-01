@@ -170,6 +170,14 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
             border: `1px solid ${currentThemeData.border}`,
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
         },
+        cardGreen: {
+            background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '2px solid #10b981',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+            color: 'white'
+        },
         h3: {
             fontSize: '1.25rem',
             fontWeight: '600',
@@ -574,14 +582,6 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
 
                         {/* Botões de Ação */}
                         <div style={styles.buttonGroup}>
-                            <button
-                                style={styles.button.primary}
-                                onClick={actions.revealClue}
-                                disabled={loading || (revealedCluesCount || 0) >= 5 || status !== 'accepting'}
-                            >
-                                {(revealedCluesCount || 0) >= 5 ? '✅ Todas as dicas reveladas' : `🔓 Revelar Dica (${(revealedCluesCount || 0) + 1}/5)`}
-                            </button>
-
                             {status === 'accepting' && (
                                 <button
                                     style={styles.button.warning}
@@ -635,29 +635,24 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                 </div>
                             )}
                         </div>
-
-                        <button
-                            style={{...styles.button.danger, marginTop: '1rem'}}
-                            onClick={() => {
-                                if (window.confirm('⚠️ ATENÇÃO - RESETAR JOGO (EMERGÊNCIA)\n\nIsso irá DELETAR PERMANENTEMENTE:\n❌ O jogo atual do banco de dados\n❌ Todos os palpites enviados\n❌ Dados do ganhador (se houver)\n\n⚠️ ESTA AÇÃO NÃO PODE SER DESFEITA!\n\nTem certeza absoluta?')) {
-                                    if (window.confirm('🔴 ÚLTIMA CONFIRMAÇÃO\n\nVocê está prestes a DELETAR PERMANENTEMENTE todos os dados do jogo.\n\nConfirma RESETAR o jogo?')) {
-                                        actions.resetGame();
-                                    }
-                                }
-                            }}
-                            disabled={loading}
-                        >
-                            🚨 Resetar Jogo (Emergência)
-                        </button>
                     </div>
 
                     {/* Dicas */}
-                    <div style={styles.card}>
-                        <h3 style={styles.h3}>💡 Dicas Reveladas</h3>
-                        <ul style={styles.cluesList}>
+                    <div style={styles.cardGreen}>
+                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem'}}>
+                            <h3 style={{...styles.h3, margin: 0, color: 'white'}}>💡 Dicas Reveladas</h3>
+                            <button
+                                style={{...styles.button.success, padding: '0.5rem 1rem', fontSize: '0.875rem'}}
+                                onClick={actions.revealClue}
+                                disabled={loading || (revealedCluesCount || 0) >= 5 || status !== 'accepting'}
+                            >
+                                {(revealedCluesCount || 0) >= 5 ? '✅ Todas reveladas' : `🔓 Revelar Dica (${(revealedCluesCount || 0) + 1}/5)`}
+                            </button>
+                        </div>
+                        <ul style={{...styles.cluesList, color: 'white'}}>
                             {(giveaway?.product?.clues || []).map((clue, i) => (
-                                <li key={i} style={styles.clue(i < (revealedCluesCount || 0))}>
-                                    <strong>Dica {i + 1}:</strong> {clue}
+                                <li key={i} style={{...styles.clue(i < (revealedCluesCount || 0)), color: 'white'}}>
+                                    <strong style={{color: 'white'}}>Dica {i + 1}:</strong> {clue}
                                     {i < (revealedCluesCount || 0) && <span style={{marginLeft: '0.5rem'}}>✅</span>}
                                 </li>
                             ))}
