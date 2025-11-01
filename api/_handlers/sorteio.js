@@ -356,7 +356,10 @@ async function processarGanhadores(req, res) {
 
     // Primeiro, buscar ganhadores já existentes
     let ganhadoresExistentes = await databasePool.query(`
-      SELECT g.*, p.nome, p.telefone, p.cidade, p.bairro, pr.nome as promocao_nome
+      SELECT
+        g.id, g.participante_id, g.promocao_id, g.posicao, g.premio, g.sorteado_em, g.cancelado,
+        p.nome, p.telefone, p.cidade, p.bairro,
+        pr.nome as promocao_nome
       FROM ganhadores g
       JOIN participantes p ON g.participante_id = p.id
       LEFT JOIN promocoes pr ON g.promocao_id = pr.id
