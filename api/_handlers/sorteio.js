@@ -173,16 +173,13 @@ async function realizarSorteio(req, res) {
     const ganhadores = [];
     const premios = ['1º Lugar - R$ 10.000', '2º Lugar - R$ 5.000', '3º Lugar - R$ 2.000'];
 
-    console.log(`📊 [SORTEIO] Iniciando loop para criar ganhadores - total a criar: ${quantidade}`);
+    // Loop para criar ganhadores
     for (let i = 0; i < participantesResult.rows.length && i < quantidade; i++) {
       const participante = participantesResult.rows[i];
       const premio = premios[i] || `${i + 1}º Lugar`;
 
-      console.log(`📊 [SORTEIO] Inserindo ganhador ${i + 1}/${quantidade}: ${participante.nome} (posição: ${i + 1})`);
-
       try {
         // Inserir ganhador na tabela
-        // Usar ON CONFLICT para atualizar em vez de falhar se já existe (por ex: sorteio repetido)
         const insertResult = await databasePool.query(`
           INSERT INTO ganhadores (participante_id, promocao_id, posicao, premio, cancelado)
           VALUES ($1, $2, $3, $4, false)
@@ -204,19 +201,12 @@ async function realizarSorteio(req, res) {
           sorteado_em: insertResult.rows[0].sorteado_em,
           status: 'sorteado'
         });
-
-        console.log(`✅ [SORTEIO] Ganhador ${i + 1} inserido com sucesso`);
       } catch (insertError) {
-        console.error(`❌ [SORTEIO] ERRO ao inserir ganhador ${i + 1}:`, insertError.message);
-        console.error('Detalhes completos do erro:', insertError);
-        console.error('Stack trace:', insertError.stack);
-        console.error('Code:', insertError.code);
-        console.error('Detail:', insertError.detail);
-        // Continuar com os próximos ganhadores mesmo se um falhar
+        console.error(`ERRO ao inserir ganhador ${i + 1}:`, insertError.message);
       }
     }
 
-    console.log(`📊 [SORTEIO] Sorteio finalizado com ${ganhadores.length} ganhador(es)`);
+    console.log(`✅ SORTEIO PROMO ${promocaoId}: ${ganhadores.length}/${quantidade} ganhadores criados`);
     return res.status(200).json({
       success: true,
       data: ganhadores,
