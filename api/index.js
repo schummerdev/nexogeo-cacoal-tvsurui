@@ -1015,7 +1015,10 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({
           success: true,
           ganhadores: result.rows,
-          timestamp: new Date().toISOString()
+          api_version: '2.0.0',
+          quantidade_configurada: result.rows.length,
+          timestamp_servidor: new Date().toISOString(),
+          timestamp: new Date().toISOString() // Mantido para compatibilidade
         });
       }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { maskName } from '../utils/privacyUtils';
 import './SorteioPublicoPage.css';
@@ -62,9 +62,6 @@ const SorteioPublicoPage = () => {
   const initialPromocaoId = promocaoIdFromUrl ? promocaoIdFromUrl.toString() : null;
   const [promocaoId, setPromocaoId] = useState(initialPromocaoId);
 
-  console.log('🚀 [INIT] SorteioPublicoPage - URL param:', promocaoIdFromUrl, 'State inicial:', initialPromocaoId);
-  console.log('🔗 [URL] Parâmetros completos da URL:', Object.fromEntries(searchParams));
-
   // Memoizar videoUrl para evitar re-renders desnecessários
   const videoUrl = useMemo(() => {
     const videoUrlParam = searchParams.get('video');
@@ -83,9 +80,14 @@ const SorteioPublicoPage = () => {
   const [emissora, setEmissora] = useState(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
 
+  // Refs para controlar execução única e evitar re-renders
+  const hasLoadedData = useRef(false);
+  const countdownStarted = useRef(false);
+
   // Definir startCountdown antes dos useEffects para evitar Temporal Dead Zone
   const startCountdown = useCallback(() => {
-    if (showWinners) return; // Não iniciar se já está mostrando ganhadores
+    if (countdownStarted.current || showWinners) return; // Não iniciar se já iniciou ou já está mostrando ganhadores
+    countdownStarted.current = true;
 
     console.log('⏰ Iniciando countdown de 10 segundos...');
     const timer = setInterval(() => {
@@ -135,18 +137,19 @@ const SorteioPublicoPage = () => {
 
   useEffect(() => {
     const fetchWinners = async () => {
-      console.log('🔍 [USEEFFECT2] promocaoId atual:', promocaoId, 'tipo:', typeof promocaoId);
       if (!promocaoId) {
         console.log('⏳ Aguardando definição do promocaoId...');
         return;
       }
 
-      // Permitir primeira execução mesmo com loading=true inicial
-      if (loading && winners.length > 0) {
-        console.log('⏳ Já carregou dados, ignorando nova execução...');
+      // Prevenir múltiplas execuções usando ref
+      if (hasLoadedData.current) {
+        console.log('⏳ Dados já carregados, ignorando nova execução...');
         return;
       }
 
+      console.log(`🔍 Buscando dados para promoção ID: ${promocaoId}`);
+      hasLoadedData.current = true; // Marca como carregado ANTES do fetch
       setLoading(true);
       try {
         console.log(`🔍 [ATUAL] Buscando promoção com ID: ${promocaoId} (tipo: ${typeof promocaoId})`);
@@ -170,7 +173,7 @@ const SorteioPublicoPage = () => {
         console.log('📊 Winners length:', winnersToSet.length);
         if (winnersToSet.length > 0) {
           winnersToSet.forEach((w, i) => {
-            console.log(`  ${i + 1}. ${w.nome} - Posição: ${w.posicao}`);
+            console.log(`  ${i + 1}. ${w.participante_nome || w.nome || 'Sem nome'} - Posição: ${w.posicao || 'N/A'}`);
           });
         }
         setWinners(winnersToSet);
@@ -206,6 +209,7 @@ const SorteioPublicoPage = () => {
       } catch (err) {
         console.error('Erro ao carregar dados:', err);
         setError('Erro ao carregar dados do sorteio');
+        hasLoadedData.current = false; // Reset para permitir retry em caso de erro
       } finally {
         setLoading(false);
       }
