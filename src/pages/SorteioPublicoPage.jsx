@@ -156,7 +156,13 @@ const SorteioPublicoPage = () => {
         }
         const data = await response.json();
         console.log('📊 Dados de ganhadores recebidos:', data);
-        setWinners(data.ganhadores || data.data || []);
+        console.log('📊 data.data:', data.data);
+        console.log('📊 data.data length:', data.data?.length);
+        console.log('📊 data.total:', data.total);
+        const winnersToSet = data.ganhadores || data.data || [];
+        console.log('📊 Winners a serem setados:', winnersToSet);
+        console.log('📊 Winners length:', winnersToSet.length);
+        setWinners(winnersToSet);
         
         // Buscar informações da promoção específica
         console.log('Buscando promoção com ID:', promocaoId);
