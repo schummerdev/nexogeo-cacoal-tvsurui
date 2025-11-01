@@ -156,12 +156,20 @@ const SorteioPublicoPage = () => {
         }
         const data = await response.json();
         console.log('📊 Dados de ganhadores recebidos:', data);
+        console.log('📊 Chaves do objeto data:', Object.keys(data));
         console.log('📊 data.data:', data.data);
+        console.log('📊 data.ganhadores:', data.ganhadores);
         console.log('📊 data.data length:', data.data?.length);
+        console.log('📊 data.ganhadores length:', data.ganhadores?.length);
         console.log('📊 data.total:', data.total);
         const winnersToSet = data.ganhadores || data.data || [];
         console.log('📊 Winners a serem setados:', winnersToSet);
         console.log('📊 Winners length:', winnersToSet.length);
+        if (winnersToSet.length > 0) {
+          winnersToSet.forEach((w, i) => {
+            console.log(`  ${i + 1}. ${w.nome} - Posição: ${w.posicao}`);
+          });
+        }
         setWinners(winnersToSet);
         
         // Buscar informações da promoção específica
