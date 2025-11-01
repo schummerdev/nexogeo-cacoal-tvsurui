@@ -206,7 +206,10 @@ async function realizarSorteio(req, res) {
       }
     }
 
-    console.log(`✅ SORTEIO PROMO ${promocaoId}: ${ganhadores.length}/${quantidade} ganhadores criados`);
+    console.error(`✅✅✅ SORTEIO PROMO ${promocaoId}: ${ganhadores.length}/${quantidade} ganhadores criados ✅✅✅`);
+    console.error(`PARTICIPANTES SELECIONADOS: ${participantesResult.rows.length}`);
+    console.error(`GANHADORES NO ARRAY: ${ganhadores.length}`);
+
     return res.status(200).json({
       success: true,
       data: ganhadores,
