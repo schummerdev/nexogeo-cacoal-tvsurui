@@ -410,20 +410,25 @@ async function processarGanhadores(req, res) {
     }
 
     // Usar ganhadores da base de dados
-    ganhadores = ganhadoresExistentes.rows.map(ganhador => ({
-      id: `winner_${ganhador.participante_id}`,
-      participante_id: ganhador.participante_id,
-      promocao_id: ganhador.promocao_id,
-      nome: ganhador.nome,
-      telefone: ganhador.telefone,
-      cidade: ganhador.cidade,
-      bairro: ganhador.bairro,
-      promocao_nome: ganhador.promocao_nome,
-      posicao: ganhador.posicao,
-      premio: ganhador.premio,
-      sorteado_em: ganhador.sorteado_em,
-      status: 'sorteado'
-    }));
+    console.log(`📊 [GANHADORES] ganhadoresExistentes.rows.length ANTES do map: ${ganhadoresExistentes.rows.length}`);
+    ganhadores = ganhadoresExistentes.rows.map((ganhador, idx) => {
+      console.log(`📊 [GANHADORES] Mapeando ganhador ${idx}: ${ganhador.nome} - posicao: ${ganhador.posicao}`);
+      return {
+        id: `winner_${ganhador.participante_id}`,
+        participante_id: ganhador.participante_id,
+        promocao_id: ganhador.promocao_id,
+        nome: ganhador.nome,
+        telefone: ganhador.telefone,
+        cidade: ganhador.cidade,
+        bairro: ganhador.bairro,
+        promocao_nome: ganhador.promocao_nome,
+        posicao: ganhador.posicao,
+        premio: ganhador.premio,
+        sorteado_em: ganhador.sorteado_em,
+        status: 'sorteado'
+      };
+    });
+    console.log(`📊 [GANHADORES] ganhadores.length APÓS o map: ${ganhadores.length}`);
 
   } catch (queryError) {
     console.error('Erro ao buscar ganhadores:', queryError);
