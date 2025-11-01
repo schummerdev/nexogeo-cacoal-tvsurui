@@ -442,9 +442,15 @@ async function processarGanhadores(req, res) {
     console.log(`  ${idx + 1}. ${g.nome} - Posição: ${g.posicao}`);
   });
 
+  // Desativar cache para garantir dados atualizados
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   return res.status(200).json({
     success: true,
     data: ganhadores,
+    ganhadores: ganhadores,  // Também retornar em ganhadores para compatibilidade
     total: ganhadores.length,
     promocao_id: parseInt(promocaoId),
     message: `${ganhadores.length} ganhadores encontrados para a promoção ${promocaoId}`
