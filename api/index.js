@@ -1,5 +1,6 @@
 // API consolidada para resolver limite Vercel (12 funções max)
 // Fix: Caminhos de import corrigidos para _handlers/ subfolder
+// VERSION: v2.0-31out2025-15h00 - Force rebuild to clear serverless cache
 const { query, testConnection, initDatabase } = require('../lib/db.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
