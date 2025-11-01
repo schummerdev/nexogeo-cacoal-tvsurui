@@ -208,7 +208,10 @@ async function realizarSorteio(req, res) {
         console.log(`✅ [SORTEIO] Ganhador ${i + 1} inserido com sucesso`);
       } catch (insertError) {
         console.error(`❌ [SORTEIO] ERRO ao inserir ganhador ${i + 1}:`, insertError.message);
-        console.error('Detalhes do erro:', insertError);
+        console.error('Detalhes completos do erro:', insertError);
+        console.error('Stack trace:', insertError.stack);
+        console.error('Code:', insertError.code);
+        console.error('Detail:', insertError.detail);
         // Continuar com os próximos ganhadores mesmo se um falhar
       }
     }
