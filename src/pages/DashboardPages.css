@@ -662,6 +662,18 @@
   border-color: #5a6268 !important;
 }
 
+.btn-duplicate {
+  background: #17a2b8 !important;
+  border-color: #17a2b8 !important;
+  color: white !important;
+  font-size: 1.1rem;
+}
+
+.btn-duplicate:hover {
+  background: #138496 !important;
+  border-color: #117a8b !important;
+}
+
 .btn-qrcode-tv {
   background: #8b5cf6 !important;
   border-color: #8b5cf6 !important;
