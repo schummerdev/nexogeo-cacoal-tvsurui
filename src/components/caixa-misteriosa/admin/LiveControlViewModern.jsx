@@ -170,14 +170,6 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
             border: `1px solid ${currentThemeData.border}`,
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
         },
-        cardGreen: {
-            background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
-            padding: '1.5rem',
-            borderRadius: '0.75rem',
-            border: '2px solid #10b981',
-            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
-            color: 'white'
-        },
         h3: {
             fontSize: '1.25rem',
             fontWeight: '600',
@@ -638,21 +630,34 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                     </div>
 
                     {/* Dicas */}
-                    <div style={styles.cardGreen}>
+                    <div style={styles.card}>
                         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem'}}>
-                            <h3 style={{...styles.h3, margin: 0, color: 'white'}}>💡 Dicas Reveladas</h3>
+                            <h3 style={{...styles.h3, margin: 0}}>💡 Dicas Reveladas</h3>
                             <button
-                                style={{...styles.button.success, padding: '0.5rem 1rem', fontSize: '0.875rem'}}
+                                style={{
+                                    background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+                                    color: 'white',
+                                    padding: '0.5rem 1rem',
+                                    fontSize: '0.875rem',
+                                    borderRadius: '0.5rem',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    fontWeight: '600',
+                                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                                    transition: 'all 0.2s'
+                                }}
                                 onClick={actions.revealClue}
                                 disabled={loading || (revealedCluesCount || 0) >= 5 || status !== 'accepting'}
+                                onMouseEnter={(e) => !e.target.disabled && (e.target.style.transform = 'translateY(-2px)')}
+                                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                             >
                                 {(revealedCluesCount || 0) >= 5 ? '✅ Todas reveladas' : `🔓 Revelar Dica (${(revealedCluesCount || 0) + 1}/5)`}
                             </button>
                         </div>
-                        <ul style={{...styles.cluesList, color: 'white'}}>
+                        <ul style={styles.cluesList}>
                             {(giveaway?.product?.clues || []).map((clue, i) => (
-                                <li key={i} style={{...styles.clue(i < (revealedCluesCount || 0)), color: 'white'}}>
-                                    <strong style={{color: 'white'}}>Dica {i + 1}:</strong> {clue}
+                                <li key={i} style={styles.clue(i < (revealedCluesCount || 0))}>
+                                    <strong>Dica {i + 1}:</strong> {clue}
                                     {i < (revealedCluesCount || 0) && <span style={{marginLeft: '0.5rem'}}>✅</span>}
                                 </li>
                             ))}
