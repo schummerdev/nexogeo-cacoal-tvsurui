@@ -340,23 +340,73 @@ module.exports = async (req, res) => {
           }
           // Senão, finalPromocaoId permanece null (participante sem promoção)
 
+          // ✅ VALIDAÇÃO: Latitude e Longitude não podem ser strings vazias
+          // Converter "" para NULL ou validar número
+          let finalLatitude = null;
+          let finalLongitude = null;
+
+          if (latitude && latitude.trim() !== '') {
+            const latNum = parseFloat(latitude);
+            if (isNaN(latNum)) {
+              return res.status(400).json({
+                success: false,
+                message: `Latitude deve ser um número válido. Recebido: "${latitude}"`,
+                field: 'latitude',
+                received_value: latitude
+              });
+            }
+            finalLatitude = latNum;
+          }
+
+          if (longitude && longitude.trim() !== '') {
+            const lonNum = parseFloat(longitude);
+            if (isNaN(lonNum)) {
+              return res.status(400).json({
+                success: false,
+                message: `Longitude deve ser um número válido. Recebido: "${longitude}"`,
+                field: 'longitude',
+                received_value: longitude
+              });
+            }
+            finalLongitude = lonNum;
+          }
+
           console.log('Executando UPDATE com:', {
-            nome, telefone, email, bairro, cidade, latitude, longitude, finalPromocaoId, id,
+            nome, telefone, email, bairro, cidade, finalLatitude, finalLongitude, finalPromocaoId, id,
             received_promocao_id: { tipo: typeof promocao_id, valor: promocao_id },
             received_promocao: { tipo: typeof promocao, valor: promocao }
           });
-          
-          const result = await databasePool.query(`
+
+          // ✅ CORREÇÃO: Tentar atualizar em participantes primeiro, depois em public_participants
+          let result = await databasePool.query(`
             UPDATE participantes
             SET nome = $1, telefone = $2, email = $3, bairro = $4, cidade = $5, latitude = $6, longitude = $7, promocao_id = $8
             WHERE id = $9 AND deleted_at IS NULL
             RETURNING *
-          `, [nome, telefone, email, bairro, cidade, latitude, longitude, finalPromocaoId, id]);
-          
-          console.log('UPDATE result rows:', result.rows.length);
-          
-                    if (result.rows.length === 0) {
-            res.status(404).json({ message: `Participante com ID ${id} não encontrado` });
+          `, [nome, telefone, email, bairro, cidade, finalLatitude, finalLongitude, finalPromocaoId, id]);
+
+          console.log('UPDATE result rows (participantes):', result.rows.length);
+
+          // Se não encontrou em participantes, tentar em public_participants
+          if (result.rows.length === 0) {
+            console.log(`⚠️ Participante não encontrado em tabela 'participantes'. Tentando 'public_participants'...`);
+
+            result = await databasePool.query(`
+              UPDATE public_participants
+              SET name = $1, phone = $2, latitude = $3, longitude = $4, neighborhood = $5, city = $6
+              WHERE id = $7 AND deleted_at IS NULL
+              RETURNING *
+            `, [nome, telefone, finalLatitude, finalLongitude, bairro, cidade, id]);
+
+            console.log('UPDATE result rows (public_participants):', result.rows.length);
+          }
+
+          if (result.rows.length === 0) {
+            res.status(404).json({
+              success: false,
+              message: `Participante com ID ${id} não encontrado em nenhuma tabela (participantes ou public_participants)`,
+              participant_id: id
+            });
           } else {
             res.status(200).json({ success: true, data: result.rows[0] });
           }
