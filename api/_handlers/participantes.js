@@ -391,10 +391,11 @@ module.exports = async (req, res) => {
           if (result.rows.length === 0) {
             console.log(`⚠️ Participante não encontrado em tabela 'participantes'. Tentando 'public_participants'...`);
 
+            // ✅ NOTA: public_participants não tem deleted_at, usar apenas id
             result = await databasePool.query(`
               UPDATE public_participants
               SET name = $1, phone = $2, latitude = $3, longitude = $4, neighborhood = $5, city = $6
-              WHERE id = $7 AND deleted_at IS NULL
+              WHERE id = $7
               RETURNING *
             `, [nome, telefone, finalLatitude, finalLongitude, bairro, cidade, id]);
 
