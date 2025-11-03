@@ -11,6 +11,7 @@ export const login = async (usuario, senha) => {
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify({ usuario, senha })
     });
 
@@ -20,6 +21,8 @@ export const login = async (usuario, senha) => {
     }
 
     const data = await response.json();
+    // ✅ SEGURANÇA: Token agora está em HttpOnly cookie, não em localStorage
+    // Retornar apenas os dados do usuário (sem token)
     return data;
   } catch (error) {
     console.error('Erro no login:', error);
@@ -70,13 +73,28 @@ export const isTokenExpired = (token) => {
 };
 
 // Função para fazer logout
-export const logout = () => {
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userData');
-  window.location.href = '/login';
+export const logout = async () => {
+  try {
+    // ✅ SEGURANÇA: Chamar endpoint logout para limpar cookie HttpOnly no servidor
+    await fetch(`${API_BASE_URL}/?route=auth&endpoint=logout`, {
+      method: 'POST',
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies
+    });
+  } catch (error) {
+    console.error('Erro ao fazer logout na API:', error);
+    // Continuar mesmo se falhar - limpar localStorage localmente
+  } finally {
+    // Limpar dados locais
+    localStorage.removeItem('userData');
+    window.location.href = '/login';
+  }
 };
 
 // Função para obter o token atual
+// ⚠️ DEPRECATED: Token agora está em HttpOnly cookie, não acessível via JavaScript
+// Manter para compatibilidade, mas sempre retorna null
 export const getCurrentToken = () => {
-  return localStorage.getItem('authToken');
+  // ✅ SEGURANÇA: HttpOnly cookies não são acessíveis via JavaScript
+  // O servidor envia o cookie automaticamente com credentials: 'include'
+  return null;
 };

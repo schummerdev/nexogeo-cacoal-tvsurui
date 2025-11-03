@@ -380,10 +380,8 @@ const WinnerDrawView = ({ liveGame, actions, loading }) => {
                 setIsDrawing(true);
                 const res = await fetch('/api/caixa-misteriosa/game/draw-winner-from-all', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
                 });
 
                 const data = await res.json();
@@ -408,10 +406,8 @@ const WinnerDrawView = ({ liveGame, actions, loading }) => {
             setIsDrawing(true);
             const res = await fetch('/api/caixa-misteriosa/game/draw-winner', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                }
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
             });
 
             const data = await res.json();

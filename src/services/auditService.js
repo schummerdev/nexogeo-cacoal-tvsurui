@@ -23,9 +23,11 @@ export const logAction = async (action, tableName, recordId, additionalData = {}
 
     const response = await fetch(url, {
       method: 'POST',
+      credentials: 'include',
+      credentials: 'include', // 🔐 Enviar cookies automaticamente (HttpOnly authToken)
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        'Content-Type': 'application/json'
+        // ✅ Remover Authorization header - usar HttpOnly cookie em vez disso
       },
       body: JSON.stringify(payload)
     });
@@ -50,9 +52,10 @@ export const logDataAccess = async (participantId, dataType, accessReason, maske
   try {
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=data-access`, {
       method: 'POST',
+      credentials: 'include',
+      credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         participant_id: participantId,
@@ -78,9 +81,10 @@ export const logConsent = async (participantId, consentType, consentGiven, conse
   try {
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=consent`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       },
       body: JSON.stringify({
         participant_id: participantId,
@@ -117,7 +121,7 @@ export const fetchAuditLogs = async (filters = {}) => {
 
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=logs&${queryParams}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       }
     });
 
@@ -147,7 +151,7 @@ export const fetchDataAccessLogs = async (filters = {}) => {
 
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=data-access-logs&${queryParams}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       }
     });
 
@@ -169,7 +173,7 @@ export const fetchAuditStats = async (daysBack = 30) => {
   try {
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=stats&days=${daysBack}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       }
     });
 
@@ -207,7 +211,7 @@ export const exportAuditLogs = async (filters = {}, format = 'csv') => {
 
     const response = await fetch(exportUrl, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       }
     });
 
@@ -239,9 +243,10 @@ export const checkDataRetention = async (recordId, dataType) => {
   try {
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=retention-check`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       },
       body: JSON.stringify({
         record_id: recordId,
@@ -267,8 +272,9 @@ export const cleanupOldLogs = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=cleanup`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       }
     });
 
@@ -298,7 +304,7 @@ export const fetchSystemLogs = async (filters = {}) => {
 
     const response = await fetch(`${API_BASE_URL}/?route=audit&action=system-logs&${queryParams}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        // 🔐 HttpOnly cookie é enviado automaticamente com credentials: 'include'
       }
     });
 

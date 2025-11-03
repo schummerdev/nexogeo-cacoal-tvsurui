@@ -1,5 +1,5 @@
 // src/services/promocaoService.js
-import { getCurrentToken } from './authService';
+// ✅ SEGURANÇA: Removido getCurrentToken() - token agora é HttpOnly cookie
 import { auditHelpers, logAction, logError } from './auditService';
 
 // Usar URL relativa para funcionar com Vercel
@@ -9,16 +9,11 @@ const API_BASE_URL = '/api';
 export const fetchPromocoes = async () => {
   try {
     console.log('🔍 Iniciando fetchPromocoes...');
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
-    console.log('🔑 Token encontrado, fazendo requisição para:', `${API_BASE_URL}/?route=promocoes`);
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
+    console.log('🔑 Fazendo requisição para:', `${API_BASE_URL}/?route=promocoes`);
     
     const response = await fetch(`${API_BASE_URL}/?route=promocoes`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {
@@ -48,17 +43,14 @@ export const fetchPromocoes = async () => {
 // Função para criar uma nova promoção
 export const createPromocao = async (promocaoData) => {
   try {
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
     
     const response = await fetch(`${API_BASE_URL}/?route=promocoes`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify(promocaoData)
     });
     
@@ -100,18 +92,13 @@ export const createPromocao = async (promocaoData) => {
 // Função para atualizar uma promoção
 export const updatePromocao = async (id, promocaoData) => {
   try {
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
     // Buscar dados originais antes da atualização para auditoria
     let originalData = null;
     try {
       const originalResponse = await fetch(`${API_BASE_URL}/?route=promocoes&id=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
       });
       if (originalResponse.ok) {
         const originalResult = await originalResponse.json();
@@ -124,9 +111,9 @@ export const updatePromocao = async (id, promocaoData) => {
     const response = await fetch(`${API_BASE_URL}/?route=promocoes&id=${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify(promocaoData)
     });
     
@@ -169,18 +156,13 @@ export const updatePromocao = async (id, promocaoData) => {
 // Função para excluir uma promoção
 export const deletePromocao = async (id) => {
   try {
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
     // Buscar dados da promoção antes da exclusão para auditoria
     let promocaoData = null;
     try {
       const promocaoResponse = await fetch(`${API_BASE_URL}/?route=promocoes&id=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
       });
       if (promocaoResponse.ok) {
         const promocaoResult = await promocaoResponse.json();
@@ -192,9 +174,7 @@ export const deletePromocao = async (id) => {
 
     const response = await fetch(`${API_BASE_URL}/?route=promocoes&id=${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
     
     if (!response.ok) {
@@ -235,15 +215,10 @@ export const deletePromocao = async (id) => {
 // Função para buscar uma promoção por ID
 export const getPromocaoById = async (id) => {
   try {
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
     
     const response = await fetch(`${API_BASE_URL}/?route=promocoes&id=${id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
     
     if (!response.ok) {

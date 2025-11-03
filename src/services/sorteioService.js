@@ -1,23 +1,18 @@
 // src/services/sorteioService.js
-import { getCurrentToken } from './authService';
+// ✅ SEGURANÇA: Removido getCurrentToken() - token agora é HttpOnly cookie
 import { auditHelpers } from './auditService';
 
 // Usar URL relativa para funcionar com Vercel
 const API_BASE_URL = '/api';
 
 // Função para fazer requisições autenticadas
+// ✅ SEGURANÇA: Usa cookies HttpOnly em vez de Authorization headers
 const makeAuthenticatedRequest = async (url, options = {}) => {
-  const token = getCurrentToken();
-  
-  if (!token) {
-    throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-  }
-  
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
     },
+    credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
   };
 
   const mergedOptions = {
@@ -30,7 +25,7 @@ const makeAuthenticatedRequest = async (url, options = {}) => {
   };
 
   const response = await fetch(url, mergedOptions);
-  
+
   if (!response.ok) {
     if (response.status === 401) {
       throw new Error('Token expirado. Faça login novamente.');
@@ -254,17 +249,17 @@ export const buscarPromocoesEncerradas = async () => {
 // Cancelar ganhador específico
 export const cancelarGanhador = async (ganhadorId, motivo = 'Cancelado pelo administrador') => {
   try {
-    const token = localStorage.getItem('authToken');
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    
+
     console.log('🔄 Cancelando ganhador:', ganhadorId);
-    
+
     const response = await fetch('/api/?route=sorteio&action=ganhadores&id=' + ganhadorId, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
       },
+      credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify({
         ganhador_id: ganhadorId,
         motivo: motivo,
@@ -273,11 +268,11 @@ export const cancelarGanhador = async (ganhadorId, motivo = 'Cancelado pelo admi
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.error || 'Erro ao cancelar ganhador');
     }
-    
+
     console.log('✅ Ganhador cancelado com sucesso:', data);
 
     // Verificar se foi o último ganhador da promoção e reativar se necessário
@@ -287,7 +282,7 @@ export const cancelarGanhador = async (ganhadorId, motivo = 'Cancelado pelo admi
 
         // Buscar ganhadores restantes da promoção
         const ganhadoresResponse = await fetch(`/api/?route=sorteio&action=ganhadores&id=${data.data.promocao_id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
         });
 
         if (ganhadoresResponse.ok) {

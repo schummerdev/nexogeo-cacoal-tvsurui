@@ -28,13 +28,8 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = () => {
     try {
-      const token = getCurrentToken();
-      
-      if (!token || isTokenExpired(token)) {
-        logout();
-        return;
-      }
-
+      // ✅ SEGURANÇA: Token agora é HttpOnly cookie, não verificar aqui
+      // Apenas verificar se há dados de usuário em localStorage
       const userData = getCurrentUser();
       if (userData) {
         setUser(userData);
@@ -52,28 +47,30 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData, token) => {
     try {
-      localStorage.setItem('authToken', token);
+      // ✅ SEGURANÇA: Token agora está em HttpOnly cookie (não armazenar em localStorage)
+      // Apenas armazenar dados públicos do usuário em localStorage
       localStorage.setItem('userData', JSON.stringify(userData));
       setUser(userData);
       setIsLoggedIn(true);
 
       // Log de auditoria para login
       auditHelpers.userLogin(userData.id);
-      console.log('🔐 Login auditado:', userData.username);
+      console.log('🔐 Login auditado:', userData.usuario || userData.username);
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       throw error;
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     // Log de auditoria para logout
     if (user) {
       auditHelpers.userLogout(user.id);
       console.log('🚪 Logout auditado:', user.username);
     }
 
-    localStorage.removeItem('authToken');
+    // ✅ SEGURANÇA: Token agora está em HttpOnly cookie
+    // Não há localStorage authToken para remover
     localStorage.removeItem('userData');
     setUser(null);
     setIsLoggedIn(false);

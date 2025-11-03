@@ -64,40 +64,58 @@ module.exports = async (req, res) => {
       if (promocaoId) {
         // Buscar promoção específica por ID
         console.log('Buscando promoção por ID:', promocaoId);
+        // ✅ FIXED: SQL aggregation - explicit GROUP BY
         query = `
-          SELECT p.*, e.nome as emissora_nome,
+          SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
+                 p.status, p.link_participacao, p.criado_em, p.emissora_id,
+                 p.numero_ganhadores, p.deleted_at, p.deleted_by,
+                 e.nome as emissora_nome,
                  COALESCE(COUNT(pt.id), 0) as participantes
-          FROM promocoes p 
-          LEFT JOIN emissoras e ON p.emissora_id = e.id 
+          FROM promocoes p
+          LEFT JOIN emissoras e ON p.emissora_id = e.id
           LEFT JOIN participantes pt ON p.id = pt.promocao_id
           WHERE p.id = $1
-          GROUP BY p.id, e.nome
+          GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
+                   p.status, p.link_participacao, p.criado_em, p.emissora_id,
+                   p.numero_ganhadores, p.deleted_at, p.deleted_by, e.nome
         `;
         params = [promocaoId];
       } else {
         // Buscar todas as promoções com contagem de participantes
         if (status) {
           console.log('Buscando promoções com status:', status);
+          // ✅ FIXED: SQL aggregation - explicit GROUP BY
           query = `
-            SELECT p.*, e.nome as emissora_nome,
+            SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
+                   p.status, p.link_participacao, p.criado_em, p.emissora_id,
+                   p.numero_ganhadores, p.deleted_at, p.deleted_by,
+                   e.nome as emissora_nome,
                    COALESCE(COUNT(pt.id), 0) as participantes
-            FROM promocoes p 
-            LEFT JOIN emissoras e ON p.emissora_id = e.id 
+            FROM promocoes p
+            LEFT JOIN emissoras e ON p.emissora_id = e.id
             LEFT JOIN participantes pt ON p.id = pt.promocao_id
             WHERE p.status = $1
-            GROUP BY p.id, e.nome
+            GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
+                     p.status, p.link_participacao, p.criado_em, p.emissora_id,
+                     p.numero_ganhadores, p.deleted_at, p.deleted_by, e.nome
             ORDER BY p.id DESC
           `;
           params = [status];
         } else {
           console.log('Buscando todas as promoções...');
+          // ✅ FIXED: SQL aggregation - explicit GROUP BY
           query = `
-            SELECT p.*, e.nome as emissora_nome,
+            SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
+                   p.status, p.link_participacao, p.criado_em, p.emissora_id,
+                   p.numero_ganhadores, p.deleted_at, p.deleted_by,
+                   e.nome as emissora_nome,
                    COALESCE(COUNT(pt.id), 0) as participantes
-            FROM promocoes p 
-            LEFT JOIN emissoras e ON p.emissora_id = e.id 
+            FROM promocoes p
+            LEFT JOIN emissoras e ON p.emissora_id = e.id
             LEFT JOIN participantes pt ON p.id = pt.promocao_id
-            GROUP BY p.id, e.nome
+            GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
+                     p.status, p.link_participacao, p.criado_em, p.emissora_id,
+                     p.numero_ganhadores, p.deleted_at, p.deleted_by, e.nome
             ORDER BY p.id DESC
           `;
         }
@@ -205,7 +223,14 @@ module.exports = async (req, res) => {
 
       try {
         // Primeiro tentar excluir diretamente
-        const result = await databasePool.query('DELETE FROM promocoes WHERE id = $1 RETURNING *', [id]);
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
+        // Note: This handler might be deprecated - main DELETE is in api/index.js
+        const result = await databasePool.query(`
+            UPDATE promocoes
+            SET deleted_at = NOW(), deleted_by = $1
+            WHERE id = $2
+            RETURNING id, nome, deleted_at, deleted_by
+        `, [1, id]); // TODO: Get actual user_id from request context
         
         // Invalidar cache após deletar promoção
         await cacheManager.invalidatePromocoes();

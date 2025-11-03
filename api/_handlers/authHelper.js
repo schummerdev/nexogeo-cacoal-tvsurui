@@ -15,12 +15,44 @@ if (!process.env.JWT_SECRET) {
  */
 async function getAuthenticatedUser(req, allowedRoles = []) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    let token = null;
+
+    // 🔐 SEGURANÇA: Ler token do HttpOnly cookie primeiro (mais seguro)
+    // Cookies são enviados automaticamente pelo browser com credentials: 'include'
+    if (req.cookies && req.cookies.authToken) {
+      token = req.cookies.authToken;
+      console.log('[AUTH] 🔐 Token lido do HttpOnly cookie (req.cookies)');
+    }
+    // Em Vercel, req.cookies pode não estar populado, então parsear do header manualmente
+    else if (req.headers.cookie) {
+      const cookieString = req.headers.cookie;
+      const cookies = cookieString.split(';').reduce((acc, cookie) => {
+        const [name, value] = cookie.trim().split('=');
+        if (name && value) {
+          acc[name] = decodeURIComponent(value);
+        }
+        return acc;
+      }, {});
+      if (cookies.authToken) {
+        token = cookies.authToken;
+        console.log('[AUTH] 🔐 Token lido do header cookie (parsed)');
+      }
+    }
+    // Fallback para Authorization header (compatibilidade)
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.substring(7);
+      console.log('[AUTH] 🔓 Token lido do Authorization header');
+    }
+
+    if (!token) {
+      console.log('[AUTH] ⚠️ Nenhum token encontrado. Cookies disponíveis:', {
+        hasCookiesObj: !!req.cookies,
+        hasCookieHeader: !!req.headers.cookie,
+        cookieHeader: req.headers.cookie ? req.headers.cookie.substring(0, 50) + '...' : 'nenhum'
+      });
       throw new Error('Token de autenticação não fornecido');
     }
-    
-    const token = authHeader.substring(7);
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Token is valid, now get user from DB to ensure they still exist and get their role

@@ -802,10 +802,8 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
 
                                                                     const res = await fetch('/api/caixa-misteriosa/submissions/edit', {
                                                                         method: 'POST',
-                                                                        headers: {
-                                                                            'Content-Type': 'application/json',
-                                                                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                                                                        },
+                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                        credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
                                                                         body: JSON.stringify(payload)
                                                                     });
 
@@ -850,10 +848,8 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                                                 try {
                                                                     const res = await fetch('/api/caixa-misteriosa/submissions/delete', {
                                                                         method: 'POST',
-                                                                        headers: {
-                                                                            'Content-Type': 'application/json',
-                                                                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                                                                        },
+                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                        credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
                                                                         body: JSON.stringify({
                                                                             submissionId: sub.id
                                                                         })

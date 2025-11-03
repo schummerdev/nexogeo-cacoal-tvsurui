@@ -51,9 +51,11 @@ async function cancelarGanhador(req, res) {
     await client.query('BEGIN');
 
     // 1. Buscar dados do ganhador antes de cancelar
+    // ✅ SEGURANÇA (ALTO-003): Campos explícitos
     const ganhadorQuery = `
       SELECT
-        g.*,
+        g.id, g.promocao_id, g.participante_id, g.premio, g.created_at,
+        g.cancelado_em, g.motivo_cancelamento, g.cancelado_por,
         p.nome as promocao_nome,
         pa.nome as participante_nome,
         pa.telefone as participante_telefone,
@@ -86,6 +88,7 @@ async function cancelarGanhador(req, res) {
     }
 
     // 3. Atualizar o ganhador como cancelado
+    // ✅ SEGURANÇA (ALTO-003): Campos explícitos
     const updateQuery = `
       UPDATE ganhadores
       SET
@@ -93,7 +96,8 @@ async function cancelarGanhador(req, res) {
         motivo_cancelamento = $2,
         cancelado_por = $3
       WHERE id = $1
-      RETURNING *
+      RETURNING id, promocao_id, participante_id, premio, created_at,
+                cancelado_em, motivo_cancelamento, cancelado_por
     `;
 
     const updateResult = await client.query(updateQuery, [
@@ -177,9 +181,11 @@ async function listarGanhadores(req, res) {
   try {
     const { promocao_id, incluir_cancelados } = req.query;
 
+    // ✅ SEGURANÇA (ALTO-003): Campos explícitos
     let query = `
       SELECT
-        g.*,
+        g.id, g.promocao_id, g.participante_id, g.premio, g.created_at,
+        g.cancelado_em, g.motivo_cancelamento, g.cancelado_por,
         p.nome as promocao_nome,
         pa.nome as participante_nome,
         pa.telefone as participante_telefone,

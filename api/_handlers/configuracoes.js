@@ -14,9 +14,14 @@ async function processEmissoras(req, res) {
       try {
         // Verificar se a tabela existe
         await pool.query(`SELECT 1 FROM emissoras LIMIT 1`);
-        
+
+        // ✅ SEGURANÇA (ALTO-003): Campos explícitos
         // Tabela existe, buscar dados
-        const result = await pool.query(`SELECT * FROM emissoras ORDER BY id ASC LIMIT 1`);
+        const result = await pool.query(`
+          SELECT id, nome, descricao, logo_url, tema_cor, website, telefone,
+                 instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco, created_at
+          FROM emissoras ORDER BY id ASC LIMIT 1
+        `);
         
         if (result.rows.length > 0) {
           await pool.end();
@@ -57,10 +62,12 @@ async function processEmissoras(req, res) {
             return;
           }
 
+          // ✅ SEGURANÇA (ALTO-003): Campos explícitos
           const result = await pool.query(`
-            INSERT INTO emissoras (nome, descricao) 
-            VALUES ($1, $2) 
-            RETURNING *
+            INSERT INTO emissoras (nome, descricao)
+            VALUES ($1, $2)
+            RETURNING id, nome, descricao, logo_url, tema_cor, website, telefone,
+                      instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco, created_at
           `, [nome, descricao]);
           
           await pool.end();
@@ -107,14 +114,16 @@ async function processEmissoras(req, res) {
           // Tentar atualizar registro existente ou inserir novo
           let result;
           try {
+            // ✅ SEGURANÇA (ALTO-003): Campos explícitos
             result = await pool.query(`
-              UPDATE emissoras 
-              SET nome = $1, descricao = $2, logo_url = $3, tema_cor = $4, 
-                  website = $5, telefone = $6, instagram = $7, facebook = $8, 
-                  youtube = $9, linkedin = $10, twitter = $11, whatsapp = $12, 
+              UPDATE emissoras
+              SET nome = $1, descricao = $2, logo_url = $3, tema_cor = $4,
+                  website = $5, telefone = $6, instagram = $7, facebook = $8,
+                  youtube = $9, linkedin = $10, twitter = $11, whatsapp = $12,
                   email = $13, endereco = $14
               WHERE id = 1
-              RETURNING *
+              RETURNING id, nome, descricao, logo_url, tema_cor, website, telefone,
+                        instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco, created_at
             `, [
               data.nome, data.descricao || '', data.logoUrl || '', data.temaCor || '#007bff',
               data.website || '', data.telefone || '', data.instagram || '', data.facebook || '',
@@ -124,12 +133,14 @@ async function processEmissoras(req, res) {
             
 
             if (result.rows.length === 0) {
+              // ✅ SEGURANÇA (ALTO-003): Campos explícitos
               // Se não atualizou nenhum registro, inserir novo
               result = await pool.query(`
-                INSERT INTO emissoras (nome, descricao, logo_url, tema_cor, website, telefone, 
+                INSERT INTO emissoras (nome, descricao, logo_url, tema_cor, website, telefone,
                                      instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-                RETURNING *
+                RETURNING id, nome, descricao, logo_url, tema_cor, website, telefone,
+                          instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco, created_at
               `, [
                 data.nome, data.descricao || '', data.logoUrl || '', data.temaCor || '#007bff',
                 data.website || '', data.telefone || '', data.instagram || '', data.facebook || '',

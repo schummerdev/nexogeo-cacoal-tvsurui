@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getCurrentToken } from '../services/authService';
 import caixaMisteriosaStore from '../store/caixaMisteriosaStore';
 
 // Hook customizado para gerenciar todo o estado e lógica do Caixa Misteriosa
@@ -28,22 +27,17 @@ export function useCaixaMisteriosa() {
 
             console.log('🔐 [apiFetch DEBUG] URL:', url, 'isPublicRoute:', isPublicRoute);
 
-            // Adiciona token apenas para endpoints protegidos (rotas não públicas)
+            // Adiciona credentials para endpoints protegidos (rotas não públicas)
+            const fetchOptions = { ...options, headers };
             if (!isPublicRoute) {
-                const token = getCurrentToken();
-                console.log('🔐 [apiFetch DEBUG] Token obtido:', token ? `${token.substring(0, 20)}...` : 'NULL');
-                if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
-                    console.log('✅ [apiFetch DEBUG] Header Authorization adicionado');
-                } else {
-                    console.error('❌ [apiFetch DEBUG] Token não encontrado no localStorage!');
-                }
+                console.log('✅ [apiFetch DEBUG] Endpoint protegido - adicionando credentials');
+                fetchOptions.credentials = 'include'; // SEGURANÇA: Enviar cookies HttpOnly
             } else {
                 console.log('🌐 [apiFetch DEBUG] Rota pública - sem autenticação');
             }
 
             console.log('🔐 [apiFetch DEBUG] Headers finais:', Object.keys(headers));
-            const response = await fetch(`${API_BASE_URL}${url}`, { ...options, headers });
+            const response = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
 
             if (!response.ok) {
                 const errorData = await response.json();

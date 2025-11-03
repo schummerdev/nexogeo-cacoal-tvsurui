@@ -35,11 +35,11 @@ async function buscarParticipantesDisponiveis(req, res) {
       FROM participantes p
       WHERE p.promocao_id = $1
       AND p.id NOT IN (
-        SELECT DISTINCT participante_id 
-        FROM ganhadores 
-        WHERE promocao_id = $1 
+        SELECT DISTINCT participante_id
+        FROM ganhadores
+        WHERE promocao_id = $1
         AND participante_id IS NOT NULL
-        AND (cancelado = false OR cancelado IS NULL)
+        AND deleted_at IS NULL
       )
       ORDER BY p.participou_em DESC
     `;
@@ -134,18 +134,20 @@ async function realizarSorteio(req, res) {
     console.log(`📊 [SORTEIO] Quantidade após parseInt: ${quantidade} (tipo: ${typeof quantidade})`);
 
     // Verificar se já existem ganhadores para esta promoção e cancelá-los automaticamente
+    // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
     const existingWinners = await databasePool.query(`
-      SELECT COUNT(*) as total FROM ganhadores 
-      WHERE promocao_id = $1 AND (cancelado = false OR cancelado IS NULL)
+      SELECT COUNT(*) as total FROM ganhadores
+      WHERE promocao_id = $1 AND deleted_at IS NULL
     `, [promocaoId]);
 
     if (existingWinners.rows[0].total > 0) {
-      // Cancelar ganhadores existentes automaticamente
+      // Soft Delete ganhadores existentes automaticamente
+      // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados
       await databasePool.query(`
-        UPDATE ganhadores 
-        SET cancelado = true 
-        WHERE promocao_id = $1 AND (cancelado = false OR cancelado IS NULL)
-      `, [promocaoId]);
+        UPDATE ganhadores
+        SET deleted_at = NOW(), deleted_by = $1, cancelado = true
+        WHERE promocao_id = $2 AND deleted_at IS NULL
+      `, [1, promocaoId]); // user_id = 1 (system user for automatic operations)
       
       console.log(`✅ Cancelados ${existingWinners.rows[0].total} ganhadores existentes da promoção ${promocaoId} para novo sorteio`);
     }
@@ -370,7 +372,7 @@ async function processarGanhadores(req, res) {
       FROM ganhadores g
       JOIN participantes p ON g.participante_id = p.id
       LEFT JOIN promocoes pr ON g.promocao_id = pr.id
-      WHERE g.promocao_id = $1 AND (g.cancelado = false OR g.cancelado IS NULL)
+      WHERE g.promocao_id = $1 AND g.deleted_at IS NULL
       ORDER BY g.posicao
     `, [promocaoId]);
 
@@ -406,7 +408,7 @@ async function processarGanhadores(req, res) {
           FROM ganhadores g
           JOIN participantes p ON g.participante_id = p.id
           LEFT JOIN promocoes pr ON g.promocao_id = pr.id
-          WHERE g.promocao_id = $1 AND (g.cancelado = false OR g.cancelado IS NULL)
+          WHERE g.promocao_id = $1 AND g.deleted_at IS NULL
           ORDER BY g.posicao
         `, [promocaoId]);
       }
@@ -481,18 +483,20 @@ async function obterEstatisticas(req, res) {
 
     // Buscar estatísticas reais do banco de dados
     const [totalGanhadoresResult, promocoesComGanhadoresResult, participantesDisponiveisResult, participantesTotalResult] = await Promise.all([
-      // Total de ganhadores não cancelados
+      // Total de ganhadores não deletados
+      // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
       databasePool.query(`
-        SELECT COUNT(*) as count 
-        FROM ganhadores 
-        WHERE cancelado = false OR cancelado IS NULL
+        SELECT COUNT(*) as count
+        FROM ganhadores
+        WHERE deleted_at IS NULL
       `),
-      
+
       // Promoções com ganhadores
+      // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
       databasePool.query(`
-        SELECT COUNT(DISTINCT promocao_id) as count 
-        FROM ganhadores 
-        WHERE cancelado = false OR cancelado IS NULL
+        SELECT COUNT(DISTINCT promocao_id) as count
+        FROM ganhadores
+        WHERE deleted_at IS NULL
       `),
       
       // Participantes disponíveis (que não ganharam ainda)
@@ -500,10 +504,10 @@ async function obterEstatisticas(req, res) {
         SELECT COUNT(*) as count 
         FROM participantes p 
         WHERE p.id NOT IN (
-          SELECT DISTINCT participante_id 
-          FROM ganhadores g 
-          WHERE g.participante_id IS NOT NULL 
-          AND (g.cancelado = false OR g.cancelado IS NULL)
+          SELECT DISTINCT participante_id
+          FROM ganhadores g
+          WHERE g.participante_id IS NOT NULL
+          AND g.deleted_at IS NULL
         )
       `),
       
@@ -548,7 +552,12 @@ async function obterEstatisticas(req, res) {
 async function limparDadosTeste(req, res) {
   try {
     // Remover todos os ganhadores de teste
-    await databasePool.query(`DELETE FROM ganhadores`);
+    // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
+    await databasePool.query(`
+        UPDATE ganhadores
+        SET deleted_at = NOW(), deleted_by = $1
+        WHERE deleted_at IS NULL
+    `, [1]); // user_id = 1 (system user for cleanup operations)
     
     // Resetar a sequência de IDs
     await databasePool.query(`ALTER SEQUENCE ganhadores_id_seq RESTART WITH 1`);
@@ -583,7 +592,8 @@ async function buscarPromocoesEncerradas(req, res) {
       FROM promocoes p
       INNER JOIN ganhadores g ON p.id = g.promocao_id
       WHERE p.status = 'encerrada'
-        AND (g.cancelado = false OR g.cancelado IS NULL)
+        AND g.deleted_at IS NULL
+        AND p.deleted_at IS NULL
       GROUP BY p.id, p.nome, p.status, p.data_inicio, p.data_fim
       ORDER BY p.data_fim DESC, p.id DESC
       LIMIT 5
@@ -611,7 +621,7 @@ async function buscarPromocoesEncerradas(req, res) {
           FROM ganhadores g
           LEFT JOIN participantes pt ON g.participante_id = pt.id
           WHERE g.promocao_id = $1
-            AND (g.cancelado = false OR g.cancelado IS NULL)
+            AND g.deleted_at IS NULL
           ORDER BY g.sorteado_em DESC
         `;
         

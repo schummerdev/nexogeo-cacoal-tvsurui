@@ -4,38 +4,13 @@
 export const getCurrentUser = () => {
   try {
     const userData = localStorage.getItem('userData');
-    const token = localStorage.getItem('authToken');
-    
-    // Preferir userData se existir
+
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie, usar apenas userData
     if (userData) {
       const parsed = JSON.parse(userData);
       return parsed;
     }
-    
-    // Fallback: tentar extrair do token
-    if (token) {
-      // Se for um token JWT
-      if (token.includes('.')) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return {
-          id: payload.id,
-          usuario: payload.usuario,
-          role: payload.role || 'user'
-        };
-      }
-      // Se for token base64 simples (Google Auth)
-      else {
-        const decoded = JSON.parse(atob(token));
-        return {
-          id: decoded.id,
-          usuario: decoded.usuario,
-          role: decoded.role || 'user',
-          email: decoded.email,
-          loginType: decoded.loginType
-        };
-      }
-    }
-    
+
     return null;
   } catch (error) {
     console.error('Erro ao obter dados do usuário:', error);
@@ -51,8 +26,9 @@ export const isAdmin = () => {
 
 // Função para verificar se o usuário está logado
 export const isAuthenticated = () => {
-  const token = localStorage.getItem('authToken');
-  return !!token;
+  // ✅ SEGURANÇA: Token agora é HttpOnly cookie
+  // Verificar se há dados de usuário em localStorage (token está no servidor)
+  return !!localStorage.getItem('userData');
 };
 
 // Função para obter o role do usuário

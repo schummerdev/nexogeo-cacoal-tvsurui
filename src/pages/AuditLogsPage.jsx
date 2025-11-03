@@ -77,10 +77,10 @@ const AuditLogsPage = () => {
       // Carregar logs e estatísticas usando API consolidada
       const [logsResponse, statsResponse] = await Promise.allSettled([
         fetch(logsUrl, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         }),
         fetch(`/api/?route=audit&action=stats&days=30`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         })
       ]);
 

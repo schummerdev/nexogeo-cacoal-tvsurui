@@ -711,16 +711,23 @@ async function debugTables(req, res) {
       ganhadoresData = { rows: [{ total: 0 }], error: e.message };
     }
 
+    // ✅ SEGURANÇA (ALTO-003): Campos explícitos
     // 4. Sample dos dados
     let promocoesSample, participantesSample;
     try {
-      promocoesSample = await databasePool.query('SELECT * FROM promocoes LIMIT 2');
+      promocoesSample = await databasePool.query(`
+        SELECT id, nome, descricao, premio, status, data_inicio, data_fim, created_at
+        FROM promocoes LIMIT 2
+      `);
     } catch (e) {
       promocoesSample = { rows: [], error: e.message };
     }
 
     try {
-      participantesSample = await databasePool.query('SELECT * FROM participantes LIMIT 2');
+      participantesSample = await databasePool.query(`
+        SELECT id, nome, telefone, email, cidade, bairro, promocao_id, created_at
+        FROM participantes LIMIT 2
+      `);
     } catch (e) {
       participantesSample = { rows: [], error: e.message };
     }
@@ -797,10 +804,14 @@ async function inspectDatabase(req, res) {
       participantesCount = { error: err.message };
     }
 
+    // ✅ SEGURANÇA (ALTO-003): Campos explícitos
     // 4. SAMPLE DE PARTICIPANTES
     let participantesSample;
     try {
-      const sample = await databasePool.query('SELECT * FROM participantes LIMIT 1');
+      const sample = await databasePool.query(`
+        SELECT id, nome, telefone, email, cidade, bairro, promocao_id, created_at
+        FROM participantes LIMIT 1
+      `);
       participantesSample = sample.rows;
     } catch (err) {
       participantesSample = { error: err.message };

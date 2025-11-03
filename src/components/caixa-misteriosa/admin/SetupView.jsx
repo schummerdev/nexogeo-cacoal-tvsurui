@@ -389,16 +389,9 @@ const SetupView = ({
     const handleDeleteProduct = async (productId) => {
         if (window.confirm('Tem certeza que deseja excluir este produto?')) {
             try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                    handleUnauthorized();
-                    return;
-                }
                 const response = await fetch(`/api/caixa-misteriosa/products/${productId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
                 });
                 if (response.status === 401) {
                     handleUnauthorized();

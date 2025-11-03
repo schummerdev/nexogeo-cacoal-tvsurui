@@ -307,8 +307,12 @@ module.exports = async (req, res) => {
     // GET /api/audit/logs - Buscar logs de auditoria
     if (method === 'GET' && path === '/api/audit/logs') {
       const { user_id, action, table_name, start_date, end_date, limit = 50, offset = 0 } = url.searchParams;
-      
-      let query = 'SELECT * FROM audit_logs WHERE 1=1';
+
+      // ✅ SEGURANÇA (ALTO-003): Campos explícitos
+      let query = `SELECT id, user_id, action, table_name, record_id, old_values, new_values,
+                          ip_address, user_agent, session_id, request_method, request_url,
+                          response_status, execution_time, error_message, additional_data, created_at
+                   FROM audit_logs WHERE 1=1`;
       const params = [];
       let paramCount = 0;
       
@@ -353,9 +357,13 @@ module.exports = async (req, res) => {
     // GET /api/audit/stats - Estatísticas de auditoria
     if (method === 'GET' && path === '/api/audit/stats') {
       const { days = 30 } = url.searchParams;
-      
-      const result = await databasePool.query('SELECT * FROM get_audit_stats($1)', [days]);
-      
+
+      // ✅ SEGURANÇA (ALTO-003): Campos explícitos (função retorna TABLE com campos conhecidos)
+      const result = await databasePool.query(
+        'SELECT total_actions, creates, updates, deletes, views, top_users, top_tables, recent_errors FROM get_audit_stats($1)',
+        [days]
+      );
+
       return res.status(200).json(result.rows[0] || {});
     }
     

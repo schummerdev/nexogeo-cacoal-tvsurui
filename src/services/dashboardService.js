@@ -1,5 +1,5 @@
 // src/services/dashboardService.js
-import { getCurrentToken } from './authService';
+// ✅ SEGURANÇA: Removido getCurrentToken() - token agora é HttpOnly cookie
 
 // Usar URL relativa para funcionar com Vercel
 const API_BASE_URL = '/api';
@@ -8,18 +8,15 @@ const API_BASE_URL = '/api';
 export const fetchDashboardData = async () => {
   try {
     console.log('🔍 Iniciando fetchDashboardData...');
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
-    console.log('🔑 Token encontrado, fazendo requisição para:', `${API_BASE_URL}/?route=dashboard`);
-    
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
+    console.log('🔑 Fazendo requisição para:', `${API_BASE_URL}/?route=dashboard`);
+
     const response = await fetch(`${API_BASE_URL}/?route=dashboard`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
-      }
+      },
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {

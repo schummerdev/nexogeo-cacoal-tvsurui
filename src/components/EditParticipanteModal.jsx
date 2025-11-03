@@ -22,12 +22,38 @@ const EditParticipanteModal = ({
 
   useEffect(() => {
     if (participante && isOpen) {
+      // ✅ FIXADO: Normalizar promotion_id para número ou null
+      const getPromocaoId = (value) => {
+        // Se já é número inteiro e positivo, retorna
+        if (Number.isInteger(value) && value > 0) {
+          return value;
+        }
+        // Se é string, tenta converter
+        if (typeof value === 'string' && value.trim()) {
+          const parsed = parseInt(value, 10);
+          if (Number.isInteger(parsed) && parsed > 0) {
+            return parsed;
+          }
+        }
+        // Senão (null, undefined, string vazia, etc), retorna null
+        return null;
+      };
+
+      const promocaoId = getPromocaoId(participante.promocao_id);
+
+      if (participante.promocao_id !== null && participante.promocao_id !== undefined && promocaoId === null) {
+        console.warn('⚠️ AVISO: promocao_id não é válido, será enviado como null:', {
+          tipo: typeof participante.promocao_id,
+          valor: participante.promocao_id
+        });
+      }
+
       setFormData({
         nome: participante.nome || '',
         telefone: participante.telefone || '',
         bairro: participante.bairro || '',
         cidade: participante.cidade || '',
-        promocao: participante.promocao_id || participante.promocao || '',
+        promocao: promocaoId,  // ✅ FIXADO: null (não string vazia!) ou número
         latitude: participante.latitude || '',
         longitude: participante.longitude || ''
       });

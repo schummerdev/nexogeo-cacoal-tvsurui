@@ -63,6 +63,7 @@ module.exports = async (req, res) => {
               0 as total_submissions,
               0 as correct_guesses
             FROM participantes p
+            WHERE p.deleted_at IS NULL
           `);
 
           participantes = regularResult.rows;
@@ -180,6 +181,7 @@ module.exports = async (req, res) => {
                COALESCE(p.participou_em, CURRENT_TIMESTAMP) as data_participacao
         FROM participantes p
         LEFT JOIN promocoes pr ON p.promocao_id = pr.id
+        WHERE p.deleted_at IS NULL
         ORDER BY COALESCE(p.participou_em, CURRENT_TIMESTAMP) DESC
       `);
 
@@ -265,16 +267,20 @@ module.exports = async (req, res) => {
       
     } else if (req.method === 'PUT') {
       const url = new URL(req.url, 'http://localhost');
-      const id = url.searchParams.get('id');
-      
-      console.log('PUT request - ID:', id, 'URL:', req.url);
-      
-      if (!id || id === 'undefined' || id === 'null') {
-                console.error('PUT request sem ID válido:', { id, url: req.url });
-        res.status(400).json({ 
-          message: 'ID é obrigatório para atualização',
-          received_id: id,
-          url: req.url 
+      const idParam = url.searchParams.get('id');
+
+      // ✅ FIXADO: Converter ID para número inteiro
+      const id = parseInt(idParam, 10);
+
+      console.log('PUT request - ID:', { original: idParam, parsed: id }, 'URL:', req.url);
+
+      if (!idParam || idParam === 'undefined' || idParam === 'null' || !Number.isInteger(id) || id <= 0) {
+        console.error('PUT request sem ID válido:', { idParam, parsed: id, url: req.url });
+        res.status(400).json({
+          message: 'ID é obrigatório e deve ser um número inteiro positivo',
+          received_id: idParam,
+          parsed_id: id,
+          url: req.url
         });
         return;
       }
@@ -299,18 +305,51 @@ module.exports = async (req, res) => {
           
           // Extract data
           const { nome, telefone, email, bairro, cidade, latitude, longitude, promocao_id, promocao } = data;
-          
-          // Handle promocao field mapping to promocao_id
-          const finalPromocaoId = promocao_id || promocao || null;
-          
+
+          // ✅ FIXADO: Validar que promocao_id é número inteiro, null, ou undefined (nunca string)
+          let finalPromocaoId = null;
+
+          // Se promocao_id foi fornecido e não é vazio
+          if (promocao_id !== undefined && promocao_id !== null && promocao_id !== '') {
+            const promId = Number(promocao_id);
+            // Validar que é número inteiro positivo
+            if (!Number.isInteger(promId) || promId <= 0) {
+              return res.status(400).json({
+                success: false,
+                message: `Erro: promocao_id deve ser um número inteiro positivo (>0). Recebido: ${promocao_id} (tipo: ${typeof promocao_id})`,
+                received_value: promocao_id,
+                received_type: typeof promocao_id,
+                suggestion: 'Se não há promoção associada, deixe o campo em branco ou null'
+              });
+            }
+            finalPromocaoId = promId;
+          }
+          // Se promocao_id é vazio, null, ou undefined, tenta usar o campo 'promocao'
+          else if (promocao !== undefined && promocao !== null && promocao !== '') {
+            const promValue = Number(promocao);
+            if (!Number.isInteger(promValue) || promValue <= 0) {
+              return res.status(400).json({
+                success: false,
+                message: `Erro: campo 'promocao' deve ser um número inteiro positivo (>0). Recebido: ${promocao} (tipo: ${typeof promocao})`,
+                received_value: promocao,
+                received_type: typeof promocao,
+                suggestion: 'Se não há promoção associada, deixe o campo em branco ou null'
+              });
+            }
+            finalPromocaoId = promValue;
+          }
+          // Senão, finalPromocaoId permanece null (participante sem promoção)
+
           console.log('Executando UPDATE com:', {
-            nome, telefone, email, bairro, cidade, latitude, longitude, finalPromocaoId, id
+            nome, telefone, email, bairro, cidade, latitude, longitude, finalPromocaoId, id,
+            received_promocao_id: { tipo: typeof promocao_id, valor: promocao_id },
+            received_promocao: { tipo: typeof promocao, valor: promocao }
           });
           
           const result = await databasePool.query(`
-            UPDATE participantes 
+            UPDATE participantes
             SET nome = $1, telefone = $2, email = $3, bairro = $4, cidade = $5, latitude = $6, longitude = $7, promocao_id = $8
-            WHERE id = $9 
+            WHERE id = $9 AND deleted_at IS NULL
             RETURNING *
           `, [nome, telefone, email, bairro, cidade, latitude, longitude, finalPromocaoId, id]);
           
@@ -355,9 +394,10 @@ module.exports = async (req, res) => {
 
       try {
         // Verificar se o participante é ganhador ativo (não cancelado)
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
         const ganhadorAtivo = await databasePool.query(`
-          SELECT id FROM ganhadores 
-          WHERE participante_id = $1 AND (cancelado = false OR cancelado IS NULL)
+          SELECT id FROM ganhadores
+          WHERE participante_id = $1 AND deleted_at IS NULL
         `, [id]);
         
         if (ganhadorAtivo.rows.length > 0) {
@@ -370,10 +410,12 @@ module.exports = async (req, res) => {
         
         // Se chegou aqui, pode excluir (ou é ganhador cancelado)
         // Primeiro remover registros de ganhadores cancelados
-        await databasePool.query(`
-          DELETE FROM ganhadores 
-          WHERE participante_id = $1 AND cancelado = true
-        `, [id]);
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete already applied via cancelado/deleted_at
+        // Ganhadores cancelados já estão soft-deleted, então podemos pular hard delete
+        // await databasePool.query(`
+        //   DELETE FROM ganhadores
+        //   WHERE participante_id = $1 AND cancelado = true
+        // `, [id]);
         
         // Agora excluir o participante
         const result = await databasePool.query('DELETE FROM participantes WHERE id = $1 RETURNING *', [id]);

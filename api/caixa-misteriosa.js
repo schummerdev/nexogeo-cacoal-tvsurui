@@ -830,9 +830,10 @@ async function submitGuess(req, res) {
         }
 
         // Busca o jogo pelo ID fornecido
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
         const gameResult = await query(`
             SELECT id FROM games
-            WHERE id = $1 AND status = 'accepting'
+            WHERE id = $1 AND status = 'accepting' AND deleted_at IS NULL
         `, [gameId]);
 
         if (gameResult.rows.length === 0) {
@@ -849,11 +850,12 @@ async function submitGuess(req, res) {
         // Modo novo: com participante público
         if (publicParticipantId) {
             // Verifica participante e palpites disponíveis
+            // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
             const participantResult = await query(`
                 SELECT id, name, phone, neighborhood, city, extra_guesses,
                 (SELECT COUNT(*) FROM submissions
                  WHERE (public_participant_id = $1 OR user_phone = (SELECT phone FROM public_participants WHERE id = $1))
-                 AND game_id = $2) as used_guesses
+                 AND game_id = $2 AND deleted_at IS NULL) as used_guesses
                 FROM public_participants WHERE id = $1
             `, [publicParticipantId, validatedGameId]);
 
@@ -932,8 +934,9 @@ async function submitGuess(req, res) {
         }
 
         // Modo legado (sem publicParticipantId) - usado pelo /register
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
         const existingSubmission = await query(`
-            SELECT id FROM submissions WHERE game_id = $1 AND user_phone = $2
+            SELECT id FROM submissions WHERE game_id = $1 AND user_phone = $2 AND deleted_at IS NULL
         `, [validatedGameId, userPhone]);
 
         if (existingSubmission.rows.length > 0) {
@@ -994,9 +997,13 @@ async function registerParticipant(req, res) {
     }
 
     try {
+        // ✅ SEGURANÇA (ALTO-003): Campos explícitos
         let existingParticipantResult;
         try {
-            existingParticipantResult = await query('SELECT * FROM public_participants WHERE phone = $1', [cleanPhone]);
+            existingParticipantResult = await query(
+                'SELECT id, name, phone, neighborhood, reference_code, game_id, created_at FROM public_participants WHERE phone = $1',
+                [cleanPhone]
+            );
         } catch (dbError) {
             dbError.message = `Erro na etapa de SELECT do participante: ${dbError.message}`;
             throw dbError;
@@ -1188,6 +1195,7 @@ async function startGame(req, res) {
         const activeGame = await query(`
             SELECT id FROM games
             WHERE status IN ('accepting', 'closed')
+              AND deleted_at IS NULL
         `);
 
         if (activeGame.rows.length > 0) {
@@ -1521,6 +1529,7 @@ async function revealClue(req, res) {
             FROM games g
             JOIN products p ON g.product_id = p.id
             WHERE g.status IN ('accepting', 'closed')
+              AND g.deleted_at IS NULL
             ORDER BY g.created_at DESC
             LIMIT 1
         `);
@@ -1597,9 +1606,10 @@ async function endSubmissions(req, res) {
         await getAuthenticatedUser(req, ['admin']);
 
         // Busca o jogo que aceita palpites
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
         const gameResult = await query(`
             SELECT id FROM games
-            WHERE status = 'accepting'
+            WHERE status = 'accepting' AND deleted_at IS NULL
             ORDER BY created_at DESC
             LIMIT 1
         `);
@@ -1670,6 +1680,7 @@ async function drawWinner(req, res) {
             FROM games g
             JOIN products pr ON g.product_id = pr.id
             WHERE g.status = 'closed'
+              AND g.deleted_at IS NULL
             ORDER BY g.created_at DESC
             LIMIT 1
         `);
@@ -1806,6 +1817,7 @@ async function drawWinnerFromAll(req, res) {
             FROM games g
             JOIN products pr ON g.product_id = pr.id
             WHERE g.status = 'closed'
+              AND g.deleted_at IS NULL
             ORDER BY g.created_at DESC
             LIMIT 1
         `);
@@ -1908,41 +1920,59 @@ async function drawWinnerFromAll(req, res) {
 }
 
 async function resetGame(req, res) {
+    // ✅ SEGURANÇA (ALTO-001): Transação para reset de jogo
+    const { Pool } = require('pg');
+    const pool = new Pool({
+        connectionString: process.env.DATABASE_URL
+    });
+    const client = await pool.connect();
+
     try {
-        // ✅ MOVED INSIDE try-catch
-        await getAuthenticatedUser(req, ['admin']);
+        // Autenticação
+        const user = await getAuthenticatedUser(req, ['admin']);
         console.log('🔄 [RESET] Iniciando reset do jogo...');
 
-        // Busca jogos ativos ou fechados
-        const gameResult = await query(`
+        // Iniciar transação
+        await client.query('BEGIN');
+
+        // 1️⃣ Busca jogos ativos ou fechados
+        const gameResult = await client.query(`
             SELECT id FROM games
             WHERE status IN ('accepting', 'closed', 'finished')
             ORDER BY created_at DESC
         `);
 
         if (gameResult.rows.length === 0) {
+            await client.query('ROLLBACK');
             return res.status(404).json({
                 success: false,
                 message: 'Nenhum jogo encontrado para resetar'
             });
         }
 
-        // Remove todas as submissões dos jogos
+        // 2️⃣ Soft Delete todas as submissões dos jogos
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
         for (const game of gameResult.rows) {
-            await query(`DELETE FROM submissions WHERE game_id = $1`, [game.id]);
+            await client.query(`
+                UPDATE submissions
+                SET deleted_at = NOW(), deleted_by = $1
+                WHERE game_id = $2
+            `, [1, game.id]); // user_id = 1 (system user for reset operations)
         }
 
-        // Remove os jogos
-        await query(`
-            DELETE FROM games
+        // 3️⃣ Soft Delete os jogos
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
+        await client.query(`
+            UPDATE games
+            SET deleted_at = NOW(), deleted_by = $1
             WHERE status IN ('accepting', 'closed', 'finished')
-        `);
+        `, [1]); // user_id = 1 (system user for reset operations)
 
         console.log('✅ [RESET] Jogos removidos:', { count: gameResult.rows.length });
 
-        // 🔥 RESET: Define saldo de 1 palpite (base) para todos os participantes
+        // 4️⃣ Define saldo de 1 palpite (base) para todos os participantes
         // extra_guesses = 0 significa que terão 1 palpite total (1 base + 0 extras)
-        const updateResult = await query(`
+        const updateResult = await client.query(`
             UPDATE public_participants
             SET extra_guesses = 0
             RETURNING id, name, extra_guesses
@@ -1953,31 +1983,40 @@ async function resetGame(req, res) {
             participants: updateResult.rows.map(p => ({ id: p.id, name: p.name, totalGuesses: 1 + p.extra_guesses }))
         });
 
-        // Log de auditoria
-        const user = await getAuthenticatedUser(req, ['admin']);
-        await logAuditAction({
-            user_id: user.id,
-            action: 'RESET_GAME',
-            table_name: 'games',
-            record_id: null,
-            new_values: { games_deleted: gameResult.rows.length, participants_reset: updateResult.rows.length },
-            ip_address: getClientIP(req),
-            user_agent: req.headers['user-agent'],
-            request_method: req.method,
-            request_url: req.originalUrl || req.url,
-            additional_data: {
-                games_removed: gameResult.rows.length,
-                participants_updated: updateResult.rows.length,
+        // 5️⃣ Registrar log de auditoria
+        await client.query(`
+            INSERT INTO audit_logs (
+                user_id, action, table_name, record_id, details, ip_address
+            ) VALUES ($1, $2, $3, $4, $5, $6)
+        `, [
+            user.id,
+            'RESET_GAME',
+            'games',
+            null,
+            JSON.stringify({
+                games_deleted: gameResult.rows.length,
+                participants_reset: updateResult.rows.length,
                 reset_type: 'full_reset'
-            }
-        });
+            }),
+            req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || '0.0.0.0'
+        ]);
+
+        // Commit da transação
+        await client.query('COMMIT');
 
         res.status(200).json({
             success: true,
             message: `Jogo resetado! Todos os ${updateResult.rows.length} participante(s) agora têm 1 palpite disponível.`,
             participantsUpdated: updateResult.rows.length
         });
+
     } catch (error) {
+        try {
+            await client.query('ROLLBACK');
+        } catch (rollbackError) {
+            console.error('❌ Erro ao fazer rollback:', rollbackError);
+        }
+
         console.error('❌ Erro em resetGame:', error);
 
         // Se for erro de autenticação, retornar 401
@@ -1992,6 +2031,9 @@ async function resetGame(req, res) {
             success: false,
             message: 'Erro ao resetar jogo'
         });
+    } finally {
+        client.release();
+        pool.end();
     }
 }
 
@@ -2777,6 +2819,7 @@ async function getParticipantInfo(req, res) {
         const currentGameResult = await query(`
             SELECT id FROM games
             WHERE status IN ('accepting', 'closed')
+              AND deleted_at IS NULL
             ORDER BY created_at DESC
             LIMIT 1
         `);
@@ -2997,6 +3040,7 @@ async function getReferrals(req, res) {
         const activeGameResult = await query(`
             SELECT id FROM games
             WHERE status IN ('accepting', 'closed', 'finished')
+              AND deleted_at IS NULL
             ORDER BY created_at DESC
             LIMIT 1
         `);
@@ -3190,6 +3234,7 @@ async function getWinners(req, res) {
             FROM games g
             JOIN products p ON g.product_id = p.id
             WHERE g.status IN ('closed', 'finished')
+              AND g.deleted_at IS NULL
             ORDER BY g.created_at DESC
             LIMIT 1
         `);
@@ -3255,6 +3300,7 @@ async function cleanOffensiveSubmissions(req, res) {
         const gameResult = await query(`
             SELECT id FROM games
             WHERE status IN ('accepting', 'closed', 'setup')
+              AND deleted_at IS NULL
             ORDER BY created_at DESC
             LIMIT 1
         `);
@@ -3269,8 +3315,9 @@ async function cleanOffensiveSubmissions(req, res) {
         const gameId = gameResult.rows[0].id;
 
         // Busca todas as submissions do jogo
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
         const submissionsResult = await query(`
-            SELECT id, guess FROM submissions WHERE game_id = $1
+            SELECT id, guess FROM submissions WHERE game_id = $1 AND deleted_at IS NULL
         `, [gameId]);
 
         const submissions = submissionsResult.rows;
@@ -3295,12 +3342,14 @@ async function cleanOffensiveSubmissions(req, res) {
             });
         }
 
-        // Remove palpites ofensivos
+        // Soft Delete palpites ofensivos
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
         const deleteResult = await query(`
-            DELETE FROM submissions
-            WHERE id = ANY($1)
-            RETURNING id, guess
-        `, [offensiveIds]);
+            UPDATE submissions
+            SET deleted_at = NOW(), deleted_by = $1
+            WHERE id = ANY($2)
+            RETURNING id, guess, deleted_at
+        `, [1, offensiveIds]); // user_id = 1 (system user for automated cleanup)
 
         console.log(`✅ Palpites removidos: ${deleteResult.rows.length}`);
 
@@ -3407,12 +3456,15 @@ async function deleteSubmission(req, res) {
 
         console.log(`🗑️ [DELETE SUBMISSION] Excluindo palpite ID ${submissionId}`);
 
-        // Deleta o palpite do banco
+        // Soft Delete o palpite do banco
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
+        const user = await getAuthenticatedUser(req, ['admin']);
         const result = await query(`
-            DELETE FROM submissions
-            WHERE id = $1
-            RETURNING id, guess, user_name
-        `, [submissionId]);
+            UPDATE submissions
+            SET deleted_at = NOW(), deleted_by = $1
+            WHERE id = $2
+            RETURNING id, guess, user_name, deleted_at
+        `, [user.id, submissionId]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({
@@ -3463,6 +3515,7 @@ async function correctSpellingSubmissions(req, res) {
         const gameResult = await query(`
             SELECT id FROM games
             WHERE status IN ('accepting', 'closed', 'setup')
+              AND deleted_at IS NULL
             ORDER BY created_at DESC
             LIMIT 1
         `);
@@ -3477,8 +3530,9 @@ async function correctSpellingSubmissions(req, res) {
         const gameId = gameResult.rows[0].id;
 
         // Busca todas as submissions do jogo
+        // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
         const submissionsResult = await query(`
-            SELECT id, guess FROM submissions WHERE game_id = $1
+            SELECT id, guess FROM submissions WHERE game_id = $1 AND deleted_at IS NULL
         `, [gameId]);
 
         const submissions = submissionsResult.rows;

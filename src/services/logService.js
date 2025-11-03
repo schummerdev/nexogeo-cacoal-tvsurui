@@ -2,7 +2,7 @@
 // Registra acessos e ações executadas pelos usuários
 
 import React from 'react';
-import { getCurrentToken } from './authService';
+// ✅ SEGURANÇA: Removido getCurrentToken() - token agora é HttpOnly cookie
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
@@ -31,12 +31,13 @@ export const registrarLog = async (acao, detalhes = {}) => {
     };
 
     // Enviar log para o backend
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
     const response = await fetch(`${API_BASE_URL}/logs`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify(logData)
     });
 
@@ -81,10 +82,9 @@ const salvarLogLocal = (logData) => {
 // Função para obter logs (para tela de administração)
 export const obterLogs = async (limite = 100, offset = 0) => {
   try {
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
     const response = await fetch(`${API_BASE_URL}/logs?limite=${limite}&offset=${offset}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {

@@ -1,5 +1,5 @@
 // src/services/participanteService.js
-import { getCurrentToken } from './authService';
+// ✅ SEGURANÇA: Removido getCurrentToken() - token agora é HttpOnly cookie
 import { auditHelpers, logAction, logError } from './auditService';
 
 // Usar URL relativa para funcionar com Vercel
@@ -9,16 +9,11 @@ const API_BASE_URL = '/api';
 export const fetchParticipantes = async () => {
   try {
     console.log('🔍 Iniciando fetchParticipantes...');
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
-    console.log('🔑 Token encontrado, fazendo requisição para:', `${API_BASE_URL}/?route=participantes`);
-    
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie, enviar automaticamente
+    console.log('🔑 Fazendo requisição para:', `${API_BASE_URL}/?route=participantes`);
+
     const response = await fetch(`${API_BASE_URL}/?route=participantes`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {
@@ -48,18 +43,13 @@ export const fetchParticipantes = async () => {
 // Função para excluir um participante
 export const deleteParticipante = async (id) => {
   try {
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
     // Buscar dados do participante antes da exclusão para auditoria
     let participantData = null;
     try {
       const participantResponse = await fetch(`${API_BASE_URL}/?route=participantes&id=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
       });
       if (participantResponse.ok) {
         const participantResult = await participantResponse.json();
@@ -71,9 +61,7 @@ export const deleteParticipante = async (id) => {
 
     const response = await fetch(`${API_BASE_URL}/?route=participantes&id=${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {
@@ -114,18 +102,13 @@ export const deleteParticipante = async (id) => {
 // Função para atualizar um participante
 export const updateParticipante = async (id, participanteData) => {
   try {
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
     // Buscar dados originais antes da atualização para auditoria
     let originalData = null;
     try {
       const originalResponse = await fetch(`${API_BASE_URL}/?route=participantes&id=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
       });
       if (originalResponse.ok) {
         const originalResult = await originalResponse.json();
@@ -142,13 +125,13 @@ export const updateParticipante = async (id, participanteData) => {
       data: participanteData,
       dataJson: JSON.stringify(participanteData)
     });
-    
+
     const response = await fetch(`${API_BASE_URL}/?route=participantes&id=${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify(participanteData)
     });
     
@@ -210,18 +193,13 @@ export const updateParticipante = async (id, participanteData) => {
 export const fetchParticipantesUnificados = async (includePublic = true) => {
   try {
     console.log('🔍 Iniciando fetchParticipantesUnificados...', { includePublic });
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
     const url = `${API_BASE_URL}/participantes?unified=true&includePublic=${includePublic}`;
-    console.log('🔑 Token encontrado, fazendo requisição para:', url);
+    console.log('🔑 Fazendo requisição para:', url);
 
     const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {
@@ -261,18 +239,13 @@ export const fetchParticipantesUnificados = async (includePublic = true) => {
 export const fetchGameParticipantsStats = async () => {
   try {
     console.log('📊 Iniciando fetchGameParticipantsStats...');
-    const token = getCurrentToken();
-    if (!token) {
-      throw new Error('Token de acesso não encontrado. Faça login para continuar.');
-    }
+    // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
     const url = `${API_BASE_URL}/caixa-misteriosa/stats/game-participants`;
-    console.log('🔑 Token encontrado, fazendo requisição para:', url);
+    console.log('🔑 Fazendo requisição para:', url);
 
     const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
 
     if (!response.ok) {

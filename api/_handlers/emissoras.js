@@ -24,10 +24,15 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       console.log('Buscando emissoras...');
       
+      // ✅ SEGURANÇA (ALTO-003): Campos explícitos
       // Primeiro tentar buscar da tabela emissoras se existir
       let result;
       try {
-        result = await pool.query(`SELECT * FROM emissoras ORDER BY nome ASC`);
+        result = await pool.query(`
+          SELECT id, nome, descricao, logo_url, tema_cor, website, telefone,
+                 instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco, created_at
+          FROM emissoras ORDER BY nome ASC
+        `);
       } catch (tableError) {
         console.log('Tabela emissoras não existe, criando dados mock');
         // Se a tabela não existir, retornar dados mock
@@ -77,10 +82,12 @@ module.exports = async (req, res) => {
             return;
           }
 
+          // ✅ SEGURANÇA (ALTO-003): Campos explícitos
           const result = await pool.query(`
-            INSERT INTO emissoras (nome, descricao) 
-            VALUES ($1, $2) 
-            RETURNING *
+            INSERT INTO emissoras (nome, descricao)
+            VALUES ($1, $2)
+            RETURNING id, nome, descricao, logo_url, tema_cor, website, telefone,
+                      instagram, facebook, youtube, linkedin, twitter, whatsapp, email, endereco, created_at
           `, [nome, descricao]);
           
           await pool.end();

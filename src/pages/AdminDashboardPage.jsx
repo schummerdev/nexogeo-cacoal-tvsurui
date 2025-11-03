@@ -137,7 +137,7 @@ const AdminDashboardPage = () => {
   const loadOrigemData = async () => {
     try {
       const response = await fetch(`/api/dashboard?action=origem-cadastros&promocao_id=${selectedPromocao}`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
       });
 
       if (response.ok) {
@@ -171,16 +171,16 @@ const AdminDashboardPage = () => {
       // Carregar dados em paralelo - USAR API PRINCIPAL
       const [dashboardResponse, promocoesResponse, participantesResponse, origemResponse] = await Promise.allSettled([
         fetch('/api/?route=dashboard', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         }),
         fetch('/api/?route=promocoes', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         }),
         fetch('/api/?route=dashboard&action=participantes-por-promocao', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         }),
         fetch(`/api/?route=dashboard&action=origem-cadastros&promocao_id=${selectedPromocao}`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         })
       ]);
 
@@ -285,7 +285,7 @@ const AdminDashboardPage = () => {
 
       try {
         const cmPartResponse = await fetch('/api/caixa-misteriosa/stats/participation', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         });
 
         if (cmPartResponse.ok) {
@@ -320,7 +320,7 @@ const AdminDashboardPage = () => {
 
       try {
         const cmNewRegResponse = await fetch('/api/caixa-misteriosa/stats/new-registrations', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         });
 
         if (cmNewRegResponse.ok) {

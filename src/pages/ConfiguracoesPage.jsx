@@ -332,7 +332,7 @@ const ConfiguracoesPage = () => {
     setLoadingAuditStats(true);
     try {
       const response = await fetch('/api/?route=audit&action=stats&days=30', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
       });
 
       if (response.ok) {
@@ -358,11 +358,8 @@ const ConfiguracoesPage = () => {
 
   const loadConfig = async () => {
     try {
-      const token = localStorage.getItem('authToken');
       const response = await fetch('/api/configuracoes?type=emissora', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
       });
 
       if (response.ok) {
@@ -414,8 +411,6 @@ const ConfiguracoesPage = () => {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('authToken');
-      
       const payload = {
         nome: emissora.nome,
         logoUrl: emissora.logoUrl,
@@ -433,14 +428,11 @@ const ConfiguracoesPage = () => {
         email: emissora.email,
         descricao: emissora.descricao
       };
-      
-      
+
       const response = await fetch('/api/configuracoes?type=emissora', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
         body: JSON.stringify(payload)
       });
       
@@ -474,7 +466,6 @@ const ConfiguracoesPage = () => {
         // Mensagem específica para erro de autenticação
         if (response.status === 401 || response.status === 403) {
           alert('Sessão expirada ou sem permissão. Por favor, faça login novamente.');
-          localStorage.removeItem('authToken');
           window.location.href = '/login';
           return;
         }
@@ -492,11 +483,8 @@ const ConfiguracoesPage = () => {
 
   const loadAdministradores = async () => {
     try {
-      const token = localStorage.getItem('authToken');
       const response = await fetch('/api/?route=usuarios', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
       });
 
       if (response.ok) {
@@ -542,18 +530,14 @@ const ConfiguracoesPage = () => {
 
   const handleSubmitAdmin = async (e) => {
     e.preventDefault();
-    
+
     try {
-      const token = localStorage.getItem('authToken');
-      
       if (editingAdmin) {
         // Atualizar administrador existente
         const response = await fetch(`/api/configuracoes?type=administradores&id=${editingAdmin.id}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
           body: JSON.stringify({
             usuario: adminData.usuario
           })
@@ -561,7 +545,7 @@ const ConfiguracoesPage = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setAdministradores(prev => prev.map(a => 
+          setAdministradores(prev => prev.map(a =>
             a.id === editingAdmin.id ? data.data : a
           ));
           alert('Administrador atualizado com sucesso!');
@@ -573,10 +557,8 @@ const ConfiguracoesPage = () => {
         // Criar novo administrador
         const response = await fetch('/api/configuracoes?type=administradores', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
           body: JSON.stringify({
             usuario: adminData.usuario,
             senha: adminData.senha,
@@ -604,12 +586,9 @@ const ConfiguracoesPage = () => {
   const handleDeleteAdmin = async (adminId) => {
     if (window.confirm('Tem certeza que deseja excluir este administrador?')) {
       try {
-        const token = localStorage.getItem('authToken');
         const response = await fetch(`/api/configuracoes?type=administradores&id=${adminId}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include' // SEGURANÇA: Enviar cookies HttpOnly
         });
 
         if (response.ok) {
@@ -648,13 +627,10 @@ const ConfiguracoesPage = () => {
     }
 
     try {
-      const token = localStorage.getItem('authToken');
       const response = await fetch(`/api/?route=usuarios&id=${changingPasswordUser.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
         body: JSON.stringify({
           senha: newPassword
         })
