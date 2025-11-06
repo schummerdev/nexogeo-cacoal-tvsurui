@@ -719,8 +719,7 @@ module.exports = async function handler(req, res) {
     if (endpoint === 'test') {
       try {
         const result = await testConnection();
-        return res.status(result.success ? 200 : 500).json(result);
-    \n  catch (error) {
+        return res.status(result.success ? 200 : 500).json(result);\n} catch (error) {
         console.error('❌ Erro no teste de conexão DB:', error.message); // Log apenas no servidor
         return res.status(500).json({
           success: false,
