@@ -1,40 +1,6 @@
-promocaoService.js:11 🔍 Iniciando fetchPromocoes...
-promocaoService.js:13 🔑 Fazendo requisição para: /api/?route=promocoes
-promocaoService.js:15  GET https://nexogeo-cacoal-tvsurui.vercel.app/api/?route=promocoes 503 (Service Unavailable)
-n @ promocaoService.js:15
-(anônimo) @ PromocoesPage.jsx:45
-(anônimo) @ PromocoesPage.jsx:60
-au @ react-dom.production.min.js:244
-Ss @ react-dom.production.min.js:286
-(anônimo) @ react-dom.production.min.js:282
-x @ scheduler.production.min.js:13
-T @ scheduler.production.min.js:14
-promocaoService.js:38 Erro ao buscar promoções: Error: Erro na requisição: 503 
-    at n (promocaoService.js:23:13)
-    at async PromocoesPage.jsx:47:15
-n @ promocaoService.js:38
-await in n
-(anônimo) @ PromocoesPage.jsx:45
-(anônimo) @ PromocoesPage.jsx:60
-au @ react-dom.production.min.js:244
-Ss @ react-dom.production.min.js:286
-(anônimo) @ react-dom.production.min.js:282
-x @ scheduler.production.min.js:13
-T @ scheduler.production.min.js:14
-PromocoesPage.jsx:54 Error: Erro na requisição: 503 
-    at n (promocaoService.js:23:13)
-    at async PromocoesPage.jsx:47:15
-(anônimo) @ PromocoesPage.jsx:54
-await in (anônimo)
-(anônimo) @ PromocoesPage.jsx:60
-au @ react-dom.production.min.js:244
-Ss @ react-dom.production.min.js:286
-(anônimo) @ react-dom.production.min.js:282
-x @ scheduler.production.min.js:13
-T @ scheduler.production.min.js:14
-
-
-
+api/?route=auth&endpoint=login:1  Failed to load resource: the server responded with a status of 500 ()
+installHook.js:1 Erro no login: SyntaxError: Unexpected token 'A', "A server e"... is not valid JSON
+overrideMethod @ installHook.js:1
 
 
 Time
@@ -42,27 +8,39 @@ Status
 Host
 Request
 Messages
-Nov 03 14:26:30.54
+Nov 06 15:03:59.87
 GET
-503
+500
+nexogeo-cacoal-tvsurui.vercel.app
+/api/configuracoes
+/var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 06 15:03:59.87
+GET
+500
+nexogeo-cacoal-tvsurui.vercel.app
+/api/promocoes
+/var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 06 15:03:52.60
+GET
+500
+nexogeo-cacoal-tvsurui.vercel.app
+/api/configuracoes
+/var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 06 15:03:52.60
+GET
+500
+nexogeo-cacoal-tvsurui.vercel.app
+/api/promocoes
+/var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. /var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 06 15:03:32.97
+POST
+500
 nexogeo-cacoal-tvsurui.vercel.app
 /api/
-2
-[HANDLER] ❌ Módulo db.js não foi carregado. DATABASE_URL está configurado?
-Nov 03 14:26:15.97
-GET
-503
-nexogeo-cacoal-tvsurui.vercel.app
-/api/
-2
-[HANDLER] ❌ Módulo db.js não foi carregado. DATABASE_URL está configurado?
-Nov 03 14:26:11.93
-GET
-503
-nexogeo-cacoal-tvsurui.vercel.app
-/api/
-10
-[HANDLER] ❌ Módulo db.js não foi carregado. DATABASE_URL está configurado?
+/var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. /var/task/api/index.js:3129 } catch (error) { ^^^^^ SyntaxError: Unexpected token 'catch' at wrapSafe (node:internal/modules/cjs/loader:1620:18) at Module._compile (node:internal/modules/cjs/loader:1662:20) at Object..js (node:internal/modules/cjs/loader:1820:10) at Module.load (node:internal/modules/cjs/loader:1423:32) at Function.<anonymous> (node:internal/modules/cjs/loader:1246:12) at /opt/rust/nodejs.js:2:13528 at Function.Gr (/opt/rust/nodejs.js:2:13906) at Ue.e.<computed>.Be._load (/opt/rust/nodejs.js:2:13498) at TracingChannel.traceSync (node:diagnostics_channel:322:14) at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+No more logs to show within selected timeline
 
 
+
+use pensar profundo e veja como corrigir esses erros
 
