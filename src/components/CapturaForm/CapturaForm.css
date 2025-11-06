@@ -526,3 +526,40 @@
     font-size: 0.8125rem;
   }
 }
+
+/* Estilos para o Skeleton Loading */
+.skeleton-container .skeleton {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-container .skeleton-logo {
+  width: 150px;
+  height: 50px;
+  margin: 0 auto 20px;
+}
+
+.skeleton-container .skeleton-title {
+  width: 80%;
+  height: 36px;
+  margin: 0 auto 10px;
+}
+
+.skeleton-container .skeleton-text {
+  width: 90%;
+  height: 20px;
+  margin: 0 auto;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #f0f0f0;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}
