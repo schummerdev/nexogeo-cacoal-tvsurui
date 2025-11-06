@@ -3072,7 +3072,7 @@ module.exports = async function handler(req, res) {
           console.log('🔧 URL encurtada com fallback local:', shortUrl);
         }
       }
-      } // Fechar o bloco else para URLs públicas
+      // Fechar o bloco else para URLs públicas (comment only)
 
       return res.status(200).json({
         success: true,
