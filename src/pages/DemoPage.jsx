@@ -12,7 +12,7 @@ const DemoPage = () => {
     {
       image: '/imagens/banner1.png',
       alt: 'Banner 1 - NexoGeo',
-      link: 'https://nexogeo.vercel.app' // Opcional: adicione o link desejado
+      link: '/' // Link para a página inicial
     },
     {
       image: '/imagens/banner2.png',

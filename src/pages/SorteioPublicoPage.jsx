@@ -477,9 +477,7 @@ const SorteioPublicoPage = () => {
             Sistema completo de gestão de promoções e sorteios
           </p>
           <a
-            href="https://nexogeo.vercel.app/demo"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/demo"
             className="nexogeo-link"
           >
             📦 Conheça nossos pacotes

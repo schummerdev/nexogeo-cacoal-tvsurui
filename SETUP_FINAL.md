@@ -76,10 +76,10 @@ Build dura aproximadamente 2-3 minutos
 ### 2. Testar a Aplicação
 ```bash
 # Acesse a URL de produção
-https://nexogeo-cacoal-tvsurui.vercel.app
+https://nexogeo.vercel.app
 
 # OU use a build URL temporária
-https://nexogeo-cacoal-tvsurui-4twkfjyau-schummerdevs-projects.vercel.app
+https://nexogeo.vercel.app
 
 # Teste fazer login
 # Console (F12) não deve ter erros 500
