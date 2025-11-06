@@ -719,7 +719,8 @@ module.exports = async function handler(req, res) {
     if (endpoint === 'test') {
       try {
         const result = await testConnection();
-        return res.status(result.success ? 200 : 500).json(result);\n} catch (error) {
+        return res.status(result.success ? 200 : 500).json(result);
+      } catch (error) {
         console.error('❌ Erro no teste de conexão DB:', error.message); // Log apenas no servidor
         return res.status(500).json({
           success: false,
@@ -2967,7 +2968,6 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ success: false, message: 'Método não permitido. Use POST.' });
     }
 
-    try {
       const { url: longUrl } = req.body;
 
       if (!longUrl) {
@@ -3083,14 +3083,9 @@ module.exports = async function handler(req, res) {
                 'Link encurtado localmente'
       });
 
-    } catch (error) { // internal catch for shorten route
-      console.error('Erro ao encurtar URL:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Erro interno ao encurtar o link.',
-        error: process.env.NODE_ENV === 'development' ? error.message : 'Serviço temporariamente indisponível'
-      });
     }
+
+  } // Fecha o bloco if (route === 'encurtar-link')
 
   // Rota padrão (index)
   return res.status(200).json({
@@ -3124,8 +3119,7 @@ module.exports = async function handler(req, res) {
     ],
     timestamp: new Date().toISOString()
   });
-
-  } catch (error) {
+} catch (error) {
     // ✅ CRITICAL: Global error handler - ensures ALL errors return JSON (never plain text)
     // This prevents Vercel's default "A server error has occurred" plain text response
     console.error('❌ FATAL ERROR in API handler:', {
