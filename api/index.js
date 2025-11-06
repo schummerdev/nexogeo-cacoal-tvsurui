@@ -1299,13 +1299,11 @@ module.exports = async function handler(req, res) {
       
       // GET - Listar promoções ou buscar por ID
       if (req.method === 'GET') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        const user = await getAuthenticatedUser(req, ['admin']);
-        console.log('[DASHBOARD] Usuário autenticado:', user.usuario);
-
         const { id, status } = req.query || {};
 
+        // Se um ID for fornecido, a rota é PÚBLICA para permitir que o formulário de captura funcione.
         if (id) {
+          console.log(`[PUBLIC] Buscando promoção pública por ID: ${id}`);
           // Buscar promoção específica por ID
           // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
           const result = await query(`
@@ -1331,6 +1329,11 @@ module.exports = async function handler(req, res) {
             timestamp: new Date().toISOString()
           });
         } else {
+          // Se nenhum ID for fornecido, a rota é PRIVADA e requer autenticação de admin.
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          const user = await getAuthenticatedUser(req, ['admin']);
+          console.log('[DASHBOARD] Usuário autenticado para listar promoções:', user.usuario);
+          
           // Listar todas as promoções (com filtro de status opcional)
           // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
           let queryText = `
