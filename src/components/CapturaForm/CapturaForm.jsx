@@ -1,12 +1,26 @@
 // src/components/CapturaForm/CapturaForm.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CapturaForm.css';
 import { fetchPromocoes } from '../../services/promocaoService';
 import { auditHelpers } from '../../services/auditService';
 import { useTheme } from '../../contexts/ThemeContext';
 import ThemeSelector from '../ThemeSelector/ThemeSelector';
+
+// Componente de Skeleton para o cabeçalho do formulário
+const FormHeaderSkeleton = () => (
+  <div className="form-header skeleton-container">
+    <div className="emissora-logo-section">
+      <div className="skeleton skeleton-logo"></div>
+    </div>
+    <div className="promocao-info">
+      <div className="skeleton skeleton-title"></div>
+      <div className="skeleton skeleton-text"></div>
+    </div>
+  </div>
+);
+
 
 // Componente principal do formulário de captura
 const CapturaForm = () => {
@@ -23,7 +37,7 @@ const CapturaForm = () => {
 
   const [promocao, setPromocao] = useState({
     id: null,
-    nome: 'Carregando promoção',
+    nome: '',
     descricao: '',
   });
 
@@ -46,57 +60,17 @@ const CapturaForm = () => {
   
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true); // Novo estado para o carregamento inicial
 
   // --- EFEITOS (LÓGICA QUE RODA QUANDO O COMPONENTE CARREGA) ---
 
-  // Efeito para buscar dados da promoção e parâmetros da URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const promocaoId = params.get('id');
-    const promocaoSlug = params.get('slug');
-    
-    setOrigem({
-      source: params.get('utm_source') || 'direto',
-      medium: params.get('utm_medium') || 'link',
-    });
-
-    // Priorizar ID, mas aceitar slug como fallback
-    let promocaoIdentifier = promocaoId;
-    if (!promocaoIdentifier && promocaoSlug) {
-      // Se for slug tv-surui---comando-na-tv, usar ID 7
-      if (promocaoSlug === 'tv-surui---comando-na-tv') {
-        promocaoIdentifier = '7';
-      } else {
-        promocaoIdentifier = promocaoSlug;
-      }
-    }
-    
-    if (promocaoIdentifier) {
-      // Busca dados reais da promoção via API
-      console.log(`Buscando dados da promoção: ${promocaoIdentifier}`);
-      
-      fetchPromocaoData(promocaoIdentifier);
-    } else {
-      // Se não há código de promoção, mostrar seletor com promoções ativas
-      console.log('Nenhum código de promoção informado - carregando promoções ativas');
-      setMostrarSeletorPromocao(true);
-      fetchPromocoesAtivas();
-      setPromocao({ nome: 'Escolha uma promoção', descricao: 'Selecione a promoção desejada abaixo.' });
-    }
-
-    // Buscar dados da emissora
-    fetchEmissoraData();
-  }, []); // O array vazio [] faz este efeito rodar apenas uma vez
-
-  // Função para buscar dados da promoção na API
-  const fetchPromocaoData = async (identifier) => {
+  // Função para buscar dados da promoção na API (usando useCallback para otimização)
+  const fetchPromocaoData = useCallback(async (identifier) => {
     try {
-      // Se for um número, buscar por ID diretamente
       let response;
       if (/^\d+$/.test(identifier)) {
         response = await fetch(`/api/promocoes?id=${identifier}`);
       } else {
-        // Senão, usar API de slug
         response = await fetch(`/api/promocoes-slug?slug=${identifier}`);
       }
       
@@ -105,7 +79,7 @@ const CapturaForm = () => {
       }
       
       const data = await response.json();
-      const promocaoData = data.data[0] || data.data; // Pode ser array ou objeto
+      const promocaoData = data.data[0] || data.data;
       setPromocao({
         id: promocaoData.id,
         nome: promocaoData.nome,
@@ -118,82 +92,73 @@ const CapturaForm = () => {
         descricao: 'Verifique o link de participação.',
       });
     }
-  };
+  }, []);
 
-  // Função para buscar promoções ativas (versão pública sem token)
-  const fetchPromocoesAtivas = async () => {
+  // Função para buscar promoções ativas (usando useCallback)
+  const fetchPromocoesAtivas = useCallback(async () => {
     try {
-      console.log('📍 Iniciando busca por promoções ativas...');
-      console.log('🔧 User Agent:', navigator.userAgent);
-      console.log('📱 É mobile?', /Mobile|Android|iPhone|iPad/.test(navigator.userAgent));
-      
-      // Fazer chamada direta à API sem token (público)
-      console.log('🌐 Chamando API pública de promoções...');
       const response = await fetch('/api/promocoes', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        }
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
       });
       
-      if (!response.ok) {
-        throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
       
       const result = await response.json();
-      const data = result.data;
-      console.log('📦 Dados recebidos da API:', data);
-      
-      // Filtro mais rigoroso para garantir apenas promoções ativas
-      const promocoesAtivas = data.filter(promocao => {
-        const isActive = promocao.status && promocao.status.toLowerCase() === 'ativa';
-        console.log(`📋 Promoção "${promocao.nome}": status="${promocao.status}" ativa=${isActive}`);
-        return isActive;
-      });
-      console.log('✅ Promoções ativas filtradas:', promocoesAtivas.map(p => `${p.nome} (${p.status})`));
-      
+      const promocoesAtivas = result.data.filter(p => p.status && p.status.toLowerCase() === 'ativa');
       setPromocoesDisponiveis(promocoesAtivas);
-      
-      if (promocoesAtivas.length === 0) {
-        console.log('⚠️ Nenhuma promoção ativa encontrada');
-      }
-      
-      console.log('📊 Total de promoções disponíveis:', promocoesAtivas.length);
     } catch (error) {
       console.error('❌ Erro ao buscar promoções ativas:', error);
-      // Não usar fallback - mostrar apenas se realmente existirem promoções ativas
       setPromocoesDisponiveis([]);
-      console.log('🔄 Nenhuma promoção disponível devido a erro na API');
     }
-  };
+  }, []);
 
-  // Função para buscar dados da emissora na API
-  const fetchEmissoraData = async () => {
+  // Função para buscar dados da emissora na API (usando useCallback)
+  const fetchEmissoraData = useCallback(async () => {
     try {
       const response = await fetch('/api/configuracoes?type=emissora');
-      
-      if (!response.ok) {
-        console.warn('Não foi possível carregar dados da emissora');
-        return;
-      }
+      if (!response.ok) return;
       
       const data = await response.json();
-      const emissoraData = data.data; // data.data já é o objeto da emissora
-      setEmissora({
-        nome: emissoraData.nome || '',
-        logo_url: emissoraData.logo_url || '',
-        tema_cor: emissoraData.tema_cor || 'azul',
-        instagram: emissoraData.instagram || '',
-        facebook: emissoraData.facebook || '',
-        youtube: emissoraData.youtube || '',
-        website: emissoraData.website || '',
-        telefone: emissoraData.telefone || ''
-      });
+      const emissoraData = data.data;
+      setEmissora(prev => ({ ...prev, ...emissoraData }));
     } catch (error) {
       console.warn('Erro ao buscar emissora:', error);
     }
-  };
+  }, []);
+
+  // Efeito principal para carregar todos os dados iniciais em paralelo
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setIsLoading(true);
+      const params = new URLSearchParams(window.location.search);
+      const promocaoId = params.get('id');
+      const promocaoSlug = params.get('slug');
+      
+      setOrigem({
+        source: params.get('utm_source') || 'direto',
+        medium: params.get('utm_medium') || 'link',
+      });
+
+      let promocaoIdentifier = promocaoId || (promocaoSlug === 'tv-surui---comando-na-tv' ? '7' : promocaoSlug);
+      
+      const dataPromises = [fetchEmissoraData()];
+
+      if (promocaoIdentifier) {
+        dataPromises.push(fetchPromocaoData(promocaoIdentifier));
+      } else {
+        setMostrarSeletorPromocao(true);
+        dataPromises.push(fetchPromocoesAtivas());
+        setPromocao({ nome: 'Escolha uma promoção', descricao: 'Selecione a promoção desejada abaixo.' });
+      }
+
+      await Promise.all(dataPromises);
+      setIsLoading(false);
+    };
+
+    loadInitialData();
+  }, [fetchPromocaoData, fetchPromocoesAtivas, fetchEmissoraData]);
+
 
   // Efeito para solicitar a geolocalização (executa apenas uma vez)
   useEffect(() => {
@@ -208,13 +173,6 @@ const CapturaForm = () => {
           },
           (error) => {
             console.warn('❌ Erro na geolocalização:', error.message);
-            // Apenas tentar novamente uma vez se for erro de timeout
-            if (error.code === error.TIMEOUT && !geolocalizacao) {
-              setTimeout(() => {
-                console.log('🔄 Tentando geolocalização novamente...');
-                obterGeolocalizacao();
-              }, 3000);
-            }
           },
           {
             enableHighAccuracy: true,
@@ -222,12 +180,8 @@ const CapturaForm = () => {
             maximumAge: 60000 // Cache por 1 minuto
           }
         );
-      } else if (!('geolocation' in navigator)) {
-        console.warn('❌ Geolocalização não suportada pelo navegador');
       }
     };
-
-    // Executar apenas uma vez quando o componente monta
     obterGeolocalizacao();
   }, []); // Array vazio = executa apenas uma vez
 
@@ -401,39 +355,36 @@ const CapturaForm = () => {
       </div>
 
       <form className="form-card" onSubmit={handleSubmit}>
-        <div className="form-header">
-          {/* Logo da emissora no topo (substitui o logo do sistema) */}
-          {emissora.logo_url ? (
-            <div className="emissora-logo-section">
-              <img 
-                src={emissora.logo_url} 
-                alt={`Logo ${emissora.nome}`} 
-                className="logo-emissora-principal" 
-              />
-            </div>
-          ) : emissora.nome ? (
-            <div className="emissora-nome-section">
-              <h2 className="nome-emissora-principal">{emissora.nome}</h2>
-            </div>
-          ) : (
-            /* Fallback para logo NexoGeo se não houver dados da emissora */
-            <div className="emissora-logo-section">
-              <img
-                src="/imagens/logo0.png"
-                alt="NexoGeo Logo"
-                className="logo-emissora-principal"
-              />
-            </div>
-          )}
-          
-          {/* Informações da promoção */}
-          <div className="promocao-info">
-            <h1 className="promocao-titulo">{promocao.nome}</h1>
-            {promocao.descricao && (
-              <p className="promocao-descricao">{promocao.descricao}</p>
+        {isLoading ? (
+          <FormHeaderSkeleton />
+        ) : (
+          <div className="form-header">
+            {emissora.logo_url ? (
+              <div className="emissora-logo-section">
+                <img 
+                  src={emissora.logo_url} 
+                  alt={`Logo ${emissora.nome}`} 
+                  className="logo-emissora-principal" 
+                />
+              </div>
+            ) : (
+              <div className="emissora-logo-section">
+                <img
+                  src="/imagens/logo0.png"
+                  alt="NexoGeo Logo"
+                  className="logo-emissora-principal"
+                />
+              </div>
             )}
+            
+            <div className="promocao-info">
+              <h1 className="promocao-titulo">{promocao.nome}</h1>
+              {promocao.descricao && (
+                <p className="promocao-descricao">{promocao.descricao}</p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Seletor de promoção quando não há código na URL */}
         {mostrarSeletorPromocao && (
