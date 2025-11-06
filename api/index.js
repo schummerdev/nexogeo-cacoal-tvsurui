@@ -3084,7 +3084,7 @@ module.exports = async function handler(req, res) {
                 'Link encurtado localmente'
       });
 
-    } catch (error) {
+    } catch (error) { // internal catch for shorten route
       console.error('Erro ao encurtar URL:', error);
       return res.status(500).json({
         success: false,
@@ -3092,7 +3092,6 @@ module.exports = async function handler(req, res) {
         error: process.env.NODE_ENV === 'development' ? error.message : 'Serviço temporariamente indisponível'
       });
     }
-  }
 
   // Rota padrão (index)
   return res.status(200).json({
