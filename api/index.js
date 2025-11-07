@@ -284,9 +284,7 @@ module.exports = async function handler(req, res) {
           const payload = {
             id: user.id,
             usuario: user.usuario,
-            role: user.role || 'user',
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+            role: user.role || 'user'
           };
 
           console.log('[DIAGNOSE] Payload para JWT:', JSON.stringify(payload));
@@ -294,7 +292,7 @@ module.exports = async function handler(req, res) {
           console.log('[DIAGNOSE] JWT_SECRET tipo:', typeof process.env.JWT_SECRET);
           console.log('[DIAGNOSE] JWT_SECRET comprimento:', process.env.JWT_SECRET?.length);
 
-          const token = jwt.sign(payload, process.env.JWT_SECRET);
+          const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
           console.log('[DIAGNOSE] ✅ JWT gerado com sucesso');
 
           return res.status(200).json({
@@ -358,12 +356,10 @@ module.exports = async function handler(req, res) {
           const payload = {
             id: user.id,
             usuario: user.usuario,
-            role: user.role || 'user',
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+            role: user.role || 'user'
           };
 
-          const token = jwt.sign(payload, process.env.JWT_SECRET);
+          const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
           console.log('[DIAGNOSE] Token gerado, tentando setar cookie...');
 
           // Tentar setar o cookie exatamente como no login
@@ -487,11 +483,9 @@ module.exports = async function handler(req, res) {
           const payload = {
             id: user.id,
             usuario: user.usuario,
-            role: user.role || 'user',
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+            role: user.role || 'user'
           };
-          token = jwt.sign(payload, process.env.JWT_SECRET);
+          token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
           completedSteps.push('jwt_sign');
           console.log('[FLOW-STEP3] ✅ JWT gerado');
         } catch (jwtError) {
@@ -862,12 +856,10 @@ module.exports = async function handler(req, res) {
           const payload = {
             id: user.id,
             usuario: user.usuario,
-            role: user.role || 'user',
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 dias
+            role: user.role || 'user'
           };
 
-          const token = jwt.sign(payload, process.env.JWT_SECRET);
+          const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
           console.log('[LOGIN] ✅ JWT gerado com sucesso');
 
           // ✅ SEGURANÇA: Enviar token em cookie HttpOnly [CRÍTICO-001]
