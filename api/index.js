@@ -1321,9 +1321,9 @@ module.exports = async function handler(req, res) {
             timestamp: new Date().toISOString()
           });
         } else {
-          // Se nenhum ID for fornecido, a rota é PRIVADA e requer autenticação de admin.
-          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-          const user = await getAuthenticatedUser(req, ['admin']);
+          // Se nenhum ID for fornecido, a rota é PRIVADA e requer autenticação.
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user, viewer
+          const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user', 'viewer']);
           console.log('[DASHBOARD] Usuário autenticado para listar promoções:', user.usuario);
           
           // Listar todas as promoções (com filtro de status opcional)
@@ -1361,8 +1361,8 @@ module.exports = async function handler(req, res) {
         const createBlocked = await rateLimitCreate(req, res);
         if (createBlocked) return;
 
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        const user = await getAuthenticatedUser(req, ['admin']);
+        // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
+        const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
         const { nome, descricao, data_inicio, data_fim, status = 'ativa', numero_ganhadores = 1 } = req.body || {};
 
         if (!nome || !data_inicio || !data_fim) {
@@ -1451,8 +1451,8 @@ module.exports = async function handler(req, res) {
 
       // PUT - Atualizar promoção com transação
       if (req.method === 'PUT') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        const user = await getAuthenticatedUser(req, ['admin']);
+        // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
+        const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
         const { id } = req.query || {};
         const { nome, descricao, status, data_inicio, data_fim, numero_ganhadores } = req.body || {};
 
@@ -1553,8 +1553,8 @@ module.exports = async function handler(req, res) {
 
       // DELETE - Excluir promoção com transação
       if (req.method === 'DELETE') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        const user = await getAuthenticatedUser(req, ['admin']);
+        // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator
+        const user = await getAuthenticatedUser(req, ['admin', 'moderator']);
         const { id } = req.query || {};
 
         if (!id) {
