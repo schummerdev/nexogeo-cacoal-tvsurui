@@ -132,20 +132,39 @@ async function cancelarGanhador(req, res) {
       })
     ]);
 
-    // 5. Opcional: Adicionar o participante de volta ao pool de elegíveis
+    // 5. Verificar se precisa reativar a promoção automaticamente
+    // Contar ganhadores não cancelados da promoção
+    const ganhadoresAtivosQuery = `
+      SELECT COUNT(*) as total
+      FROM ganhadores
+      WHERE promocao_id = $1 AND cancelado_em IS NULL
+    `;
+    const ganhadoresAtivosResult = await client.query(ganhadoresAtivosQuery, [ganhador.promocao_id]);
+    const totalGanhadoresAtivos = parseInt(ganhadoresAtivosResult.rows[0].total);
+
+    // Se não há mais ganhadores ativos E a promoção está encerrada, reativar automaticamente
     const promocaoStatusQuery = `
       SELECT status FROM promocoes WHERE id = $1
     `;
     const promocaoStatus = await client.query(promocaoStatusQuery, [ganhador.promocao_id]);
 
-    if (promocaoStatus.rows[0]?.status === 'ativa') {
-      // Remover restrição de "já ganhou" se existir
+    if (totalGanhadoresAtivos === 0 && promocaoStatus.rows[0]?.status === 'encerrada') {
+      // Reativar promoção automaticamente
       await client.query(`
-        UPDATE participantes
-        SET ja_ganhou = false
+        UPDATE promocoes
+        SET status = 'ativa'
         WHERE id = $1
-      `, [ganhador.participante_id]);
+      `, [ganhador.promocao_id]);
+
+      console.log(`✅ Promoção ID ${ganhador.promocao_id} reativada automaticamente (todos ganhadores foram cancelados)`);
     }
+
+    // 6. Remover restrição de "já ganhou" do participante
+    await client.query(`
+      UPDATE participantes
+      SET ja_ganhou = false
+      WHERE id = $1
+    `, [ganhador.participante_id]);
 
     await client.query('COMMIT');
 

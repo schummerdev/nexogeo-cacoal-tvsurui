@@ -678,7 +678,7 @@ const SorteioPage = () => {
                     marginBottom: '15px'
                   }}>
                     <div>
-                      <h4 style={{ 
+                      <h4 style={{
                         margin: '0 0 8px 0',
                         color: 'var(--color-text)',
                         fontSize: '1.2rem',
@@ -697,6 +697,36 @@ const SorteioPage = () => {
                         <span>🏆 Ganhadores: {promocao.total_ganhadores}</span>
                       </div>
                     </div>
+
+                    {/* Botão Ver Sorteio Público */}
+                    <button
+                      onClick={() => {
+                        const publicUrl = `/sorteio-publico?promocao=${promocao.id}`;
+                        window.open(publicUrl, '_blank');
+                        showToast('Página pública do sorteio aberta em nova aba', 'success');
+                      }}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'opacity 0.2s',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.target.style.opacity = '0.85'}
+                      onMouseLeave={(e) => e.target.style.opacity = '1'}
+                      title={`Abrir sorteio público da promoção ${promocao.nome}`}
+                    >
+                      <span>🎯</span>
+                      <span>Ver Sorteio Público</span>
+                    </button>
                   </div>
 
                   {/* Lista de Ganhadores */}
