@@ -20,9 +20,10 @@ dev-debug.log
 node_modules/
 # Environment variables
 .env
-.env.new
-.env.vercel
-.env.testsprite
+.env.*
+.env_*
+*.env
+DATABASE_URL_FIX.md
 # Editor directories and files
 .idea
 .vscode
