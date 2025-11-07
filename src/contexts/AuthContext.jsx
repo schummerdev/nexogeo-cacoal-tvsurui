@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const canCancelWinner = () => {
-    return hasRole('admin');
+    return hasAnyRole(['admin', 'moderator', 'user']);
   };
 
   const canAccessAuditLogs = () => {
