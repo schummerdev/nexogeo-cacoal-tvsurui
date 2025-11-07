@@ -368,7 +368,7 @@ module.exports = async function handler(req, res) {
             'authToken=' + token,
             'Path=/',
             'HttpOnly',
-            'SameSite=Strict',
+            'SameSite=Lax',
             isProduction ? 'Secure' : '',
             'Max-Age=' + (7 * 24 * 60 * 60)
           ].filter(Boolean).join('; ');
@@ -506,7 +506,7 @@ module.exports = async function handler(req, res) {
             'authToken=' + token,
             'Path=/',
             'HttpOnly',
-            'SameSite=Strict',
+            'SameSite=Lax',
             isProduction ? 'Secure' : '',
             'Max-Age=' + (7 * 24 * 60 * 60)
           ].filter(Boolean).join('; ');
@@ -868,7 +868,7 @@ module.exports = async function handler(req, res) {
             'authToken=' + token,
             'Path=/',
             'HttpOnly',
-            'SameSite=Strict',
+            'SameSite=Lax',
             isProduction ? 'Secure' : '',
             'Max-Age=' + (7 * 24 * 60 * 60)  // 7 dias
           ].filter(Boolean).join('; ');
@@ -902,7 +902,7 @@ module.exports = async function handler(req, res) {
 
       if (endpoint === 'logout') {
         // ✅ SEGURANÇA: Limpar cookie HttpOnly no logout [CRÍTICO-001]
-        res.setHeader('Set-Cookie', 'authToken=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
+        res.setHeader('Set-Cookie', 'authToken=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
 
         return res.status(200).json({
           success: true,
