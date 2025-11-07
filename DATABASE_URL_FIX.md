@@ -97,7 +97,7 @@ Aguarde 2-3 minutos para rebuild
 
 Após redeploy, verifique se os erros sumiram:
 
-1. Acesse: https://nexogeo-cacoal-tvsurui.vercel.app/login
+1. Acesse: https://nexogeo.vercel.app/login
 2. Tente fazer login
 3. Verifique o Console do navegador (F12)
 4. Deveria NOT ter erros 500
@@ -143,7 +143,7 @@ Se após configurar o DATABASE_URL correto os erros persistirem:
 - [ ] Fui em Deployments
 - [ ] Cliquei em "Redeploy" do último deployment
 - [ ] Aguardei 2-3 minutos
-- [ ] Testei login em https://nexogeo-cacoal-tvsurui.vercel.app/login
+- [ ] Testei login em https://nexogeo.vercel.app/login
 - [ ] Não há mais erros 500 ✅
 
 ---
