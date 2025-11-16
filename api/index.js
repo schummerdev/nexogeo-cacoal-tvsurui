@@ -1,6 +1,7 @@
 // API consolidada para resolver limite Vercel (12 funções max)
 // Fix: Caminhos de import corrigidos para _handlers/ subfolder
 // VERSION: v2.1-01nov2025-env-fix - Fix environment variable handling for Vercel
+// FORCE REBUILD: 2025-11-14T20:15:00 - Cache invalidation attempt #6
 console.log('[STARTUP] Iniciando handler da API...');
 
 // ✅ SEGURANÇA: Envolver requires críticos em try-catch para capturar erros de inicialização
@@ -100,6 +101,112 @@ module.exports = async function handler(req, res) {
       console.log('[COOKIE-PARSE] 🔐 Cookies parseados manualmente do header');
     }
 
+    // ✅ DIAGNÓSTICO ULTRA-RÁPIDO: Contar telefones únicos
+    if (req.url.includes('count-phones')) {
+      console.log('[COUNT-PHONES] 📊 Contando telefones únicos...');
+      try {
+        const databasePool = require('./_lib/database');
+        const result = await databasePool.query(`
+          SELECT
+            COUNT(*) as total,
+            COUNT(DISTINCT telefone) as unicos
+          FROM participantes
+          WHERE deleted_at IS NULL
+        `);
+
+        const total = parseInt(result.rows[0].total);
+        const unicos = parseInt(result.rows[0].unicos);
+
+        return res.status(200).json({
+          success: true,
+          total_registros: total,
+          telefones_unicos: unicos,
+          duplicatas: total - unicos,
+          conclusao: unicos === 1
+            ? `✅ CORRETO: ${total} registros do mesmo telefone (mesma pessoa ${total}x)`
+            : unicos === total
+            ? `❌ INCORRETO: ${total} telefones diferentes - deduplicação removendo registros válidos!`
+            : `📊 PARCIAL: ${unicos} telefones únicos de ${total} registros`
+        });
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    // ✅ DIAGNÓSTICO: Verificar schema do banco vs schema documentado
+    if (req.url.includes('schema-check') || req.url.includes('verificar-schema')) {
+      console.log('[SCHEMA-CHECK] 🔍 Verificando schema do banco de dados...');
+      try {
+        const { checkSchema } = require('./_debug/schema-check');
+        const report = await checkSchema();
+
+        return res.status(200).json({
+          success: true,
+          data: report
+        });
+      } catch (error) {
+        console.error('[SCHEMA-CHECK] ❌ Erro:', error);
+        return res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    // ✅ MIGRAÇÃO: Sistema automatizado de migrações de banco
+    if (req.url.includes('run-migrations') || req.url.includes('executar-migracoes')) {
+      console.log('[MIGRATIONS] 🔄 Iniciando sistema de migrações...');
+
+      // ⚠️ TEMPORÁRIO: Autenticação desabilitada para migração inicial
+      // TODO: Reativar após migração completa
+      // const authHeader = req.headers.authorization;
+      // if (!authHeader && req.method === 'POST') {
+      //   return res.status(401).json({
+      //     success: false,
+      //     error: 'Autenticação necessária para executar migrações'
+      //   });
+      // }
+
+      try {
+        const { getMigrationStatus, runAllPendingMigrations } = require('./_debug/run-migrations');
+
+        if (req.method === 'GET') {
+          // Apenas verificar status das migrações
+          const status = await getMigrationStatus();
+          return res.status(200).json({
+            success: true,
+            data: status
+          });
+        }
+
+        if (req.method === 'POST') {
+          // Executar todas as migrações pendentes
+          console.log('[MIGRATIONS] ⚠️ Executando migrações pendentes...');
+          const result = await runAllPendingMigrations();
+
+          return res.status(200).json({
+            success: result.success,
+            data: result
+          });
+        }
+
+        return res.status(405).json({
+          success: false,
+          error: 'Método não permitido. Use GET para status ou POST para executar.'
+        });
+
+      } catch (error) {
+        console.error('[MIGRATIONS] ❌ Erro:', error);
+        return res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
     // ✅ CRITICAL: Health check PRIMEIRO, antes de qualquer verificação de módulo
     // Isso permite diagnosticar quais módulos/variáveis estão faltando
     if (req.url.startsWith('/api/health') || req.url.startsWith('/health')) {
@@ -140,6 +247,84 @@ module.exports = async function handler(req, res) {
           status: 'API respondendo (com erro em verificação)',
           error: healthError.message,
           timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    // ✅ DIAGNÓSTICO RÁPIDO: Verificar telefones únicos em participantes
+    if (req.url.includes('verificar-telefones') || (req.url.includes('route=participantes') && req.url.includes('endpoint=diagnostico'))) {
+      console.log('[DIAGNOSTICO] 🔍 Verificando telefones únicos em participantes...');
+
+      if (!query) {
+        return res.status(500).json({ success: false, error: 'Database não inicializado' });
+      }
+
+      try {
+        const databasePool = require('./_lib/database');
+
+        // Contar total e telefones únicos
+        const result = await databasePool.query(`
+          SELECT
+            COUNT(*) as total_registros,
+            COUNT(DISTINCT telefone) as telefones_unicos,
+            COUNT(*) - COUNT(DISTINCT telefone) as duplicatas
+          FROM participantes
+          WHERE deleted_at IS NULL
+        `);
+
+        // Top 5 telefones mais repetidos
+        const duplicados = await databasePool.query(`
+          SELECT
+            telefone,
+            COUNT(*) as quantidade,
+            STRING_AGG(DISTINCT nome, ', ' ORDER BY nome) as nomes
+          FROM participantes
+          WHERE deleted_at IS NULL
+          GROUP BY telefone
+          ORDER BY quantidade DESC
+          LIMIT 5
+        `);
+
+        // Amostra de 3 registros
+        const amostra = await databasePool.query(`
+          SELECT id, nome, telefone, cidade, promocao_id, participou_em
+          FROM participantes
+          WHERE deleted_at IS NULL
+          ORDER BY participou_em DESC
+          LIMIT 3
+        `);
+
+        const total = parseInt(result.rows[0].total_registros);
+        const unicos = parseInt(result.rows[0].telefones_unicos);
+
+        const diagnostico = {
+          resumo: {
+            total_registros: total,
+            telefones_unicos: unicos,
+            duplicatas: parseInt(result.rows[0].duplicatas)
+          },
+          top_5_telefones_duplicados: duplicados.rows,
+          amostra_3_registros: amostra.rows,
+          conclusao: {
+            deduplicacao_correta: unicos === 1,
+            mensagem: unicos === 1
+              ? `✅ CORRETO: ${total} registros do mesmo telefone (mesma pessoa ${total}x)`
+              : `❌ INCORRETO: ${unicos} pessoas diferentes - deduplicação removendo registros válidos!`
+          }
+        };
+
+        console.log('[DIAGNOSTICO] ✅ Resultado:', diagnostico.conclusao.mensagem);
+
+        return res.status(200).json({
+          success: true,
+          data: diagnostico
+        });
+
+      } catch (error) {
+        console.error('[DIAGNOSTICO] ❌ Erro:', error);
+        return res.status(500).json({
+          success: false,
+          error: error.message
         });
       }
     }
@@ -1842,10 +2027,85 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // Rota para participantes - Redirecionando para handler dedicado que inclui endpoint unificado
+  // Rota para participantes - LISTAR TODOS SEM DEDUPLICACAO
   if (route === 'participantes') {
-    console.log('🔀 [ROUTER] Redirecionando para participantesHandler');
-    return participantesHandler(req, res);
+    console.log('🚨🚨🚨 [INDEX-DIRECT] Listando TODOS os participantes SEM deduplicacao - BYPASS handler');
+
+    try {
+      const databasePool = require('./_lib/database');
+
+      // Query direta: TODOS os participantes regulares
+      const regularResult = await databasePool.query(`
+        SELECT
+          p.id,
+          p.nome AS name,
+          p.telefone AS phone,
+          p.bairro AS neighborhood,
+          p.cidade AS city,
+          p.promocao_id,
+          pr.nome AS promocao_nome,
+          COALESCE(p.participou_em, CURRENT_TIMESTAMP) AS created_at,
+          'regular' AS participant_type,
+          p.origem_source,
+          p.origem_medium,
+          p.latitude,
+          p.longitude,
+          p.email
+        FROM participantes p
+        LEFT JOIN promocoes pr ON p.promocao_id = pr.id
+        WHERE p.deleted_at IS NULL
+        ORDER BY p.participou_em DESC
+      `);
+
+      console.log(`✅ [INDEX-DIRECT] ${regularResult.rows.length} participantes regulares encontrados`);
+
+      // TODOS os participantes públicos
+      let allParticipants = [...regularResult.rows];
+
+      try {
+        const publicResult = await databasePool.query(`
+          SELECT
+            pp.id,
+            pp.name,
+            pp.phone,
+            pp.neighborhood,
+            pp.city,
+            NULL AS promocao_id,
+            'Caixa Misteriosa' AS promocao_nome,
+            pp.created_at,
+            'public' AS participant_type
+          FROM public_participants pp
+          WHERE pp.deleted_at IS NULL
+          ORDER BY pp.created_at DESC
+        `);
+
+        console.log(`✅ [INDEX-DIRECT] ${publicResult.rows.length} participantes públicos encontrados`);
+        allParticipants = [...allParticipants, ...publicResult.rows];
+      } catch (publicError) {
+        console.log('⚠️ [INDEX-DIRECT] Erro ao buscar públicos:', publicError.message);
+      }
+
+      console.log(`🎯 [INDEX-DIRECT] TOTAL: ${allParticipants.length} participantes (SEM deduplicacao)`);
+
+      return res.status(200).json({
+        success: true,
+        data: allParticipants,
+        stats: {
+          total: allParticipants.length,
+          regular: allParticipants.filter(p => p.participant_type === 'regular').length,
+          public: allParticipants.filter(p => p.participant_type === 'public').length,
+          duplicates_removed: 0,
+          note: 'LISTAGEM DIRETA - SEM DEDUPLICACAO'
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ [INDEX-DIRECT] Erro:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
   }
 
   // Rota para sorteios

@@ -118,10 +118,15 @@ const CapturaForm = () => {
     try {
       const response = await fetch('/api/configuracoes?type=emissora');
       if (!response.ok) return;
-      
+
       const data = await response.json();
       const emissoraData = data.data;
       setEmissora(prev => ({ ...prev, ...emissoraData }));
+
+      // ✅ Preencher cidade automaticamente a partir das configurações da emissora
+      if (emissoraData.cidade) {
+        setFormData(prev => ({ ...prev, cidade: emissoraData.cidade }));
+      }
     } catch (error) {
       console.warn('Erro ao buscar emissora:', error);
     }

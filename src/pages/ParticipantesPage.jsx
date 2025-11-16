@@ -54,6 +54,12 @@ const ParticipantesPage = () => {
 
         const participantesData = participantesResult.data || [];
 
+        console.log('🔍 DEBUG - Dados recebidos da API:', {
+          total: participantesData.length,
+          primeiroParticipante: participantesData[0],
+          camposPresentes: participantesData[0] ? Object.keys(participantesData[0]) : []
+        });
+
         // Ajustar os nomes dos campos para corresponder ao frontend
         const formattedParticipantes = participantesData.map(participante => ({
           id: participante.id,
@@ -73,6 +79,11 @@ const ParticipantesPage = () => {
           total_submissions: participante.total_submissions || 0,
           correct_guesses: participante.correct_guesses || 0
         }));
+
+        console.log('🔍 DEBUG - Após mapeamento:', {
+          total: formattedParticipantes.length,
+          primeiroFormatado: formattedParticipantes[0]
+        });
 
         setParticipantes(formattedParticipantes);
         setParticipantStats(participantesResult.stats || { total: formattedParticipantes.length, regular: formattedParticipantes.length, public: 0 });

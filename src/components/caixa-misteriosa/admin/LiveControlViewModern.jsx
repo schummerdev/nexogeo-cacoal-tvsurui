@@ -115,6 +115,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
         uniqueParticipants: 0
     });
     const [correctGuessIds, setCorrectGuessIds] = useState(new Set());
+    const [aiStatus, setAiStatus] = useState({ enabled: false, status: 'loading', message: 'Verificando...' });
 
     const { giveaway, revealedCluesCount, status, submissions } = liveGame || {};
 
@@ -343,6 +344,28 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
             }
         };
     }, [actions]);
+
+    // Buscar status da Gemini AI
+    useEffect(() => {
+        const fetchAIStatus = async () => {
+            try {
+                console.log('🤖 [AI STATUS] Buscando status da Gemini AI...');
+                const response = await fetch('/api/caixa-misteriosa/ai-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🤖 [AI STATUS] Resposta:', data);
+                    setAiStatus(data);
+                } else {
+                    setAiStatus({ enabled: false, status: 'error', message: 'Erro ao verificar status' });
+                }
+            } catch (error) {
+                console.error('❌ [AI STATUS] Erro:', error);
+                setAiStatus({ enabled: false, status: 'error', message: 'Erro de conexão' });
+            }
+        };
+
+        fetchAIStatus();
+    }, []);
 
     // Buscar participantes e estatísticas
     useEffect(() => {
@@ -672,7 +695,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                             <h3 style={{...styles.h3, margin: 0}}>
                                 📝 Palpites Recebidos ({(submissions || []).length})
                             </h3>
-                            <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                            <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center'}}>
                                 <button
                                     onClick={async () => {
                                         if (window.confirm('Corrigir erros ortográficos nos palpites?\n\nIsso irá atualizar automaticamente os palpites com a grafia correta usando IA.')) {
@@ -740,6 +763,36 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                 >
                                     {loading ? '⏳' : '🔄'} Atualizar
                                 </button>
+                                {/* 🤖 Status da Gemini AI */}
+                                <div
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.4rem',
+                                        padding: '0.4rem 0.8rem',
+                                        borderRadius: '0.5rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '600',
+                                        background: aiStatus.status === 'active' ? '#10B981' :
+                                                   aiStatus.status === 'loading' ? '#6B7280' : '#EF4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        boxShadow: aiStatus.status === 'active' ? '0 2px 8px rgba(16, 185, 129, 0.3)' :
+                                                  aiStatus.status === 'loading' ? '0 2px 8px rgba(107, 114, 128, 0.3)' : '0 2px 8px rgba(239, 68, 68, 0.3)',
+                                        whiteSpace: 'nowrap',
+                                        cursor: 'help'
+                                    }}
+                                    title={aiStatus.status === 'active'
+                                        ? `${aiStatus.message}\nModelo: ${aiStatus.activeModel || 'N/A'}`
+                                        : aiStatus.message
+                                    }
+                                >
+                                    <span>{aiStatus.status === 'active' ? '🟢' : aiStatus.status === 'loading' ? '⏳' : '🔴'}</span>
+                                    <span>
+                                        {aiStatus.status === 'active' ? 'IA Ativa' :
+                                         aiStatus.status === 'loading' ? 'Verificando IA...' : 'IA Desativada'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 

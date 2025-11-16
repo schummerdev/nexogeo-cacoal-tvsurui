@@ -195,7 +195,7 @@ export const fetchParticipantesUnificados = async (includePublic = true) => {
     console.log('🔍 Iniciando fetchParticipantesUnificados...', { includePublic });
     // ✅ SEGURANÇA: Token agora é HttpOnly cookie
 
-    const url = `${API_BASE_URL}/participantes?unified=true&includePublic=${includePublic}`;
+    const url = `${API_BASE_URL}/?route=participantes&endpoint=list&include_public=${includePublic}`;
     console.log('🔑 Fazendo requisição para:', url);
 
     const response = await fetch(url, {

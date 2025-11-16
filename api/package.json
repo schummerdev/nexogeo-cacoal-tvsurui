@@ -1,7 +1,7 @@
 {
   "name": "nexogeo-api",
-  "version": "1.0.0",
-  "description": "API functions for NexoGeo",
+  "version": "1.0.1",
+  "description": "API functions for NexoGeo - FORCE REBUILD v2.0",
   "main": "index.js",
   "dependencies": {
     "bcryptjs": "2.4.3",

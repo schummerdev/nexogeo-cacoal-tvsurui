@@ -116,7 +116,7 @@ export const buscarGanhadores = async (promocaoId) => {
 export const buscarTodosGanhadores = async () => {
   try {
     const data = await makeAuthenticatedRequest(
-      `${API_BASE_URL}/sorteio/ganhadores`,
+      `${API_BASE_URL}/?route=ganhadores`,
       { method: 'GET' }
     );
     return data;
@@ -203,7 +203,7 @@ export const buscarPromocoesAtivas = async () => {
 export const atualizarStatusPromocao = async (promocaoId, novoStatus) => {
   try {
     console.log(`🏷️ atualizarStatusPromocao: promocaoId=${promocaoId}, novoStatus=${novoStatus}`);
-    console.log(`🌐 Endpoint: ${API_BASE_URL}/promocoes/status`);
+    console.log(`🌐 Endpoint: ${API_BASE_URL}/?route=promocoes&id=${promocaoId}`);
     
     const requestBody = {
       status: novoStatus

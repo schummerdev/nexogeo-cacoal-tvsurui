@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../components/DashboardLayout/Header';
 import { LoadingSpinner } from '../components/LoadingComponents';
 import Toast from '../components/Toast/Toast';
@@ -44,6 +44,8 @@ const SorteioPage = () => {
     bairro: '',
     periodo: 'todos'
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 50;
 
   // Carregar dados iniciais
   useEffect(() => {
@@ -314,12 +316,42 @@ const SorteioPage = () => {
     showToast('Página pública do sorteio aberta em nova aba', 'success');
   };
   
-  const filteredParticipants = participants.filter(participant => {
-    if (filters.cidade && !participant.cidade?.toLowerCase().includes(filters.cidade.toLowerCase())) return false;
-    if (filters.bairro && !participant.bairro?.toLowerCase().includes(filters.bairro.toLowerCase())) return false;
-    return true;
-  });
-  
+  const filteredParticipants = useMemo(() => {
+    return participants.filter(participant => {
+      if (filters.cidade && !participant.cidade?.toLowerCase().includes(filters.cidade.toLowerCase())) return false;
+      if (filters.bairro && !participant.bairro?.toLowerCase().includes(filters.bairro.toLowerCase())) return false;
+      return true;
+    });
+  }, [participants, filters]);
+
+  // Calcular participantes da página atual
+  const paginatedParticipants = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredParticipants.slice(startIndex, endIndex);
+  }, [filteredParticipants, currentPage, ITEMS_PER_PAGE]);
+
+  // Calcular total de páginas
+  const totalPages = Math.ceil(filteredParticipants.length / ITEMS_PER_PAGE);
+
+  // Resetar para página 1 quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, selectedPromotion]);
+
+  // Funções de navegação de página
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -560,7 +592,7 @@ const SorteioPage = () => {
                   </thead>
                   <tbody>
                     {filteredParticipants.length > 0 ? (
-                      filteredParticipants.map(participant => (
+                      paginatedParticipants.map(participant => (
                         <tr key={participant.id}>
                           <td>{maskName(participant.nome)}</td>
                           <td>{maskPhone(participant.telefone)}</td>
@@ -572,8 +604,8 @@ const SorteioPage = () => {
                     ) : (
                       <tr>
                         <td colSpan="5" className="empty-message">
-                          {participants.length === 0 
-                            ? "Nenhum participante disponível para sorteio" 
+                          {participants.length === 0
+                            ? "Nenhum participante disponível para sorteio"
                             : "Nenhum participante encontrado com os filtros aplicados"
                           }
                         </td>
@@ -581,6 +613,29 @@ const SorteioPage = () => {
                     )}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Paginação */}
+            {filteredParticipants.length > 0 && (
+              <div className="pagination">
+                <button
+                  className="pagination-btn"
+                  disabled={currentPage === 1}
+                  onClick={goToPreviousPage}
+                >
+                  ← Anterior
+                </button>
+                <span className="pagination-info">
+                  Página {currentPage} de {totalPages || 1} ({filteredParticipants.length} {filteredParticipants.length === 1 ? 'registro' : 'registros'})
+                </span>
+                <button
+                  className="pagination-btn"
+                  disabled={currentPage >= totalPages}
+                  onClick={goToNextPage}
+                >
+                  Próxima →
+                </button>
               </div>
             )}
           </div>
