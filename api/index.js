@@ -2032,6 +2032,23 @@ module.exports = async function handler(req, res) {
     // ✅ FIX: Verificar método HTTP - delegar POST/PUT/DELETE para handler
     if (req.method !== 'GET') {
       console.log(`📝 [INDEX] Delegando ${req.method} /api/participantes para handler`);
+
+      // Verificar se handler foi carregado corretamente
+      if (!participantesHandler || typeof participantesHandler !== 'function') {
+        console.error('❌ [INDEX] participantesHandler não está disponível, tentando recarregar...');
+        try {
+          participantesHandler = require('./_handlers/participantes.js');
+          console.log('✅ [INDEX] participantesHandler recarregado com sucesso');
+        } catch (reloadError) {
+          console.error('❌ [INDEX] Falha ao recarregar participantesHandler:', reloadError.message);
+          return res.status(500).json({
+            success: false,
+            error: 'Handler de participantes não disponível',
+            details: reloadError.message
+          });
+        }
+      }
+
       return participantesHandler(req, res);
     }
 
