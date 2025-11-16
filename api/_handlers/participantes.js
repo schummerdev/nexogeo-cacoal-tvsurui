@@ -1,4 +1,3 @@
-```javascript
 const { getSecureHeaders, checkRateLimit } = require('../_lib/security');
 const databasePool = require('../_lib/database');
 
@@ -318,7 +317,7 @@ module.exports = async (req, res) => {
       // GET PADRÃO: apenas participantes regulares
       // (merge inteligente via ?merge=true)
       // ============================================================
-      const url = new URL(req.url, `http://${req.headers.host}`);
+      // url já foi declarado no início do bloco GET
       const merge = url.searchParams.get('merge') === 'true';
 
       let result = await databasePool.query(`
@@ -775,4 +774,3 @@ module.exports = async (req, res) => {
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
-```
