@@ -1,0 +1,1490 @@
+{
+  "timestamp": "2025-11-16T21:06:06.483Z",
+  "tabelas": {
+    "existentes": [
+      "audit_logs",
+      "configuracoes_emissora",
+      "consent_logs",
+      "data_access_logs",
+      "games",
+      "ganhadores",
+      "participantes",
+      "products",
+      "promocoes",
+      "public_participants",
+      "rate_limits",
+      "referral_rewards",
+      "sponsors",
+      "submissions",
+      "system_logs",
+      "usuarios"
+    ],
+    "esperadas": [
+      "usuarios",
+      "configuracoes_emissora",
+      "promocoes",
+      "participantes",
+      "ganhadores",
+      "sponsors",
+      "products",
+      "games",
+      "public_participants",
+      "submissions",
+      "audit_logs",
+      "data_access_logs",
+      "consent_logs",
+      "system_logs",
+      "rate_limits"
+    ],
+    "faltantes": [],
+    "extras": [
+      "referral_rewards"
+    ]
+  },
+  "views": {
+    "existentes": [
+      "participantes_unicos",
+      "participantes_unificados"
+    ],
+    "esperadas": [
+      "participantes_unificados",
+      "participantes_unicos"
+    ],
+    "faltantes": []
+  },
+  "indices": {
+    "total": 67,
+    "por_tabela": {
+      "audit_logs": [
+        {
+          "nome": "audit_logs_pkey",
+          "definicao": "CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id)"
+        },
+        {
+          "nome": "idx_audit_logs_action",
+          "definicao": "CREATE INDEX idx_audit_logs_action ON public.audit_logs USING btree (action)"
+        },
+        {
+          "nome": "idx_audit_logs_created_at",
+          "definicao": "CREATE INDEX idx_audit_logs_created_at ON public.audit_logs USING btree (created_at)"
+        },
+        {
+          "nome": "idx_audit_logs_table_name",
+          "definicao": "CREATE INDEX idx_audit_logs_table_name ON public.audit_logs USING btree (table_name)"
+        },
+        {
+          "nome": "idx_audit_logs_user_id",
+          "definicao": "CREATE INDEX idx_audit_logs_user_id ON public.audit_logs USING btree (user_id)"
+        }
+      ],
+      "configuracoes_emissora": [
+        {
+          "nome": "emissoras_pkey",
+          "definicao": "CREATE UNIQUE INDEX emissoras_pkey ON public.configuracoes_emissora USING btree (id)"
+        }
+      ],
+      "consent_logs": [
+        {
+          "nome": "consent_logs_pkey",
+          "definicao": "CREATE UNIQUE INDEX consent_logs_pkey ON public.consent_logs USING btree (id)"
+        },
+        {
+          "nome": "idx_consent_logs_consent_type",
+          "definicao": "CREATE INDEX idx_consent_logs_consent_type ON public.consent_logs USING btree (consent_type)"
+        },
+        {
+          "nome": "idx_consent_logs_created_at",
+          "definicao": "CREATE INDEX idx_consent_logs_created_at ON public.consent_logs USING btree (created_at)"
+        },
+        {
+          "nome": "idx_consent_logs_participant_id",
+          "definicao": "CREATE INDEX idx_consent_logs_participant_id ON public.consent_logs USING btree (participant_id)"
+        }
+      ],
+      "data_access_logs": [
+        {
+          "nome": "data_access_logs_pkey",
+          "definicao": "CREATE UNIQUE INDEX data_access_logs_pkey ON public.data_access_logs USING btree (id)"
+        },
+        {
+          "nome": "idx_data_access_logs_created_at",
+          "definicao": "CREATE INDEX idx_data_access_logs_created_at ON public.data_access_logs USING btree (created_at)"
+        },
+        {
+          "nome": "idx_data_access_logs_data_type",
+          "definicao": "CREATE INDEX idx_data_access_logs_data_type ON public.data_access_logs USING btree (data_type)"
+        },
+        {
+          "nome": "idx_data_access_logs_participant_id",
+          "definicao": "CREATE INDEX idx_data_access_logs_participant_id ON public.data_access_logs USING btree (participant_id)"
+        },
+        {
+          "nome": "idx_data_access_logs_user_id",
+          "definicao": "CREATE INDEX idx_data_access_logs_user_id ON public.data_access_logs USING btree (user_id)"
+        }
+      ],
+      "games": [
+        {
+          "nome": "games_pkey",
+          "definicao": "CREATE UNIQUE INDEX games_pkey ON public.games USING btree (id)"
+        },
+        {
+          "nome": "idx_games_deleted_at",
+          "definicao": "CREATE INDEX idx_games_deleted_at ON public.games USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_games_status",
+          "definicao": "CREATE INDEX idx_games_status ON public.games USING btree (status)"
+        }
+      ],
+      "ganhadores": [
+        {
+          "nome": "ganhadores_pkey",
+          "definicao": "CREATE UNIQUE INDEX ganhadores_pkey ON public.ganhadores USING btree (id)"
+        },
+        {
+          "nome": "idx_ganhadores_cancelado",
+          "definicao": "CREATE INDEX idx_ganhadores_cancelado ON public.ganhadores USING btree (cancelado)"
+        },
+        {
+          "nome": "idx_ganhadores_deleted_at",
+          "definicao": "CREATE INDEX idx_ganhadores_deleted_at ON public.ganhadores USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_ganhadores_participante_id",
+          "definicao": "CREATE INDEX idx_ganhadores_participante_id ON public.ganhadores USING btree (participante_id)"
+        },
+        {
+          "nome": "idx_ganhadores_promocao_id",
+          "definicao": "CREATE INDEX idx_ganhadores_promocao_id ON public.ganhadores USING btree (promocao_id)"
+        },
+        {
+          "nome": "idx_ganhadores_sorteado_em",
+          "definicao": "CREATE INDEX idx_ganhadores_sorteado_em ON public.ganhadores USING btree (sorteado_em DESC)"
+        },
+        {
+          "nome": "idx_ganhadores_sorteado_por",
+          "definicao": "CREATE INDEX idx_ganhadores_sorteado_por ON public.ganhadores USING btree (sorteado_por)"
+        }
+      ],
+      "participantes": [
+        {
+          "nome": "idx_participante_unico_por_promocao",
+          "definicao": "CREATE UNIQUE INDEX idx_participante_unico_por_promocao ON public.participantes USING btree (promocao_id, telefone)"
+        },
+        {
+          "nome": "idx_participantes_deleted_at",
+          "definicao": "CREATE INDEX idx_participantes_deleted_at ON public.participantes USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_participantes_geolocalizacao",
+          "definicao": "CREATE INDEX idx_participantes_geolocalizacao ON public.participantes USING btree (latitude, longitude)"
+        },
+        {
+          "nome": "idx_participantes_promocao_id",
+          "definicao": "CREATE INDEX idx_participantes_promocao_id ON public.participantes USING btree (promocao_id) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "idx_participantes_telefone",
+          "definicao": "CREATE INDEX idx_participantes_telefone ON public.participantes USING btree (telefone)"
+        },
+        {
+          "nome": "participantes_pkey",
+          "definicao": "CREATE UNIQUE INDEX participantes_pkey ON public.participantes USING btree (id)"
+        }
+      ],
+      "products": [
+        {
+          "nome": "idx_products_sponsor_id",
+          "definicao": "CREATE INDEX idx_products_sponsor_id ON public.products USING btree (sponsor_id)"
+        },
+        {
+          "nome": "products_pkey",
+          "definicao": "CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)"
+        }
+      ],
+      "promocoes": [
+        {
+          "nome": "idx_promocoes_criado_em",
+          "definicao": "CREATE INDEX idx_promocoes_criado_em ON public.promocoes USING btree (criado_em DESC) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "idx_promocoes_datas",
+          "definicao": "CREATE INDEX idx_promocoes_datas ON public.promocoes USING btree (data_inicio, data_fim) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "idx_promocoes_deleted_at",
+          "definicao": "CREATE INDEX idx_promocoes_deleted_at ON public.promocoes USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_promocoes_is_drawing",
+          "definicao": "CREATE INDEX idx_promocoes_is_drawing ON public.promocoes USING btree (id, is_drawing) WHERE (is_drawing = true)"
+        },
+        {
+          "nome": "idx_promocoes_slug",
+          "definicao": "CREATE INDEX idx_promocoes_slug ON public.promocoes USING btree (slug)"
+        },
+        {
+          "nome": "idx_promocoes_status",
+          "definicao": "CREATE INDEX idx_promocoes_status ON public.promocoes USING btree (status) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "promocoes_pkey",
+          "definicao": "CREATE UNIQUE INDEX promocoes_pkey ON public.promocoes USING btree (id)"
+        },
+        {
+          "nome": "promocoes_slug_key",
+          "definicao": "CREATE UNIQUE INDEX promocoes_slug_key ON public.promocoes USING btree (slug)"
+        }
+      ],
+      "public_participants": [
+        {
+          "nome": "idx_public_participants_deleted",
+          "definicao": "CREATE INDEX idx_public_participants_deleted ON public.public_participants USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_public_participants_phone",
+          "definicao": "CREATE INDEX idx_public_participants_phone ON public.public_participants USING btree (phone)"
+        },
+        {
+          "nome": "idx_public_participants_referral",
+          "definicao": "CREATE INDEX idx_public_participants_referral ON public.public_participants USING btree (own_referral_code)"
+        },
+        {
+          "nome": "idx_public_participants_referral_code",
+          "definicao": "CREATE INDEX idx_public_participants_referral_code ON public.public_participants USING btree (own_referral_code)"
+        },
+        {
+          "nome": "public_participants_own_referral_code_key",
+          "definicao": "CREATE UNIQUE INDEX public_participants_own_referral_code_key ON public.public_participants USING btree (own_referral_code)"
+        },
+        {
+          "nome": "public_participants_pkey",
+          "definicao": "CREATE UNIQUE INDEX public_participants_pkey ON public.public_participants USING btree (id)"
+        }
+      ],
+      "rate_limits": [
+        {
+          "nome": "idx_rate_limits_cleanup",
+          "definicao": "CREATE INDEX idx_rate_limits_cleanup ON public.rate_limits USING btree (created_at)"
+        },
+        {
+          "nome": "idx_rate_limits_lookup",
+          "definicao": "CREATE INDEX idx_rate_limits_lookup ON public.rate_limits USING btree (ip, user_id, endpoint, created_at DESC)"
+        },
+        {
+          "nome": "rate_limits_pkey",
+          "definicao": "CREATE UNIQUE INDEX rate_limits_pkey ON public.rate_limits USING btree (id)"
+        }
+      ],
+      "referral_rewards": [
+        {
+          "nome": "idx_referral_rewards_referrer",
+          "definicao": "CREATE INDEX idx_referral_rewards_referrer ON public.referral_rewards USING btree (referrer_id)"
+        },
+        {
+          "nome": "referral_rewards_pkey",
+          "definicao": "CREATE UNIQUE INDEX referral_rewards_pkey ON public.referral_rewards USING btree (id)"
+        }
+      ],
+      "sponsors": [
+        {
+          "nome": "sponsors_pkey",
+          "definicao": "CREATE UNIQUE INDEX sponsors_pkey ON public.sponsors USING btree (id)"
+        }
+      ],
+      "submissions": [
+        {
+          "nome": "idx_submissions_deleted",
+          "definicao": "CREATE INDEX idx_submissions_deleted ON public.submissions USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_submissions_deleted_at",
+          "definicao": "CREATE INDEX idx_submissions_deleted_at ON public.submissions USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_submissions_game_id",
+          "definicao": "CREATE INDEX idx_submissions_game_id ON public.submissions USING btree (game_id)"
+        },
+        {
+          "nome": "idx_submissions_participant_id",
+          "definicao": "CREATE INDEX idx_submissions_participant_id ON public.submissions USING btree (public_participant_id)"
+        },
+        {
+          "nome": "idx_submissions_public_participant",
+          "definicao": "CREATE INDEX idx_submissions_public_participant ON public.submissions USING btree (public_participant_id)"
+        },
+        {
+          "nome": "submissions_pkey",
+          "definicao": "CREATE UNIQUE INDEX submissions_pkey ON public.submissions USING btree (id)"
+        }
+      ],
+      "system_logs": [
+        {
+          "nome": "idx_system_logs_component",
+          "definicao": "CREATE INDEX idx_system_logs_component ON public.system_logs USING btree (component)"
+        },
+        {
+          "nome": "idx_system_logs_created_at",
+          "definicao": "CREATE INDEX idx_system_logs_created_at ON public.system_logs USING btree (created_at)"
+        },
+        {
+          "nome": "idx_system_logs_level",
+          "definicao": "CREATE INDEX idx_system_logs_level ON public.system_logs USING btree (level)"
+        },
+        {
+          "nome": "system_logs_pkey",
+          "definicao": "CREATE UNIQUE INDEX system_logs_pkey ON public.system_logs USING btree (id)"
+        }
+      ],
+      "usuarios": [
+        {
+          "nome": "usuarios_email_key",
+          "definicao": "CREATE UNIQUE INDEX usuarios_email_key ON public.usuarios USING btree (email)"
+        },
+        {
+          "nome": "usuarios_google_id_key",
+          "definicao": "CREATE UNIQUE INDEX usuarios_google_id_key ON public.usuarios USING btree (google_id)"
+        },
+        {
+          "nome": "usuarios_pkey",
+          "definicao": "CREATE UNIQUE INDEX usuarios_pkey ON public.usuarios USING btree (id)"
+        },
+        {
+          "nome": "usuarios_usuario_key",
+          "definicao": "CREATE UNIQUE INDEX usuarios_usuario_key ON public.usuarios USING btree (usuario)"
+        }
+      ]
+    }
+  },
+  "funcoes": {
+    "existentes": [
+      "cleanup_old_logs",
+      "cleanup_old_rate_limits"
+    ]
+  },
+  "problemas": [],
+  "recomendacoes": [],
+  "colunas": {
+    "usuarios": {
+      "existentes": [
+        "id",
+        "usuario",
+        "senha",
+        "created_at",
+        "role",
+        "google_id",
+        "senha_hash",
+        "email",
+        "name",
+        "picture"
+      ],
+      "faltantes": [],
+      "extras": [
+        "senha",
+        "email",
+        "name",
+        "picture"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('usuarios_id_seq'::regclass)"
+        },
+        "usuario": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "senha": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "created_at": {
+          "tipo": "timestamp without time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "role": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": "'user'::character varying"
+        },
+        "google_id": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "senha_hash": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "email": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "name": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "picture": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "configuracoes_emissora": {
+      "existentes": [
+        "id",
+        "nome",
+        "logo_url",
+        "tema_cor",
+        "website",
+        "telefone",
+        "endereco",
+        "instagram",
+        "facebook",
+        "youtube",
+        "linkedin",
+        "twitter",
+        "whatsapp",
+        "email",
+        "descricao",
+        "cidade",
+        "google_api_key",
+        "created_at",
+        "updated_at"
+      ],
+      "faltantes": [],
+      "extras": [
+        "google_api_key"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('emissoras_id_seq'::regclass)"
+        },
+        "nome": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "logo_url": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "tema_cor": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": "'branco'::character varying"
+        },
+        "website": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "telefone": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "endereco": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "instagram": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "facebook": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "youtube": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "linkedin": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "twitter": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "whatsapp": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "email": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "descricao": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "cidade": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "google_api_key": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "created_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        }
+      }
+    },
+    "promocoes": {
+      "existentes": [
+        "id",
+        "nome",
+        "slug",
+        "descricao",
+        "data_inicio",
+        "data_fim",
+        "status",
+        "link_participacao",
+        "criado_em",
+        "emissora_id",
+        "numero_ganhadores",
+        "deleted_at",
+        "deleted_by",
+        "is_drawing"
+      ],
+      "faltantes": [],
+      "extras": [],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('promocoes_id_seq'::regclass)"
+        },
+        "nome": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "slug": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "descricao": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "data_inicio": {
+          "tipo": "date",
+          "nullable": "NO",
+          "default": null
+        },
+        "data_fim": {
+          "tipo": "date",
+          "nullable": "NO",
+          "default": null
+        },
+        "status": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": "'ativa'::character varying"
+        },
+        "link_participacao": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "criado_em": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "emissora_id": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "numero_ganhadores": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": "3"
+        },
+        "deleted_at": {
+          "tipo": "timestamp without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_by": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "is_drawing": {
+          "tipo": "boolean",
+          "nullable": "YES",
+          "default": "false"
+        }
+      }
+    },
+    "participantes": {
+      "existentes": [
+        "id",
+        "promocao_id",
+        "nome",
+        "telefone",
+        "bairro",
+        "cidade",
+        "latitude",
+        "longitude",
+        "origem_source",
+        "origem_medium",
+        "participou_em",
+        "origem",
+        "email",
+        "deleted_at",
+        "deleted_by"
+      ],
+      "faltantes": [],
+      "extras": [
+        "origem"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('participantes_id_seq'::regclass)"
+        },
+        "promocao_id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        "nome": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "telefone": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "bairro": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "cidade": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "latitude": {
+          "tipo": "numeric",
+          "nullable": "YES",
+          "default": null
+        },
+        "longitude": {
+          "tipo": "numeric",
+          "nullable": "YES",
+          "default": null
+        },
+        "origem_source": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "origem_medium": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "participou_em": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "origem": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": "'formulario'::character varying"
+        },
+        "email": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_at": {
+          "tipo": "timestamp without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_by": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "ganhadores": {
+      "existentes": [
+        "id",
+        "promocao_id",
+        "participante_id",
+        "sorteado_em",
+        "posicao",
+        "premio",
+        "deleted_at",
+        "deleted_by",
+        "cancelado",
+        "sorteado_por",
+        "video_url",
+        "cancelado_em",
+        "cancelado_por",
+        "motivo_cancelamento"
+      ],
+      "faltantes": [],
+      "extras": [
+        "premio",
+        "deleted_by",
+        "sorteado_por"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('ganhadores_id_seq'::regclass)"
+        },
+        "promocao_id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        "participante_id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        "sorteado_em": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "posicao": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": "1"
+        },
+        "premio": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": "'1º Lugar'::character varying"
+        },
+        "deleted_at": {
+          "tipo": "timestamp without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_by": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "cancelado": {
+          "tipo": "boolean",
+          "nullable": "YES",
+          "default": "false"
+        },
+        "sorteado_por": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "video_url": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "cancelado_em": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "cancelado_por": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "motivo_cancelamento": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "sponsors": {
+      "existentes": [
+        "id",
+        "name",
+        "created_at",
+        "logo_url",
+        "facebook_url",
+        "instagram_url",
+        "whatsapp",
+        "address",
+        "deleted_at"
+      ],
+      "faltantes": [],
+      "extras": [],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('sponsors_id_seq'::regclass)"
+        },
+        "name": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "created_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "logo_url": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "facebook_url": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "instagram_url": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "whatsapp": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "address": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "products": {
+      "existentes": [
+        "id",
+        "sponsor_id",
+        "name",
+        "clues",
+        "created_at",
+        "deleted_at"
+      ],
+      "faltantes": [],
+      "extras": [],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('products_id_seq'::regclass)"
+        },
+        "sponsor_id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        "name": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "clues": {
+          "tipo": "ARRAY",
+          "nullable": "NO",
+          "default": null
+        },
+        "created_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "deleted_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "games": {
+      "existentes": [
+        "id",
+        "product_id",
+        "status",
+        "revealed_clues_count",
+        "winner_submission_id",
+        "created_at",
+        "ended_at",
+        "deleted_at",
+        "deleted_by",
+        "winner_id",
+        "winner_guess",
+        "finished_at"
+      ],
+      "faltantes": [],
+      "extras": [
+        "winner_submission_id",
+        "ended_at",
+        "deleted_by"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('games_id_seq'::regclass)"
+        },
+        "product_id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        "status": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": "'pending'::character varying"
+        },
+        "revealed_clues_count": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "0"
+        },
+        "winner_submission_id": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "created_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "ended_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_at": {
+          "tipo": "timestamp without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_by": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "winner_id": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "winner_guess": {
+          "tipo": "text",
+          "nullable": "YES",
+          "default": null
+        },
+        "finished_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "public_participants": {
+      "existentes": [
+        "id",
+        "name",
+        "phone",
+        "neighborhood",
+        "city",
+        "referral_code",
+        "referred_by_id",
+        "own_referral_code",
+        "extra_guesses",
+        "created_at",
+        "latitude",
+        "longitude",
+        "deleted_at",
+        "reference_code",
+        "total_submissions",
+        "correct_guesses",
+        "game_id"
+      ],
+      "faltantes": [],
+      "extras": [
+        "referral_code",
+        "referred_by_id"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('public_participants_id_seq'::regclass)"
+        },
+        "name": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "phone": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "neighborhood": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "city": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "referral_code": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "referred_by_id": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "own_referral_code": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "extra_guesses": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": "0"
+        },
+        "created_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "latitude": {
+          "tipo": "numeric",
+          "nullable": "YES",
+          "default": null
+        },
+        "longitude": {
+          "tipo": "numeric",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "reference_code": {
+          "tipo": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        "total_submissions": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": "0"
+        },
+        "correct_guesses": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": "0"
+        },
+        "game_id": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        }
+      }
+    },
+    "submissions": {
+      "existentes": [
+        "id",
+        "game_id",
+        "user_name",
+        "user_phone",
+        "user_neighborhood",
+        "user_city",
+        "guess",
+        "is_correct",
+        "created_at",
+        "public_participant_id",
+        "submission_number",
+        "deleted_at",
+        "deleted_by",
+        "submitted_at"
+      ],
+      "faltantes": [],
+      "extras": [
+        "created_at",
+        "submission_number",
+        "deleted_by"
+      ],
+      "detalhes": {
+        "id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": "nextval('submissions_id_seq'::regclass)"
+        },
+        "game_id": {
+          "tipo": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        "user_name": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "user_phone": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "user_neighborhood": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "user_city": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "guess": {
+          "tipo": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        "is_correct": {
+          "tipo": "boolean",
+          "nullable": "YES",
+          "default": "false"
+        },
+        "created_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "public_participant_id": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "submission_number": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": "1"
+        },
+        "deleted_at": {
+          "tipo": "timestamp without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        "deleted_by": {
+          "tipo": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        "submitted_at": {
+          "tipo": "timestamp with time zone",
+          "nullable": "YES",
+          "default": "CURRENT_TIMESTAMP"
+        }
+      }
+    }
+  },
+  "constraints": {
+    "audit_logs": [
+      {
+        "nome": "audit_logs_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "configuracoes_emissora": [
+      {
+        "nome": "emissoras_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "consent_logs": [
+      {
+        "nome": "consent_logs_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "data_access_logs": [
+      {
+        "nome": "data_access_logs_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "games": [
+      {
+        "nome": "fk_winner_submission",
+        "tipo": "FOREIGN KEY",
+        "coluna": "winner_submission_id"
+      },
+      {
+        "nome": "games_deleted_by_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "deleted_by"
+      },
+      {
+        "nome": "games_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "games_product_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "product_id"
+      }
+    ],
+    "ganhadores": [
+      {
+        "nome": "ganhadores_deleted_by_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "deleted_by"
+      },
+      {
+        "nome": "ganhadores_participante_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "participante_id"
+      },
+      {
+        "nome": "ganhadores_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "ganhadores_promocao_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "promocao_id"
+      },
+      {
+        "nome": "ganhadores_sorteado_por_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "sorteado_por"
+      }
+    ],
+    "participantes": [
+      {
+        "nome": "participantes_deleted_by_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "deleted_by"
+      },
+      {
+        "nome": "participantes_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "participantes_promocao_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "promocao_id"
+      }
+    ],
+    "products": [
+      {
+        "nome": "products_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "products_sponsor_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "sponsor_id"
+      }
+    ],
+    "promocoes": [
+      {
+        "nome": "promocoes_deleted_by_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "deleted_by"
+      },
+      {
+        "nome": "promocoes_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "promocoes_slug_key",
+        "tipo": "UNIQUE",
+        "coluna": "slug"
+      }
+    ],
+    "public_participants": [
+      {
+        "nome": "fk_public_participants_referred_by",
+        "tipo": "FOREIGN KEY",
+        "coluna": "referred_by_id"
+      },
+      {
+        "nome": "public_participants_own_referral_code_key",
+        "tipo": "UNIQUE",
+        "coluna": "own_referral_code"
+      },
+      {
+        "nome": "public_participants_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "rate_limits": [
+      {
+        "nome": "rate_limits_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "rate_limits_user_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "user_id"
+      }
+    ],
+    "referral_rewards": [
+      {
+        "nome": "referral_rewards_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "referral_rewards_referred_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "referred_id"
+      },
+      {
+        "nome": "referral_rewards_referrer_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "referrer_id"
+      }
+    ],
+    "sponsors": [
+      {
+        "nome": "sponsors_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "submissions": [
+      {
+        "nome": "submissions_deleted_by_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "deleted_by"
+      },
+      {
+        "nome": "submissions_game_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "game_id"
+      },
+      {
+        "nome": "submissions_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "submissions_public_participant_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "public_participant_id"
+      }
+    ],
+    "system_logs": [
+      {
+        "nome": "system_logs_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "usuarios": [
+      {
+        "nome": "usuarios_email_key",
+        "tipo": "UNIQUE",
+        "coluna": "email"
+      },
+      {
+        "nome": "usuarios_google_id_key",
+        "tipo": "UNIQUE",
+        "coluna": "google_id"
+      },
+      {
+        "nome": "usuarios_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      },
+      {
+        "nome": "usuarios_usuario_key",
+        "tipo": "UNIQUE",
+        "coluna": "usuario"
+      }
+    ]
+  },
+  "estatisticas": {
+    "total_participantes": "364",
+    "total_public_participants": "46",
+    "total_promocoes": "11",
+    "total_ganhadores": "24",
+    "total_usuarios": "4"
+  }
+}

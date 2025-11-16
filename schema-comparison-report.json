@@ -1,0 +1,300 @@
+{
+  "tabelas": {
+    "ok": [
+      "usuarios",
+      "configuracoes_emissora",
+      "promocoes",
+      "participantes",
+      "ganhadores",
+      "sponsors",
+      "products",
+      "games",
+      "public_participants",
+      "submissions",
+      "audit_logs",
+      "data_access_logs",
+      "consent_logs",
+      "system_logs",
+      "rate_limits"
+    ],
+    "divergencias": [
+      {
+        "tabela": "referral_rewards",
+        "status": "EXTRA (não no schema)"
+      }
+    ]
+  },
+  "colunas": {
+    "ok": [],
+    "faltantes": [],
+    "extras": [
+      {
+        "tabela": "usuarios",
+        "coluna": "senha",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "usuarios",
+        "coluna": "email",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "usuarios",
+        "coluna": "name",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "usuarios",
+        "coluna": "picture",
+        "tipo": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "google_api_key",
+        "tipo": "text"
+      },
+      {
+        "tabela": "participantes",
+        "coluna": "origem",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "ganhadores",
+        "coluna": "premio",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "ganhadores",
+        "coluna": "deleted_by",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "ganhadores",
+        "coluna": "sorteado_por",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "games",
+        "coluna": "winner_submission_id",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "games",
+        "coluna": "ended_at",
+        "tipo": "timestamp with time zone"
+      },
+      {
+        "tabela": "games",
+        "coluna": "deleted_by",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "public_participants",
+        "coluna": "referral_code",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "public_participants",
+        "coluna": "referred_by_id",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "submissions",
+        "coluna": "created_at",
+        "tipo": "timestamp with time zone"
+      },
+      {
+        "tabela": "submissions",
+        "coluna": "submission_number",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "submissions",
+        "coluna": "deleted_by",
+        "tipo": "integer"
+      },
+      {
+        "tabela": "rate_limits",
+        "coluna": "ip",
+        "tipo": "character varying"
+      },
+      {
+        "tabela": "rate_limits",
+        "coluna": "user_id",
+        "tipo": "integer"
+      }
+    ],
+    "tipos_diferentes": [
+      {
+        "tabela": "usuarios",
+        "coluna": "created_at",
+        "esperado": "timestamp with time zone",
+        "atual": "timestamp without time zone"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "website",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "telefone",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "instagram",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "facebook",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "youtube",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "linkedin",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "twitter",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "whatsapp",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "configuracoes_emissora",
+        "coluna": "email",
+        "esperado": "character varying",
+        "atual": "text"
+      },
+      {
+        "tabela": "promocoes",
+        "coluna": "deleted_at",
+        "esperado": "timestamp with time zone",
+        "atual": "timestamp without time zone"
+      },
+      {
+        "tabela": "participantes",
+        "coluna": "deleted_at",
+        "esperado": "timestamp with time zone",
+        "atual": "timestamp without time zone"
+      },
+      {
+        "tabela": "ganhadores",
+        "coluna": "deleted_at",
+        "esperado": "timestamp with time zone",
+        "atual": "timestamp without time zone"
+      },
+      {
+        "tabela": "games",
+        "coluna": "deleted_at",
+        "esperado": "timestamp with time zone",
+        "atual": "timestamp without time zone"
+      },
+      {
+        "tabela": "submissions",
+        "coluna": "guess",
+        "esperado": "text",
+        "atual": "character varying"
+      },
+      {
+        "tabela": "submissions",
+        "coluna": "deleted_at",
+        "esperado": "timestamp with time zone",
+        "atual": "timestamp without time zone"
+      }
+    ]
+  },
+  "indices": {
+    "ok": [
+      "idx_usuarios_role",
+      "idx_usuarios_google_id",
+      "idx_promocoes_status",
+      "idx_promocoes_datas",
+      "idx_promocoes_criado_em",
+      "idx_promocoes_slug",
+      "idx_participantes_telefone",
+      "idx_participantes_nome",
+      "idx_participantes_cidade",
+      "idx_participantes_bairro",
+      "idx_participantes_criado_em",
+      "idx_participantes_promocao_id",
+      "idx_participantes_soft_delete",
+      "idx_participantes_geolocalizacao",
+      "idx_participante_unico_por_promocao",
+      "idx_ganhadores_participante_id",
+      "idx_ganhadores_promocao_id",
+      "idx_ganhadores_sorteado_em",
+      "idx_ganhadores_cancelado",
+      "idx_sponsors_deleted_at",
+      "idx_products_sponsor_id",
+      "idx_games_product_id",
+      "idx_games_status",
+      "idx_public_participants_phone",
+      "idx_public_participants_referral",
+      "idx_submissions_game_id",
+      "idx_submissions_participant_id",
+      "idx_audit_logs_user_id",
+      "idx_audit_logs_action",
+      "idx_audit_logs_table_name",
+      "idx_audit_logs_created_at",
+      "idx_audit_logs_record_id",
+      "idx_data_access_logs_user_id",
+      "idx_data_access_logs_participant_id",
+      "idx_data_access_logs_created_at",
+      "idx_data_access_logs_data_type",
+      "idx_consent_logs_participant_id",
+      "idx_consent_logs_consent_type",
+      "idx_consent_logs_created_at",
+      "idx_system_logs_level",
+      "idx_system_logs_component",
+      "idx_system_logs_created_at",
+      "idx_rate_limits_key_endpoint",
+      "idx_rate_limits_window"
+    ],
+    "faltantes": []
+  },
+  "views": {
+    "ok": [
+      "participantes_unificados",
+      "participantes_unicos"
+    ],
+    "faltantes": []
+  },
+  "funcoes": {
+    "ok": [
+      "cleanup_old_logs"
+    ],
+    "faltantes": []
+  },
+  "constraints": {
+    "ok": [
+      "promocoes.check_datas_validas",
+      "participantes.participantes_promocao_id_fkey",
+      "ganhadores.ganhadores_promocao_id_fkey",
+      "ganhadores.ganhadores_participante_id_fkey",
+      "products.products_sponsor_id_fkey",
+      "games.games_product_id_fkey",
+      "submissions.submissions_game_id_fkey"
+    ],
+    "faltantes": []
+  }
+}
