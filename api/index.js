@@ -2029,6 +2029,12 @@ module.exports = async function handler(req, res) {
 
   // Rota para participantes - LISTAR TODOS SEM DEDUPLICACAO
   if (route === 'participantes') {
+    // ✅ FIX: Verificar método HTTP - delegar POST/PUT/DELETE para handler
+    if (req.method !== 'GET') {
+      console.log(`📝 [INDEX] Delegando ${req.method} /api/participantes para handler`);
+      return participantesHandler(req, res);
+    }
+
     console.log('🚨🚨🚨 [INDEX-DIRECT] Listando TODOS os participantes SEM deduplicacao - BYPASS handler');
 
     try {
