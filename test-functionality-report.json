@@ -1,0 +1,421 @@
+{
+  "timestamp": "2025-11-16T22:07:26.444Z",
+  "tests": [
+    {
+      "name": "Cadastro de Participante",
+      "status": "pass",
+      "details": {
+        "id": 485,
+        "phone": "69999846448"
+      },
+      "timestamp": "2025-11-16T22:07:27.810Z"
+    },
+    {
+      "name": "Alteração de Participante",
+      "status": "pass",
+      "details": {
+        "id": 485,
+        "nome": "Teste Alterado 1763330847811",
+        "bairro": "Bairro Alterado"
+      },
+      "timestamp": "2025-11-16T22:07:27.907Z"
+    },
+    {
+      "name": "Alteração de Configuração",
+      "status": "pass",
+      "details": {
+        "id": 1,
+        "nome": "TV Surui Canal 15 cacoal",
+        "updated_at": "2025-11-16T22:07:28.221Z"
+      },
+      "timestamp": "2025-11-16T22:07:28.004Z"
+    },
+    {
+      "name": "Exclusão de Participante (Soft Delete)",
+      "status": "pass",
+      "details": {
+        "id": 485,
+        "nome": "Teste Alterado 1763330847811",
+        "deleted_at": "2025-11-17T02:07:28.318Z"
+      },
+      "timestamp": "2025-11-16T22:07:28.099Z"
+    },
+    {
+      "name": "Verificação Soft Delete",
+      "status": "pass",
+      "details": {
+        "visible": false
+      },
+      "timestamp": "2025-11-16T22:07:28.193Z"
+    },
+    {
+      "name": "Consulta Participantes Regulares",
+      "status": "pass",
+      "details": {
+        "total": "365",
+        "unicos": "254",
+        "cidades": "6",
+        "bairros": "140"
+      },
+      "timestamp": "2025-11-16T22:07:28.288Z"
+    },
+    {
+      "name": "Consulta Participantes Públicos",
+      "status": "pass",
+      "details": {
+        "total": "46",
+        "unicos": "45",
+        "total_extra_guesses": "0"
+      },
+      "timestamp": "2025-11-16T22:07:28.382Z"
+    },
+    {
+      "name": "Consulta Promoções",
+      "status": "pass",
+      "details": {
+        "statuses": [
+          {
+            "status": "ativa",
+            "quantidade": "1"
+          },
+          {
+            "status": "encerrada",
+            "quantidade": "9"
+          },
+          {
+            "status": "inativa",
+            "quantidade": "1"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:28.476Z"
+    },
+    {
+      "name": "Consulta Ganhadores",
+      "status": "pass",
+      "details": {
+        "total_ganhadores": "24",
+        "cancelados": "17",
+        "ativos": "7"
+      },
+      "timestamp": "2025-11-16T22:07:28.568Z"
+    },
+    {
+      "name": "View Participantes Unificados",
+      "status": "pass",
+      "details": {
+        "types": [
+          {
+            "participant_type": "regular",
+            "total": "365"
+          },
+          {
+            "participant_type": "public",
+            "total": "46"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:28.661Z"
+    },
+    {
+      "name": "View Participantes Únicos",
+      "status": "pass",
+      "details": {
+        "total": "294"
+      },
+      "timestamp": "2025-11-16T22:07:28.755Z"
+    },
+    {
+      "name": "Relatório Participantes por Promoção",
+      "status": "pass",
+      "details": {
+        "top10": [
+          {
+            "promocao": "COMBO ALÔ PIZZA (PIZZA  G E 1 REFRIGERANTE) ",
+            "status": "encerrada",
+            "total_participantes": "148",
+            "primeira_participacao": "2025-11-12T15:11:09.380Z",
+            "ultima_participacao": "2025-11-14T17:01:55.161Z"
+          },
+          {
+            "promocao": "11º Costelão solidário 16/11 - sorteio 14/11",
+            "status": "encerrada",
+            "total_participantes": "51",
+            "primeira_participacao": "2025-11-13T13:16:56.998Z",
+            "ultima_participacao": "2025-11-14T16:31:01.685Z"
+          },
+          {
+            "promocao": "CIRCO  ",
+            "status": "encerrada",
+            "total_participantes": "46",
+            "primeira_participacao": "2025-09-26T15:37:19.265Z",
+            "ultima_participacao": "2025-09-26T17:14:13.566Z"
+          },
+          {
+            "promocao": "11º Costelão Solidário 16/11 - sorteio 07/11",
+            "status": "encerrada",
+            "total_participantes": "36",
+            "primeira_participacao": "2025-11-06T14:13:31.953Z",
+            "ultima_participacao": "2025-11-12T15:43:04.821Z"
+          },
+          {
+            "promocao": "Açougue- Sorteio",
+            "status": "encerrada",
+            "total_participantes": "26",
+            "primeira_participacao": "2025-09-12T15:47:47.508Z",
+            "ultima_participacao": "2025-09-12T16:43:56.224Z"
+          },
+          {
+            "promocao": "SORTEIO ACOUGUE",
+            "status": "encerrada",
+            "total_participantes": "20",
+            "primeira_participacao": "2025-09-26T13:35:31.892Z",
+            "ultima_participacao": "2025-09-26T16:35:23.880Z"
+          },
+          {
+            "promocao": "11º Costelão Solidário - 16/11 - sorteio 31/10",
+            "status": "encerrada",
+            "total_participantes": "19",
+            "primeira_participacao": "2025-10-31T16:01:16.405Z",
+            "ultima_participacao": "2025-10-31T17:03:37.360Z"
+          },
+          {
+            "promocao": "ESPECIAL  CLUBE SOCIAL ",
+            "status": "encerrada",
+            "total_participantes": "11",
+            "primeira_participacao": "2025-09-12T13:31:53.796Z",
+            "ultima_participacao": "2025-09-12T17:12:15.018Z"
+          },
+          {
+            "promocao": "SORTEIO TESTE",
+            "status": "ativa",
+            "total_participantes": "4",
+            "primeira_participacao": "2025-11-07T13:14:55.620Z",
+            "ultima_participacao": "2025-11-16T22:02:20.788Z"
+          },
+          {
+            "promocao": "Sorteio DEMO",
+            "status": "encerrada",
+            "total_participantes": "2",
+            "primeira_participacao": "2025-10-06T20:23:40.491Z",
+            "ultima_participacao": "2025-10-06T20:56:33.795Z"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:28.852Z"
+    },
+    {
+      "name": "Relatório Distribuição Geográfica",
+      "status": "pass",
+      "details": {
+        "cities": [
+          {
+            "cidade": "Cacoal",
+            "total": "357",
+            "bairros_distintos": "137",
+            "percentual": "97.81"
+          },
+          {
+            "cidade": "Cacoal ",
+            "total": "4",
+            "bairros_distintos": "4",
+            "percentual": "1.10"
+          },
+          {
+            "cidade": "Cacoal Cacoal  Ro",
+            "total": "1",
+            "bairros_distintos": "1",
+            "percentual": "0.27"
+          },
+          {
+            "cidade": "Rolim de Moura",
+            "total": "1",
+            "bairros_distintos": "1",
+            "percentual": "0.27"
+          },
+          {
+            "cidade": "Rolim de moura",
+            "total": "1",
+            "bairros_distintos": "1",
+            "percentual": "0.27"
+          },
+          {
+            "cidade": "Rolim de moura ",
+            "total": "1",
+            "bairros_distintos": "1",
+            "percentual": "0.27"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:29.033Z"
+    },
+    {
+      "name": "Relatório Origem de Tráfego",
+      "status": "pass",
+      "details": {
+        "sources": [
+          {
+            "source": "tv",
+            "medium": "broadcast",
+            "total": "272",
+            "percentual": "74.52"
+          },
+          {
+            "source": "whatsapp",
+            "medium": "messaging",
+            "total": "46",
+            "percentual": "12.60"
+          },
+          {
+            "source": "whatsapp",
+            "medium": "social",
+            "total": "41",
+            "percentual": "11.23"
+          },
+          {
+            "source": "direto",
+            "medium": "link",
+            "total": "5",
+            "percentual": "1.37"
+          },
+          {
+            "source": "tv",
+            "medium": "link",
+            "total": "1",
+            "percentual": "0.27"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:29.128Z"
+    },
+    {
+      "name": "Relatório Audit Logs",
+      "status": "pass",
+      "details": {
+        "actions": [
+          {
+            "action": "VIEW",
+            "total": "887",
+            "ultimo_registro": "2025-11-16T22:03:09.453Z"
+          },
+          {
+            "action": "LOGIN",
+            "total": "175",
+            "ultimo_registro": "2025-11-16T21:22:50.526Z"
+          },
+          {
+            "action": "ERROR",
+            "total": "120",
+            "ultimo_registro": "2025-11-03T22:00:03.542Z"
+          },
+          {
+            "action": "CREATE",
+            "total": "83",
+            "ultimo_registro": "2025-11-16T22:02:21.640Z"
+          },
+          {
+            "action": "UPDATE",
+            "total": "67",
+            "ultimo_registro": "2025-11-13T13:09:43.192Z"
+          },
+          {
+            "action": "DRAW",
+            "total": "37",
+            "ultimo_registro": "2025-11-14T17:03:20.030Z"
+          },
+          {
+            "action": "SORTEIO_REALIZADO",
+            "total": "12",
+            "ultimo_registro": "2025-11-14T17:03:17.836Z"
+          },
+          {
+            "action": "SUBMIT_GUESS",
+            "total": "12",
+            "ultimo_registro": "2025-11-11T16:29:57.280Z"
+          },
+          {
+            "action": "UPDATE_PROMOTION",
+            "total": "10",
+            "ultimo_registro": "2025-11-13T13:09:42.158Z"
+          },
+          {
+            "action": "REVEAL_CLUE",
+            "total": "8",
+            "ultimo_registro": "2025-11-11T16:30:29.131Z"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:29.222Z"
+    },
+    {
+      "name": "Relatório Caixa Misteriosa",
+      "status": "pass",
+      "details": {
+        "games": [
+          {
+            "status": "finished",
+            "total_jogos": "13",
+            "total_dicas_reveladas": "29"
+          },
+          {
+            "status": "accepting",
+            "total_jogos": "1",
+            "total_dicas_reveladas": "2"
+          }
+        ],
+        "submissions": {
+          "total_palpites": "37",
+          "acertos": "0",
+          "jogos_com_palpites": "14"
+        }
+      },
+      "timestamp": "2025-11-16T22:07:29.489Z"
+    },
+    {
+      "name": "Integridade FK Participantes",
+      "status": "pass",
+      "details": {
+        "orphans": 0
+      },
+      "timestamp": "2025-11-16T22:07:29.582Z"
+    },
+    {
+      "name": "Verificação de Índices",
+      "status": "pass",
+      "details": {
+        "total": "79"
+      },
+      "timestamp": "2025-11-16T22:07:29.764Z"
+    },
+    {
+      "name": "Verificação de Constraints",
+      "status": "pass",
+      "details": {
+        "constraints": [
+          {
+            "constraint_type": "CHECK",
+            "total": "53"
+          },
+          {
+            "constraint_type": "FOREIGN KEY",
+            "total": "18"
+          },
+          {
+            "constraint_type": "PRIMARY KEY",
+            "total": "16"
+          },
+          {
+            "constraint_type": "UNIQUE",
+            "total": "5"
+          }
+        ]
+      },
+      "timestamp": "2025-11-16T22:07:29.862Z"
+    }
+  ],
+  "summary": {
+    "passed": 19,
+    "failed": 0,
+    "warnings": 0
+  }
+}

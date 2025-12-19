@@ -8,14 +8,14 @@ import { useAuth } from '../contexts/AuthContext';
 
 const PromocoesPage = () => {
   const { showToast } = useToast();
-  const { 
-    user, 
-    canCreatePromotion, 
-    canEditPromotion, 
+  const {
+    user,
+    canCreatePromotion,
+    canEditPromotion,
     canDeletePromotion,
-    userRole 
+    userRole
   } = useAuth();
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPromo, setEditingPromo] = useState(null);
   const [promoData, setPromoData] = useState({
@@ -26,7 +26,7 @@ const PromocoesPage = () => {
     status: 'ativa',
     numero_ganhadores: 3
   });
-  
+
   const [promocoes, setPromocoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +35,7 @@ const PromocoesPage = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [promoToDelete, setPromoToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); // Página atual da paginação
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de envio do formulário
   const ITEMS_PER_PAGE = 50; // Limite de 50 registros por página
 
   // Buscar promoções ao carregar o componente
@@ -130,12 +131,24 @@ const PromocoesPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    // Validação de datas
+    const dataInicio = new Date(promoData.data_inicio);
+    const dataFim = new Date(promoData.data_fim);
+
+    if (dataFim < dataInicio) {
+      showToast('A data de fim não pode ser anterior à data de início.', 'error');
+      return;
+    }
+
     try {
+      setIsSubmitting(true);
       if (editingPromo) {
         // Atualizar promoção existente
         const updatedPromo = await updatePromocao(editingPromo.id, promoData);
-        setPromocoes(prev => prev.map(p => 
-          p.id === editingPromo.id 
+        setPromocoes(prev => prev.map(p =>
+          p.id === editingPromo.id
             ? { ...p, ...promoData }
             : p
         ));
@@ -154,6 +167,8 @@ const PromocoesPage = () => {
     } catch (err) {
       showToast('Falha ao salvar promoção: ' + err.message, 'error');
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,7 +180,7 @@ const PromocoesPage = () => {
 
   const confirmDeletePromo = async () => {
     if (!promoToDelete) return;
-    
+
     try {
       await deletePromocao(promoToDelete.id);
       setPromocoes(prev => prev.filter(p => p.id !== promoToDelete.id));
@@ -297,8 +312,8 @@ const PromocoesPage = () => {
   if (loading) {
     return (
       <>
-        <Header 
-          title="Gerenciar Promoções" 
+        <Header
+          title="Gerenciar Promoções"
           subtitle="Crie, edite e gerencie suas campanhas de promoção"
         />
         <div className="promocoes-content">
@@ -313,8 +328,8 @@ const PromocoesPage = () => {
   if (error) {
     return (
       <>
-        <Header 
-          title="Gerenciar Promoções" 
+        <Header
+          title="Gerenciar Promoções"
           subtitle="Crie, edite e gerencie suas campanhas de promoção"
         />
         <div className="promocoes-content">
@@ -329,27 +344,27 @@ const PromocoesPage = () => {
 
   return (
     <>
-      <Header 
-        title="Gerenciar Promoções" 
+      <Header
+        title="Gerenciar Promoções"
         subtitle="Crie, edite e gerencie suas campanhas de promoção"
       />
-      
+
       <div className="promocoes-content">
         {/* Barra de Ações */}
         <div className="actions-bar">
           <div className="search-box">
-            <input 
-              type="text" 
-              placeholder="Buscar promoções..." 
+            <input
+              type="text"
+              placeholder="Buscar promoções..."
               className="search-input"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
             <span className="search-icon">🔍</span>
           </div>
-          
+
           <div className="filter-box">
-            <select 
+            <select
               className="filter-select"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -360,7 +375,7 @@ const PromocoesPage = () => {
               <option value="encerrada">Encerrada</option>
             </select>
           </div>
-          
+
           {canCreatePromotion() && (
             <button className="btn-primary" onClick={() => handleOpenModal()}>
               <span className="btn-icon">➕</span>
@@ -488,8 +503,8 @@ const PromocoesPage = () => {
                       <span className="empty-icon">📭</span>
                       <p>Nenhuma promoção encontrada</p>
                       <p className="empty-subtitle">
-                        {searchText || filterStatus !== 'todas' 
-                          ? 'Tente ajustar seus filtros de busca.' 
+                        {searchText || filterStatus !== 'todas'
+                          ? 'Tente ajustar seus filtros de busca.'
                           : 'Crie sua primeira promoção para começar!'}
                       </p>
                     </div>
@@ -544,7 +559,7 @@ const PromocoesPage = () => {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="descricao">Descrição</label>
                 <textarea
@@ -556,7 +571,7 @@ const PromocoesPage = () => {
                   required
                 />
               </div>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="data_inicio">Data de Início</label>
@@ -569,7 +584,7 @@ const PromocoesPage = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="data_fim">Data de Fim</label>
                   <input
@@ -582,7 +597,7 @@ const PromocoesPage = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="status">Status</label>
@@ -597,7 +612,7 @@ const PromocoesPage = () => {
                     <option value="encerrada">Encerrada</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="numero_ganhadores">Número de Ganhadores</label>
                   <select
@@ -612,13 +627,13 @@ const PromocoesPage = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div className="modal-actions">
                 <button type="button" className="btn-secondary" onClick={handleCloseModal}>
                   Cancelar
                 </button>
-                <button type="submit" className="btn-primary">
-                  {editingPromo ? 'Atualizar' : 'Criar'} Promoção
+                <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? 'Salvando...' : (editingPromo ? 'Atualizar' : 'Criar')} Promoção
                 </button>
               </div>
             </form>

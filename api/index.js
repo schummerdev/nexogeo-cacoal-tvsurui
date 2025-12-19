@@ -125,8 +125,8 @@ module.exports = async function handler(req, res) {
           conclusao: unicos === 1
             ? `✅ CORRETO: ${total} registros do mesmo telefone (mesma pessoa ${total}x)`
             : unicos === total
-            ? `❌ INCORRETO: ${total} telefones diferentes - deduplicação removendo registros válidos!`
-            : `📊 PARCIAL: ${unicos} telefones únicos de ${total} registros`
+              ? `❌ INCORRETO: ${total} telefones diferentes - deduplicação removendo registros válidos!`
+              : `📊 PARCIAL: ${unicos} telefones únicos de ${total} registros`
         });
       } catch (error) {
         return res.status(500).json({
@@ -802,383 +802,383 @@ module.exports = async function handler(req, res) {
       console.warn('[HANDLER] ⚠️ rateLimitGlobal não está disponível (security.js não carregou?)');
     }
 
-  // 🔐 SEGURANÇA: Fallback rate limiting em memória (para desenvolvimento)
-  const clientId = req.headers['x-forwarded-for'] ||
-                   req.connection?.remoteAddress ||
-                   req.socket?.remoteAddress ||
-                   'unknown';
+    // 🔐 SEGURANÇA: Fallback rate limiting em memória (para desenvolvimento)
+    const clientId = req.headers['x-forwarded-for'] ||
+      req.connection?.remoteAddress ||
+      req.socket?.remoteAddress ||
+      'unknown';
 
-  // Rate limit mais permissivo em desenvolvimento para evitar erro 429 no React Strict Mode
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  const rateLimit = isDevelopment ? 200 : 60; // 200 req/min em dev, 60 req/min em prod
-  const fallbackRateLimit = checkRateLimit(clientId, rateLimit, 60000);
+    // Rate limit mais permissivo em desenvolvimento para evitar erro 429 no React Strict Mode
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const rateLimit = isDevelopment ? 200 : 60; // 200 req/min em dev, 60 req/min em prod
+    const fallbackRateLimit = checkRateLimit(clientId, rateLimit, 60000);
 
-  if (!fallbackRateLimit.allowed && isDevelopment === false) {
-    return res.status(429).json({
-      success: false,
-      message: 'Muitas requisições. Tente novamente em 1 minuto.',
-      retryAfter: Math.ceil((fallbackRateLimit.resetTime - Date.now()) / 1000)
-    });
-  }
-
-  // CORS seguro - apenas origens permitidas
-  const allowedOrigins = [
-    'https://tvsurui.com.br',
-    'https://nexogeo2.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3002'
-  ];
-
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  // Headers de segurança
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Content-Security-Policy', "default-src 'self'");
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-
-  // Handle OPTIONS (preflight)
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // ✅ SEGURANÇA (ALTO-008): Validar Content-Type para POST/PUT/PATCH
-  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-    const contentType = req.headers['content-type'];
-
-    if (!contentType || !contentType.includes('application/json')) {
-      console.warn(`⚠️ Content-Type inválido: ${contentType} - rejeitando ${req.method} request`);
-
-      return res.status(415).json({
+    if (!fallbackRateLimit.allowed && isDevelopment === false) {
+      return res.status(429).json({
         success: false,
-        error: 'Unsupported Media Type',
-        message: 'Content-Type deve ser application/json',
-        received: contentType || 'nenhum',
+        message: 'Muitas requisições. Tente novamente em 1 minuto.',
+        retryAfter: Math.ceil((fallbackRateLimit.resetTime - Date.now()) / 1000)
+      });
+    }
+
+    // CORS seguro - apenas origens permitidas
+    const allowedOrigins = [
+      'https://tvsurui.com.br',
+      'https://nexogeo2.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002'
+    ];
+
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    // Headers de segurança
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Content-Security-Policy', "default-src 'self'");
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+    // Handle OPTIONS (preflight)
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    // ✅ SEGURANÇA (ALTO-008): Validar Content-Type para POST/PUT/PATCH
+    if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      const contentType = req.headers['content-type'];
+
+      if (!contentType || !contentType.includes('application/json')) {
+        console.warn(`⚠️ Content-Type inválido: ${contentType} - rejeitando ${req.method} request`);
+
+        return res.status(415).json({
+          success: false,
+          error: 'Unsupported Media Type',
+          message: 'Content-Type deve ser application/json',
+          received: contentType || 'nenhum',
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    // Extrair route de query params OU do path
+    let { route, endpoint } = req.query || {};
+
+    // Se não tem route na query, tentar extrair do path (/api/configuracoes -> route=configuracoes)
+    // IMPORTANTE: Só extrai se for rota simples (sem "/" adicional após /api/)
+    // Rotas como /api/caixa-misteriosa/game/live são tratadas por handlers separados
+    if (!route && req.url) {
+      // Tentar extrair com /api/ primeiro (produção Vercel)
+      let pathMatch = req.url.match(/^\/api\/([^?\/]+)/);
+
+      // Se não encontrou, tentar sem /api/ (desenvolvimento local - server.js já remove /api)
+      if (!pathMatch) {
+        pathMatch = req.url.match(/^\/([^?\/]+)/);
+      }
+
+      if (pathMatch && pathMatch[1] !== '' && pathMatch[1] !== '/') {
+        route = pathMatch[1].split('?')[0]; // Remove query string se houver
+        console.log('🔍 [ROUTER] Route extraído do path:', route, 'URL:', req.url);
+      }
+    }
+
+    console.log('🔍 [ROUTER] Route final:', route, 'Endpoint:', endpoint, 'URL:', req.url);
+
+    // ✅ DIAGNÓSTICO: Endpoint /api/health para verificar status de inicialização
+    // Endpoint para testar conexão com banco (health check já foi feito acima)
+    if (route === 'db') {
+      if (endpoint === 'test') {
+        try {
+          const result = await testConnection();
+          return res.status(result.success ? 200 : 500).json(result);
+        } catch (error) {
+          console.error('❌ Erro no teste de conexão DB:', error.message); // Log apenas no servidor
+          return res.status(500).json({
+            success: false,
+            error: 'Erro interno do servidor - Conexão com banco de dados',
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+
+      if (endpoint === 'init') {
+        try {
+          const result = await initDatabase();
+          return res.status(result.success ? 200 : 500).json(result);
+        } catch (error) {
+          console.error('❌ Erro na inicialização do DB:', error.message); // Log apenas no servidor
+          return res.status(500).json({
+            success: false,
+            error: 'Erro interno do servidor - Inicialização do banco de dados',
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Database API funcionando!',
+        endpoints: ['test', 'init'],
         timestamp: new Date().toISOString()
       });
     }
-  }
 
-  // Extrair route de query params OU do path
-  let { route, endpoint } = req.query || {};
+    // Roteamento baseado em query parameter: /api/?route=auth&endpoint=login
+    if (route === 'auth') {
+      // Autenticação
 
-  // Se não tem route na query, tentar extrair do path (/api/configuracoes -> route=configuracoes)
-  // IMPORTANTE: Só extrai se for rota simples (sem "/" adicional após /api/)
-  // Rotas como /api/caixa-misteriosa/game/live são tratadas por handlers separados
-  if (!route && req.url) {
-    // Tentar extrair com /api/ primeiro (produção Vercel)
-    let pathMatch = req.url.match(/^\/api\/([^?\/]+)/);
-
-    // Se não encontrou, tentar sem /api/ (desenvolvimento local - server.js já remove /api)
-    if (!pathMatch) {
-      pathMatch = req.url.match(/^\/([^?\/]+)/);
-    }
-
-    if (pathMatch && pathMatch[1] !== '' && pathMatch[1] !== '/') {
-      route = pathMatch[1].split('?')[0]; // Remove query string se houver
-      console.log('🔍 [ROUTER] Route extraído do path:', route, 'URL:', req.url);
-    }
-  }
-
-  console.log('🔍 [ROUTER] Route final:', route, 'Endpoint:', endpoint, 'URL:', req.url);
-
-  // ✅ DIAGNÓSTICO: Endpoint /api/health para verificar status de inicialização
-  // Endpoint para testar conexão com banco (health check já foi feito acima)
-  if (route === 'db') {
-    if (endpoint === 'test') {
       try {
-        const result = await testConnection();
-        return res.status(result.success ? 200 : 500).json(result);
-      } catch (error) {
-        console.error('❌ Erro no teste de conexão DB:', error.message); // Log apenas no servidor
-        return res.status(500).json({
-          success: false,
-          error: 'Erro interno do servidor - Conexão com banco de dados',
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
+        if (endpoint === 'login' || (!endpoint && req.method === 'POST')) {
+          console.log('[LOGIN] Iniciando fluxo de login...');
 
-    if (endpoint === 'init') {
-      try {
-        const result = await initDatabase();
-        return res.status(result.success ? 200 : 500).json(result);
-      } catch (error) {
-        console.error('❌ Erro na inicialização do DB:', error.message); // Log apenas no servidor
-        return res.status(500).json({
-          success: false,
-          error: 'Erro interno do servidor - Inicialização do banco de dados',
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Database API funcionando!',
-      endpoints: ['test', 'init'],
-      timestamp: new Date().toISOString()
-    });
-  }
-
-  // Roteamento baseado em query parameter: /api/?route=auth&endpoint=login
-  if (route === 'auth') {
-    // Autenticação
-
-    try {
-      if (endpoint === 'login' || (!endpoint && req.method === 'POST')) {
-        console.log('[LOGIN] Iniciando fluxo de login...');
-
-        if (req.method !== 'POST') {
-          return res.status(405).json({
-            success: false,
-            message: 'Método não permitido. Use POST para login.',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // ✅ SEGURANÇA: Rate limiting persistente para login (5 req / 15 min - previne brute force)
-        const loginBlocked = await rateLimitLogin(req, res);
-        if (loginBlocked) return;
-
-        // Autenticação com banco de dados
-        const { usuario, email, senha, username, password } = req.body || {};
-        const loginField = usuario || email || username;
-        const passwordField = senha || password;
-
-        console.log('[LOGIN] Campos recebidos - usuário:', !!loginField, 'senha:', !!passwordField);
-
-        if (!loginField || !passwordField) {
-          console.log('[LOGIN] ❌ Campos faltando');
-          return res.status(400).json({
-            success: false,
-            message: 'Email/usuário e senha são obrigatórios',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // Buscar usuário no banco de dados
-        // ✅ SEGURANÇA (ALTO-003): Campos explícitos - não expor senha_hash
-        let userResult;
-        try {
-          console.log('[LOGIN] Buscando usuário no banco:', loginField);
-          userResult = await query('SELECT id, usuario, role, google_id, created_at, senha_hash FROM usuarios WHERE usuario = $1', [loginField]);
-          console.log('[LOGIN] ✅ Usuário encontrado:', userResult.rows.length > 0);
-        } catch (dbError) {
-          console.error('[LOGIN] ❌ ERRO DB ao buscar usuário:', dbError.message, dbError.code);
-          return res.status(500).json({
-            success: false,
-            message: 'Erro ao processar login. Tente novamente mais tarde.',
-            error: process.env.NODE_ENV === 'development' ? dbError.message : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        if (userResult.rows.length === 0) {
-          console.log('[LOGIN] ❌ Usuário não encontrado');
-          return res.status(401).json({
-            success: false,
-            message: 'Usuário ou senha incorretos',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        const user = userResult.rows[0];
-        console.log('[LOGIN] Usuário encontrado - ID:', user.id, 'Tem senha_hash:', !!user.senha_hash);
-
-        // Verificar senha usando bcrypt
-        let isPasswordValid = false;
-
-        // Verificar se a coluna senha_hash existe e tem valor
-        if (user.senha_hash) {
-          try {
-            // Usar bcrypt para comparar
-            console.log('[LOGIN] Comparando senha com bcrypt...');
-            isPasswordValid = await bcrypt.compare(passwordField, user.senha_hash);
-            console.log('[LOGIN] Resultado bcrypt.compare:', isPasswordValid);
-
-            // 🔐 SEGURANÇA: Log sanitizado - não expõe resultado nem usuário completo
-            if (process.env.NODE_ENV === 'development') {
-              console.log('[LOGIN] Tentativa de login:', { usuario: user.usuario.substring(0, 3) + '***', timestamp: new Date().toISOString() });
-            }
-          } catch (bcryptError) {
-            console.error('[LOGIN] ❌ ERRO ao comparar senha com bcrypt:', bcryptError.message);
-            return res.status(500).json({
+          if (req.method !== 'POST') {
+            return res.status(405).json({
               success: false,
-              message: 'Erro ao verificar senha. Tente novamente mais tarde.',
-              error: process.env.NODE_ENV === 'development' ? bcryptError.message : undefined,
+              message: 'Método não permitido. Use POST para login.',
               timestamp: new Date().toISOString()
             });
           }
-        } else {
-          // If there is no hash, the password cannot be verified securely. Access is denied.
-          console.log('⚠️ AVISO DE SEGURANÇA: Tentativa de login para usuário sem senha_hash. Acesso negado.');
-          isPasswordValid = false;
-        }
 
-        if (!isPasswordValid) {
-          console.log('[LOGIN] ❌ Senha incorreta');
-          return res.status(401).json({
-            success: false,
-            message: 'Usuário ou senha incorretos',
-            timestamp: new Date().toISOString()
-          });
-        }
+          // ✅ SEGURANÇA: Rate limiting persistente para login (5 req / 15 min - previne brute force)
+          const loginBlocked = await rateLimitLogin(req, res);
+          if (loginBlocked) return;
 
-        // Login bem-sucedido - gerar JWT real
-        try {
-          console.log('[LOGIN] ✅ Senha válida. Gerando JWT...');
-          const payload = {
-            id: user.id,
-            usuario: user.usuario,
-            role: user.role || 'user'
-          };
+          // Autenticação com banco de dados
+          const { usuario, email, senha, username, password } = req.body || {};
+          const loginField = usuario || email || username;
+          const passwordField = senha || password;
 
-          const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
-          console.log('[LOGIN] ✅ JWT gerado com sucesso');
+          console.log('[LOGIN] Campos recebidos - usuário:', !!loginField, 'senha:', !!passwordField);
 
-          // ✅ SEGURANÇA: Enviar token em cookie HttpOnly [CRÍTICO-001]
-          const isProduction = process.env.NODE_ENV === 'production';
-          const secureCookieOptions = [
-            'authToken=' + token,
-            'Path=/',
-            'HttpOnly',
-            'SameSite=Lax',
-            isProduction ? 'Secure' : '',
-            'Max-Age=' + (7 * 24 * 60 * 60)  // 7 dias
-          ].filter(Boolean).join('; ');
+          if (!loginField || !passwordField) {
+            console.log('[LOGIN] ❌ Campos faltando');
+            return res.status(400).json({
+              success: false,
+              message: 'Email/usuário e senha são obrigatórios',
+              timestamp: new Date().toISOString()
+            });
+          }
 
-          res.setHeader('Set-Cookie', secureCookieOptions);
-          console.log('[LOGIN] ✅ Cookie HttpOnly setado');
-
-          // ✅ NÃO incluir token no response body
-          console.log('[LOGIN] ✅ Login bem-sucedido!');
-          return res.status(200).json({
-            success: true,
-            message: 'Login realizado com sucesso!',
-            user: {
-              id: user.id,
-              usuario: user.usuario,
-              email: user.usuario, // Usando usuario como email
-              role: user.role || 'user'
-            },
-            timestamp: new Date().toISOString()
-          });
-        } catch (jwtError) {
-          console.error('[LOGIN] ❌ ERRO ao gerar JWT:', jwtError.message);
-          return res.status(500).json({
-            success: false,
-            message: 'Erro ao gerar token. Tente novamente mais tarde.',
-            error: process.env.NODE_ENV === 'development' ? jwtError.message : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      }
-
-      if (endpoint === 'logout') {
-        // ✅ SEGURANÇA: Limpar cookie HttpOnly no logout [CRÍTICO-001]
-        res.setHeader('Set-Cookie', 'authToken=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
-
-        return res.status(200).json({
-          success: true,
-          message: 'Logout realizado com sucesso!',
-          timestamp: new Date().toISOString()
-        });
-      }
-
-      if (endpoint === 'verify') {
-        try {
-          // Usar função de verificação que valida o token propriamente
-          const userId = getUserIdFromRequest(req);
-
-          // Buscar dados do usuário para retornar
-          const userResult = await query('SELECT id, usuario, role FROM usuarios WHERE id = $1', [userId]);
+          // Buscar usuário no banco de dados
+          // ✅ SEGURANÇA (ALTO-003): Campos explícitos - não expor senha_hash
+          let userResult;
+          try {
+            console.log('[LOGIN] Buscando usuário no banco:', loginField);
+            userResult = await query('SELECT id, usuario, role, google_id, created_at, senha_hash FROM usuarios WHERE usuario = $1', [loginField]);
+            console.log('[LOGIN] ✅ Usuário encontrado:', userResult.rows.length > 0);
+          } catch (dbError) {
+            console.error('[LOGIN] ❌ ERRO DB ao buscar usuário:', dbError.message, dbError.code);
+            return res.status(500).json({
+              success: false,
+              message: 'Erro ao processar login. Tente novamente mais tarde.',
+              error: process.env.NODE_ENV === 'development' ? dbError.message : undefined,
+              timestamp: new Date().toISOString()
+            });
+          }
 
           if (userResult.rows.length === 0) {
+            console.log('[LOGIN] ❌ Usuário não encontrado');
             return res.status(401).json({
               success: false,
-              message: 'Usuário não encontrado',
+              message: 'Usuário ou senha incorretos',
               timestamp: new Date().toISOString()
             });
           }
 
           const user = userResult.rows[0];
+          console.log('[LOGIN] Usuário encontrado - ID:', user.id, 'Tem senha_hash:', !!user.senha_hash);
+
+          // Verificar senha usando bcrypt
+          let isPasswordValid = false;
+
+          // Verificar se a coluna senha_hash existe e tem valor
+          if (user.senha_hash) {
+            try {
+              // Usar bcrypt para comparar
+              console.log('[LOGIN] Comparando senha com bcrypt...');
+              isPasswordValid = await bcrypt.compare(passwordField, user.senha_hash);
+              console.log('[LOGIN] Resultado bcrypt.compare:', isPasswordValid);
+
+              // 🔐 SEGURANÇA: Log sanitizado - não expõe resultado nem usuário completo
+              if (process.env.NODE_ENV === 'development') {
+                console.log('[LOGIN] Tentativa de login:', { usuario: user.usuario.substring(0, 3) + '***', timestamp: new Date().toISOString() });
+              }
+            } catch (bcryptError) {
+              console.error('[LOGIN] ❌ ERRO ao comparar senha com bcrypt:', bcryptError.message);
+              return res.status(500).json({
+                success: false,
+                message: 'Erro ao verificar senha. Tente novamente mais tarde.',
+                error: process.env.NODE_ENV === 'development' ? bcryptError.message : undefined,
+                timestamp: new Date().toISOString()
+              });
+            }
+          } else {
+            // If there is no hash, the password cannot be verified securely. Access is denied.
+            console.log('⚠️ AVISO DE SEGURANÇA: Tentativa de login para usuário sem senha_hash. Acesso negado.');
+            isPasswordValid = false;
+          }
+
+          if (!isPasswordValid) {
+            console.log('[LOGIN] ❌ Senha incorreta');
+            return res.status(401).json({
+              success: false,
+              message: 'Usuário ou senha incorretos',
+              timestamp: new Date().toISOString()
+            });
+          }
+
+          // Login bem-sucedido - gerar JWT real
+          try {
+            console.log('[LOGIN] ✅ Senha válida. Gerando JWT...');
+            const payload = {
+              id: user.id,
+              usuario: user.usuario,
+              role: user.role || 'user'
+            };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+            console.log('[LOGIN] ✅ JWT gerado com sucesso');
+
+            // ✅ SEGURANÇA: Enviar token em cookie HttpOnly [CRÍTICO-001]
+            const isProduction = process.env.NODE_ENV === 'production';
+            const secureCookieOptions = [
+              'authToken=' + token,
+              'Path=/',
+              'HttpOnly',
+              'SameSite=Lax',
+              isProduction ? 'Secure' : '',
+              'Max-Age=' + (7 * 24 * 60 * 60)  // 7 dias
+            ].filter(Boolean).join('; ');
+
+            res.setHeader('Set-Cookie', secureCookieOptions);
+            console.log('[LOGIN] ✅ Cookie HttpOnly setado');
+
+            // ✅ NÃO incluir token no response body
+            console.log('[LOGIN] ✅ Login bem-sucedido!');
+            return res.status(200).json({
+              success: true,
+              message: 'Login realizado com sucesso!',
+              user: {
+                id: user.id,
+                usuario: user.usuario,
+                email: user.usuario, // Usando usuario como email
+                role: user.role || 'user'
+              },
+              timestamp: new Date().toISOString()
+            });
+          } catch (jwtError) {
+            console.error('[LOGIN] ❌ ERRO ao gerar JWT:', jwtError.message);
+            return res.status(500).json({
+              success: false,
+              message: 'Erro ao gerar token. Tente novamente mais tarde.',
+              error: process.env.NODE_ENV === 'development' ? jwtError.message : undefined,
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+
+        if (endpoint === 'logout') {
+          // ✅ SEGURANÇA: Limpar cookie HttpOnly no logout [CRÍTICO-001]
+          res.setHeader('Set-Cookie', 'authToken=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
 
           return res.status(200).json({
             success: true,
-            message: 'Token válido',
-            user: {
-              id: user.id,
-              usuario: user.usuario,
-              email: user.usuario,
-              role: user.role
-            },
-            timestamp: new Date().toISOString()
-          });
-        } catch (error) {
-          return res.status(401).json({
-            success: false,
-            message: 'Token inválido ou expirado',
+            message: 'Logout realizado com sucesso!',
             timestamp: new Date().toISOString()
           });
         }
+
+        if (endpoint === 'verify') {
+          try {
+            // Usar função de verificação que valida o token propriamente
+            const userId = getUserIdFromRequest(req);
+
+            // Buscar dados do usuário para retornar
+            const userResult = await query('SELECT id, usuario, role FROM usuarios WHERE id = $1', [userId]);
+
+            if (userResult.rows.length === 0) {
+              return res.status(401).json({
+                success: false,
+                message: 'Usuário não encontrado',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            const user = userResult.rows[0];
+
+            return res.status(200).json({
+              success: true,
+              message: 'Token válido',
+              user: {
+                id: user.id,
+                usuario: user.usuario,
+                email: user.usuario,
+                role: user.role
+              },
+              timestamp: new Date().toISOString()
+            });
+          } catch (error) {
+            return res.status(401).json({
+              success: false,
+              message: 'Token inválido ou expirado',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+
+        // Endpoint GET padrão para auth
+        return res.status(200).json({
+          success: true,
+          message: 'API Auth funcionando!',
+          availableEndpoints: ['login', 'logout', 'verify'],
+          timestamp: new Date().toISOString()
+        });
+
+      } catch (error) {
+        // ❌ CRÍTICO: Erro não capturado dentro do bloco auth
+        console.error('❌ Erro NÃO TRATADO na API de autenticação:', {
+          message: error.message,
+          stack: error.stack,
+          endpoint: endpoint,
+          method: req.method,
+          timestamp: new Date().toISOString()
+        });
+
+        return res.status(500).json({
+          success: false,
+          message: 'Erro interno do servidor - Autenticação',
+          error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+          endpoint: process.env.NODE_ENV === 'development' ? endpoint : undefined,
+          timestamp: new Date().toISOString()
+        });
       }
-
-      // Endpoint GET padrão para auth
-      return res.status(200).json({
-        success: true,
-        message: 'API Auth funcionando!',
-        availableEndpoints: ['login', 'logout', 'verify'],
-        timestamp: new Date().toISOString()
-      });
-
-    } catch (error) {
-      // ❌ CRÍTICO: Erro não capturado dentro do bloco auth
-      console.error('❌ Erro NÃO TRATADO na API de autenticação:', {
-        message: error.message,
-        stack: error.stack,
-        endpoint: endpoint,
-        method: req.method,
-        timestamp: new Date().toISOString()
-      });
-
-      return res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor - Autenticação',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-        endpoint: process.env.NODE_ENV === 'development' ? endpoint : undefined,
-        timestamp: new Date().toISOString()
-      });
     }
-  }
 
-  // Rota para configurações (dados do banco PostgreSQL)
-  if (route === 'configuracoes') {
-    const { type } = req.query || {};
-    console.log('🔍 [BACKEND] Route configuracoes acessado. Type:', type, 'Method:', req.method);
+    // Rota para configurações (dados do banco PostgreSQL)
+    if (route === 'configuracoes') {
+      const { type } = req.query || {};
+      console.log('🔍 [BACKEND] Route configuracoes acessado. Type:', type, 'Method:', req.method);
 
-    try {
-      // Configurações da emissora
-      if (type === 'emissora') {
-        console.log('✅ [BACKEND] Entrando no bloco type=emissora');
-        // GET - Buscar configurações
-        if (req.method === 'GET') {
-          // ✅ SEGURANÇA (ALTO-003): Campos explícitos
-          const result = await query('SELECT id, nome, logo_url, tema_cor, website, telefone, endereco, instagram, facebook, youtube, linkedin, twitter, whatsapp, email, descricao, cidade FROM configuracoes_emissora ORDER BY id DESC LIMIT 1');
+      try {
+        // Configurações da emissora
+        if (type === 'emissora') {
+          console.log('✅ [BACKEND] Entrando no bloco type=emissora');
+          // GET - Buscar configurações
+          if (req.method === 'GET') {
+            // ✅ SEGURANÇA (ALTO-003): Campos explícitos
+            const result = await query('SELECT id, nome, logo_url, tema_cor, website, telefone, endereco, instagram, facebook, youtube, linkedin, twitter, whatsapp, email, descricao, cidade FROM configuracoes_emissora ORDER BY id DESC LIMIT 1');
 
-          if (result.rows.length === 0) {
-          // Inserir configuração padrão da TV Surui baseada nos dados reais
-          const insertResult = await query(`
+            if (result.rows.length === 0) {
+              // Inserir configuração padrão da TV Surui baseada nos dados reais
+              const insertResult = await query(`
             INSERT INTO configuracoes_emissora (
               nome, website, telefone, email, descricao,
               instagram, facebook, youtube, endereco,
@@ -1198,45 +1198,45 @@ module.exports = async function handler(req, res) {
             ) RETURNING *
           `);
 
-          return res.status(200).json({
-            success: true,
-            data: insertResult.rows[0],
-            source: 'created',
-            timestamp: new Date().toISOString()
-          });
-        }
+              return res.status(200).json({
+                success: true,
+                data: insertResult.rows[0],
+                source: 'created',
+                timestamp: new Date().toISOString()
+              });
+            }
 
-          return res.status(200).json({
-            success: true,
-            data: result.rows[0],
-            source: 'database',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // PUT - Atualizar configurações da emissora
-        if (req.method === 'PUT') {
-          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-          await getAuthenticatedUser(req, ['admin']);
-          const {
-            nome, logoUrl, temaCor, website, telefone, endereco, cidade,
-            instagram, facebook, youtube, linkedin, twitter,
-            whatsapp, email, descricao
-          } = req.body || {};
-
-          // Adicionar coluna cidade se não existir (migração inline)
-          try {
-            await query(`ALTER TABLE configuracoes_emissora ADD COLUMN IF NOT EXISTS cidade VARCHAR(255)`);
-          } catch (err) {
-            console.log('Coluna cidade já existe ou erro ao criar:', err.message);
+            return res.status(200).json({
+              success: true,
+              data: result.rows[0],
+              source: 'database',
+              timestamp: new Date().toISOString()
+            });
           }
 
-          // Verificar se existe registro
-          const existingResult = await query('SELECT id FROM configuracoes_emissora ORDER BY id DESC LIMIT 1');
+          // PUT - Atualizar configurações da emissora
+          if (req.method === 'PUT') {
+            // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+            await getAuthenticatedUser(req, ['admin']);
+            const {
+              nome, logoUrl, temaCor, website, telefone, endereco, cidade,
+              instagram, facebook, youtube, linkedin, twitter,
+              whatsapp, email, descricao
+            } = req.body || {};
 
-          if (existingResult.rows.length === 0) {
-            // Criar novo registro se não existir
-            const insertResult = await query(`
+            // Adicionar coluna cidade se não existir (migração inline)
+            try {
+              await query(`ALTER TABLE configuracoes_emissora ADD COLUMN IF NOT EXISTS cidade VARCHAR(255)`);
+            } catch (err) {
+              console.log('Coluna cidade já existe ou erro ao criar:', err.message);
+            }
+
+            // Verificar se existe registro
+            const existingResult = await query('SELECT id FROM configuracoes_emissora ORDER BY id DESC LIMIT 1');
+
+            if (existingResult.rows.length === 0) {
+              // Criar novo registro se não existir
+              const insertResult = await query(`
               INSERT INTO configuracoes_emissora (
                 nome, logo_url, tema_cor, website, telefone, endereco, cidade,
                 instagram, facebook, youtube, linkedin, twitter,
@@ -1248,15 +1248,15 @@ module.exports = async function handler(req, res) {
                 instagram, facebook, youtube, linkedin, twitter,
                 whatsapp, email, descricao]);
 
-            return res.status(200).json({
-              success: true,
-              data: insertResult.rows[0],
-              message: 'Configurações criadas com sucesso',
-              timestamp: new Date().toISOString()
-            });
-          } else {
-            // Atualizar registro existente
-            const updateResult = await query(`
+              return res.status(200).json({
+                success: true,
+                data: insertResult.rows[0],
+                message: 'Configurações criadas com sucesso',
+                timestamp: new Date().toISOString()
+              });
+            } else {
+              // Atualizar registro existente
+              const updateResult = await query(`
               UPDATE configuracoes_emissora
               SET nome = COALESCE($1, nome),
                   logo_url = COALESCE($2, logo_url),
@@ -1279,51 +1279,51 @@ module.exports = async function handler(req, res) {
                 instagram, facebook, youtube, linkedin, twitter,
                 whatsapp, email, descricao, existingResult.rows[0].id]);
 
+              return res.status(200).json({
+                success: true,
+                data: updateResult.rows[0],
+                message: 'Configurações atualizadas com sucesso',
+                timestamp: new Date().toISOString()
+              });
+            }
+          }
+        }
+
+        // Lista de administradores
+        if (type === 'administradores') {
+          // ALL methods here are admin-only
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          await getAuthenticatedUser(req, ['admin']);
+
+          if (req.method === 'GET') {
+            const result = await query('SELECT id, usuario, role, created_at FROM usuarios ORDER BY created_at DESC');
+
             return res.status(200).json({
               success: true,
-              data: updateResult.rows[0],
-              message: 'Configurações atualizadas com sucesso',
-              timestamp: new Date().toISOString()
-            });
-          }
-        }
-      }
-
-      // Lista de administradores
-      if (type === 'administradores') {
-        // ALL methods here are admin-only
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        await getAuthenticatedUser(req, ['admin']);
-
-        if (req.method === 'GET') {
-          const result = await query('SELECT id, usuario, role, created_at FROM usuarios ORDER BY created_at DESC');
-
-          return res.status(200).json({
-            success: true,
-            data: result.rows,
-            source: 'database',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // Criar novo administrador
-        if (req.method === 'POST') {
-          const { usuario, role } = req.body || {};
-
-          if (!usuario) {
-            return res.status(400).json({
-              success: false,
-              message: 'Usuário é obrigatório',
+              data: result.rows,
+              source: 'database',
               timestamp: new Date().toISOString()
             });
           }
 
-          // ✅ SEGURANÇA: Gerar senha temporária criptograficamente segura [CRÍTICO-005]
-          const senhaTemporaria = generateSecurePassword();  // crypto.randomBytes(16) = 128 bits
-          const hashedPassword = await bcrypt.hash(senhaTemporaria, 10);
+          // Criar novo administrador
+          if (req.method === 'POST') {
+            const { usuario, role } = req.body || {};
 
-          // 📝 LOG: Senha registrada apenas uma vez (não será incluída na resposta API)
-          console.log(`
+            if (!usuario) {
+              return res.status(400).json({
+                success: false,
+                message: 'Usuário é obrigatório',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            // ✅ SEGURANÇA: Gerar senha temporária criptograficamente segura [CRÍTICO-005]
+            const senhaTemporaria = generateSecurePassword();  // crypto.randomBytes(16) = 128 bits
+            const hashedPassword = await bcrypt.hash(senhaTemporaria, 10);
+
+            // 📝 LOG: Senha registrada apenas uma vez (não será incluída na resposta API)
+            console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║ ✅ USUÁRIO CRIADO COM SUCESSO                                  ║
 ╠════════════════════════════════════════════════════════════════╣
@@ -1337,153 +1337,153 @@ module.exports = async function handler(req, res) {
 ╚════════════════════════════════════════════════════════════════╝
           `);
 
-          const insertResult = await query(`
+            const insertResult = await query(`
             INSERT INTO usuarios (usuario, senha_hash, role)
             VALUES ($1, $2, $3)
             RETURNING id, usuario, role, created_at
           `, [usuario, hashedPassword, role || 'user']);
 
-          return res.status(201).json({
-            success: true,
-            data: insertResult.rows[0],
-            message: 'Administrador criado com sucesso',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // Atualizar administrador existente
-        if (req.method === 'PUT') {
-          const { id } = req.query || {};
-          const { usuario, role } = req.body || {};
-
-          if (!id || !usuario) {
-            return res.status(400).json({
-              success: false,
-              message: 'ID e usuário são obrigatórios',
+            return res.status(201).json({
+              success: true,
+              data: insertResult.rows[0],
+              message: 'Administrador criado com sucesso',
               timestamp: new Date().toISOString()
             });
           }
 
-          const updateResult = await query(`
+          // Atualizar administrador existente
+          if (req.method === 'PUT') {
+            const { id } = req.query || {};
+            const { usuario, role } = req.body || {};
+
+            if (!id || !usuario) {
+              return res.status(400).json({
+                success: false,
+                message: 'ID e usuário são obrigatórios',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            const updateResult = await query(`
             UPDATE usuarios
             SET usuario = $1, role = $2
             WHERE id = $3
             RETURNING id, usuario, role, created_at
           `, [usuario, role || 'user', parseInt(id)]);
 
-          if (updateResult.rows.length === 0) {
-            return res.status(404).json({
-              success: false,
-              message: 'Administrador não encontrado',
+            if (updateResult.rows.length === 0) {
+              return res.status(404).json({
+                success: false,
+                message: 'Administrador não encontrado',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            return res.status(200).json({
+              success: true,
+              data: updateResult.rows[0],
+              message: 'Administrador atualizado com sucesso',
               timestamp: new Date().toISOString()
             });
           }
 
-          return res.status(200).json({
-            success: true,
-            data: updateResult.rows[0],
-            message: 'Administrador atualizado com sucesso',
-            timestamp: new Date().toISOString()
-          });
-        }
+          // Excluir administrador
+          if (req.method === 'DELETE') {
+            const { id } = req.query || {};
 
-        // Excluir administrador
-        if (req.method === 'DELETE') {
-          const { id } = req.query || {};
+            if (!id) {
+              return res.status(400).json({
+                success: false,
+                message: 'ID é obrigatório',
+                timestamp: new Date().toISOString()
+              });
+            }
 
-          if (!id) {
-            return res.status(400).json({
-              success: false,
-              message: 'ID é obrigatório',
-              timestamp: new Date().toISOString()
-            });
-          }
-
-          const deleteResult = await query(`
+            const deleteResult = await query(`
             DELETE FROM usuarios WHERE id = $1 RETURNING id
           `, [parseInt(id)]);
 
-          if (deleteResult.rows.length === 0) {
-            return res.status(404).json({
-              success: false,
-              message: 'Administrador não encontrado',
+            if (deleteResult.rows.length === 0) {
+              return res.status(404).json({
+                success: false,
+                message: 'Administrador não encontrado',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            return res.status(200).json({
+              success: true,
+              message: 'Administrador excluído com sucesso',
               timestamp: new Date().toISOString()
             });
           }
-
-          return res.status(200).json({
-            success: true,
-            message: 'Administrador excluído com sucesso',
-            timestamp: new Date().toISOString()
-          });
         }
-      }
 
-      // Configurações gerais do sistema (fallback)
-      const stats = await query(`
+        // Configurações gerais do sistema (fallback)
+        const stats = await query(`
         SELECT
           (SELECT COUNT(*) FROM promocoes WHERE deleted_at IS NULL) as total_promocoes,
           (SELECT COUNT(*) FROM participantes WHERE deleted_at IS NULL) as total_participantes,
           (SELECT COUNT(*) FROM usuarios) as total_usuarios
       `);
 
-      return res.status(200).json({
-        success: true,
-        data: {
-          nome: 'NexoGeo Sistema',
-          versao: '1.0.0',
-          empresa: 'NexoGeo',
-          usuario_atual: 'admin',
-          estatisticas: stats.rows[0],
-          configuracoes: [
-            { id: 1, nome: 'Database Status', valor: 'conectado' },
-            { id: 2, nome: 'Total Promoções', valor: stats.rows[0].total_promocoes },
-            { id: 3, nome: 'Total Participantes', valor: stats.rows[0].total_participantes }
-          ]
-        },
-        source: 'database',
-        timestamp: new Date().toISOString()
-      });
+        return res.status(200).json({
+          success: true,
+          data: {
+            nome: 'NexoGeo Sistema',
+            versao: '1.0.0',
+            empresa: 'NexoGeo',
+            usuario_atual: 'admin',
+            estatisticas: stats.rows[0],
+            configuracoes: [
+              { id: 1, nome: 'Database Status', valor: 'conectado' },
+              { id: 2, nome: 'Total Promoções', valor: stats.rows[0].total_promocoes },
+              { id: 3, nome: 'Total Participantes', valor: stats.rows[0].total_participantes }
+            ]
+          },
+          source: 'database',
+          timestamp: new Date().toISOString()
+        });
 
-    } catch (error) {
-      console.error('Erro ao buscar configurações:', error);
+      } catch (error) {
+        console.error('Erro ao buscar configurações:', error);
 
-      // Se for erro de autenticação/autorização, retornar 401/403
-      if (error.message && (
-        error.message.includes('Token') ||
-        error.message.includes('autenticação') ||
-        error.message.includes('Acesso não autorizado')
-      )) {
-        return res.status(401).json({
+        // Se for erro de autenticação/autorização, retornar 401/403
+        if (error.message && (
+          error.message.includes('Token') ||
+          error.message.includes('autenticação') ||
+          error.message.includes('Acesso não autorizado')
+        )) {
+          return res.status(401).json({
+            success: false,
+            message: error.message,
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        return res.status(500).json({
           success: false,
+          error: 'Erro ao conectar com banco de dados',
           message: error.message,
           timestamp: new Date().toISOString()
         });
       }
-
-      return res.status(500).json({
-        success: false,
-        error: 'Erro ao conectar com banco de dados',
-        message: error.message,
-        timestamp: new Date().toISOString()
-      });
     }
-  }
 
-  // Rota para promoções (dados do banco PostgreSQL)
-  if (route === 'promocoes') {
-    try {
-      
-      // GET - Listar promoções ou buscar por ID
-      if (req.method === 'GET') {
-        const { id, status } = req.query || {};
+    // Rota para promoções (dados do banco PostgreSQL)
+    if (route === 'promocoes') {
+      try {
 
-        // Se um ID for fornecido, a rota é PÚBLICA para permitir que o formulário de captura funcione.
-        if (id) {
-          console.log(`[PUBLIC] Buscando promoção pública por ID: ${id}`);
-          // Buscar promoção específica por ID
-          // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
-          const result = await query(`
+        // GET - Listar promoções ou buscar por ID
+        if (req.method === 'GET') {
+          const { id, status } = req.query || {};
+
+          // Se um ID for fornecido, a rota é PÚBLICA para permitir que o formulário de captura funcione.
+          if (id) {
+            console.log(`[PUBLIC] Buscando promoção pública por ID: ${id}`);
+            // Buscar promoção específica por ID
+            // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
+            const result = await query(`
             SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by, COUNT(pt.id) as participantes_count
             FROM promocoes p
             LEFT JOIN participantes pt ON p.id = pt.promocao_id AND pt.deleted_at IS NULL
@@ -1491,187 +1491,213 @@ module.exports = async function handler(req, res) {
             GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by
           `, [parseInt(id)]);
 
-          if (result.rows.length === 0) {
-            return res.status(404).json({
-              success: false,
-              message: 'Promoção não encontrada',
+            if (result.rows.length === 0) {
+              return res.status(404).json({
+                success: false,
+                message: 'Promoção não encontrada',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            return res.status(200).json({
+              success: true,
+              data: result.rows[0],
+              source: 'database',
               timestamp: new Date().toISOString()
             });
-          }
+          } else {
+            // Se nenhum ID for fornecido, a rota é PRIVADA e requer autenticação.
+            // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user, viewer
+            const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user', 'viewer']);
+            console.log('[DASHBOARD] Usuário autenticado para listar promoções:', user.usuario);
 
-          return res.status(200).json({
-            success: true,
-            data: result.rows[0],
-            source: 'database',
-            timestamp: new Date().toISOString()
-          });
-        } else {
-          // Se nenhum ID for fornecido, a rota é PRIVADA e requer autenticação.
-          // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user, viewer
-          const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user', 'viewer']);
-          console.log('[DASHBOARD] Usuário autenticado para listar promoções:', user.usuario);
-          
-          // Listar todas as promoções (com filtro de status opcional)
-          // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
-          let queryText = `
+            // Listar todas as promoções (com filtro de status opcional)
+            // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
+            let queryText = `
             SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by, COUNT(pt.id) as participantes_count
             FROM promocoes p
             LEFT JOIN participantes pt ON p.id = pt.promocao_id AND pt.deleted_at IS NULL
             WHERE p.deleted_at IS NULL
           `;
-          let queryParams = [];
+            let queryParams = [];
 
-          if (status) {
-            queryText += ` AND p.status = $1`;
-            queryParams.push(status);
+            if (status) {
+              queryText += ` AND p.status = $1`;
+              queryParams.push(status);
+            }
+
+            queryText += ` GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by ORDER BY p.id DESC`;
+
+            const result = await query(queryText, queryParams);
+
+            return res.status(200).json({
+              success: true,
+              data: result.rows,
+              total: result.rows.length,
+              source: 'database',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+
+        // POST - Criar nova promoção
+        if (req.method === 'POST') {
+          // ✅ SEGURANÇA: Rate limiting persistente para criação (10 req / 1 min)
+          const createBlocked = await rateLimitCreate(req, res);
+          if (createBlocked) return;
+
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
+          const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
+          const { nome, descricao, data_inicio, data_fim, status = 'ativa', numero_ganhadores = 1 } = req.body || {};
+
+          if (!nome || !data_inicio || !data_fim) {
+            return res.status(400).json({
+              success: false,
+              message: 'Nome, data de início e data fim são obrigatórios',
+              timestamp: new Date().toISOString()
+            });
           }
 
-          queryText += ` GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by ORDER BY p.id DESC`;
+          // ✅ SEGURANÇA (ALTO-001): Transação para criar promoção com auditoria
+          const client = await databasePool.connect();
 
-          const result = await query(queryText, queryParams);
+          try {
+            // 1️⃣ INICIAR TRANSAÇÃO
+            await client.query('BEGIN');
 
-          return res.status(200).json({
-            success: true,
-            data: result.rows,
-            total: result.rows.length,
-            source: 'database',
-            timestamp: new Date().toISOString()
-          });
-        }
-      }
+            // Criar slug da promoção
+            let slug = nome.toLowerCase()
+              .replace(/[áàãâ]/g, 'a')
+              .replace(/[éêë]/g, 'e')
+              .replace(/[íîï]/g, 'i')
+              .replace(/[óôõ]/g, 'o')
+              .replace(/[úûü]/g, 'u')
+              .replace(/[ç]/g, 'c')
+              .replace(/[^a-z0-9\s-]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/-+/g, '-')
+              .trim();
 
-      // POST - Criar nova promoção
-      if (req.method === 'POST') {
-        // ✅ SEGURANÇA: Rate limiting persistente para criação (10 req / 1 min)
-        const createBlocked = await rateLimitCreate(req, res);
-        if (createBlocked) return;
+            // ✅ MELHORIA: Se for uma cópia/duplicação, garantir slug único adicionando timestamp
+            if (nome.includes(' - Cópia')) {
+              slug += '-' + Math.floor(Date.now() / 1000).toString().substring(6);
+            }
 
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
-        const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
-        const { nome, descricao, data_inicio, data_fim, status = 'ativa', numero_ganhadores = 1 } = req.body || {};
-
-        if (!nome || !data_inicio || !data_fim) {
-          return res.status(400).json({
-            success: false,
-            message: 'Nome, data de início e data fim são obrigatórios',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // ✅ SEGURANÇA (ALTO-001): Transação para criar promoção com auditoria
-        const client = await databasePool.connect();
-
-        try {
-          // 1️⃣ INICIAR TRANSAÇÃO
-          await client.query('BEGIN');
-
-          // Criar slug da promoção
-          const slug = nome.toLowerCase()
-            .replace(/[áàãâ]/g, 'a')
-            .replace(/[éêë]/g, 'e')
-            .replace(/[íîï]/g, 'i')
-            .replace(/[óôõ]/g, 'o')
-            .replace(/[úûü]/g, 'u')
-            .replace(/[ç]/g, 'c')
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim();
-
-          // 2️⃣ INSERIR PROMOÇÃO
-          const insertResult = await client.query(`
+            // 2️⃣ INSERIR PROMOÇÃO
+            const insertResult = await client.query(`
             INSERT INTO promocoes (nome, descricao, slug, data_inicio, data_fim, status, numero_ganhadores)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *
           `, [nome, descricao, slug, data_inicio, data_fim, status, parseInt(numero_ganhadores)]);
 
-          const novaPromocao = insertResult.rows[0];
+            const novaPromocao = insertResult.rows[0];
 
-          // 3️⃣ REGISTRAR AUDITORIA
-          await client.query(`
+            // 3️⃣ REGISTRAR AUDITORIA
+            await client.query(`
             INSERT INTO audit_logs (user_id, action, table_name, record_id, additional_data, ip_address)
             VALUES ($1, $2, $3, $4, $5::jsonb, $6)
           `, [
-            user.id,
-            'CREATE_PROMOTION',
-            'promocoes',
-            novaPromocao.id,
-            JSON.stringify({ nome, slug, status }),
-            req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
-          ]);
+              user.id,
+              'CREATE_PROMOTION',
+              'promocoes',
+              novaPromocao.id,
+              JSON.stringify({ nome, slug, status }),
+              req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
+            ]);
 
-          // 4️⃣ COMMIT
-          await client.query('COMMIT');
+            // 4️⃣ COMMIT
+            await client.query('COMMIT');
 
-          console.log(`✅ Promoção criada com sucesso: ${nome} (ID: ${novaPromocao.id})`);
+            console.log(`✅ Promoção criada com sucesso: ${nome} (ID: ${novaPromocao.id})`);
 
-          return res.status(201).json({
-            success: true,
-            data: novaPromocao,
-            message: 'Promoção criada com sucesso',
-            timestamp: new Date().toISOString()
-          });
+            return res.status(201).json({
+              success: true,
+              data: novaPromocao,
+              message: 'Promoção criada com sucesso',
+              timestamp: new Date().toISOString()
+            });
 
-        } catch (error) {
-          // ROLLBACK EM CASO DE ERRO
-          try {
-            await client.query('ROLLBACK');
-          } catch (rollbackError) {
-            console.error('❌ Erro ao fazer rollback:', rollbackError);
-          }
+          } catch (error) {
+            // ROLLBACK EM CASO DE ERRO
+            try {
+              await client.query('ROLLBACK');
+            } catch (rollbackError) {
+              console.error('❌ Erro ao fazer rollback:', rollbackError);
+            }
 
-          console.error('❌ Erro ao criar promoção:', error);
+            console.error('❌ Erro ao criar promoção:', error.message, error);
 
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao criar promoção. Tente novamente.',
-            timestamp: new Date().toISOString()
-          });
+            // Tentar identificar se o erro é de duplicidade de slug
+            let errorMessage = 'Erro ao criar promoção. Tente novamente.';
+            if (error.code === '23505') { // Unique violation
+              const msg = error.message || '';
+              if (error.constraint === 'promocoes_slug_key' || msg.includes('slug')) {
+                errorMessage = 'Já existe uma promoção com um nome similar (URL duplicada). Escolha um nome diferente.';
+              } else if (msg.includes('nome')) {
+                errorMessage = 'Já existe uma promoção com este nome.';
+              }
+            } else if (error.code === '23514') { // Check constraint violation
+              const msg = error.message || '';
+              if (error.constraint === 'check_datas_validas' || msg.includes('data')) {
+                errorMessage = 'A data de fim deve ser posterior ou igual à data de início.';
+              }
+            } else if (error.code === '23503') { // Foreign key violation
+              errorMessage = 'Erro de integridade técnica (Chave Estrangeira). Por favor, execute a inicialização do banco de dados em /api/?route=db&endpoint=init';
+            }
 
-        } finally {
-          // 5️⃣ SEMPRE LIBERAR CONEXÃO
-          client.release();
-        }
-      }
-
-      // PUT - Atualizar promoção com transação
-      if (req.method === 'PUT') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
-        const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
-        const { id } = req.query || {};
-        const { nome, descricao, status, data_inicio, data_fim, numero_ganhadores } = req.body || {};
-
-        if (!id) {
-          return res.status(400).json({
-            success: false,
-            message: 'ID da promoção é obrigatório',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // ✅ SEGURANÇA (ALTO-001): Transação para atualizar promoção
-        const client = await databasePool.connect();
-
-        try {
-          await client.query('BEGIN');
-
-          // 1️⃣ BUSCAR DADOS ANTIGOS PARA AUDITORIA
-          // ✅ SEGURANÇA (ALTO-003): Campos explícitos
-          const oldPromoResult = await client.query('SELECT id, nome, slug, descricao, data_inicio, data_fim, status, link_participacao, criado_em, emissora_id, numero_ganhadores FROM promocoes WHERE id = $1', [parseInt(id)]);
-
-          if (oldPromoResult.rows.length === 0) {
-            await client.query('ROLLBACK');
-            return res.status(404).json({
+            return res.status(500).json({
               success: false,
-              message: 'Promoção não encontrada',
+              error: errorMessage,
+              message: error.message,
+              detail: error.detail,
+              code: error.code,
+              timestamp: new Date().toISOString()
+            });
+
+          } finally {
+            // 5️⃣ SEMPRE LIBERAR CONEXÃO
+            client.release();
+          }
+        }
+
+        // PUT - Atualizar promoção com transação
+        if (req.method === 'PUT') {
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
+          const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
+          const { id } = req.query || {};
+          const { nome, descricao, status, data_inicio, data_fim, numero_ganhadores } = req.body || {};
+
+          if (!id) {
+            return res.status(400).json({
+              success: false,
+              message: 'ID da promoção é obrigatório',
               timestamp: new Date().toISOString()
             });
           }
 
-          const oldPromoData = oldPromoResult.rows[0];
+          // ✅ SEGURANÇA (ALTO-001): Transação para atualizar promoção
+          const client = await databasePool.connect();
 
-          // 2️⃣ ATUALIZAR PROMOÇÃO
-          const updateResult = await client.query(`
+          try {
+            await client.query('BEGIN');
+
+            // 1️⃣ BUSCAR DADOS ANTIGOS PARA AUDITORIA
+            // ✅ SEGURANÇA (ALTO-003): Campos explícitos
+            const oldPromoResult = await client.query('SELECT id, nome, slug, descricao, data_inicio, data_fim, status, link_participacao, criado_em, emissora_id, numero_ganhadores FROM promocoes WHERE id = $1', [parseInt(id)]);
+
+            if (oldPromoResult.rows.length === 0) {
+              await client.query('ROLLBACK');
+              return res.status(404).json({
+                success: false,
+                message: 'Promoção não encontrada',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            const oldPromoData = oldPromoResult.rows[0];
+
+            // 2️⃣ ATUALIZAR PROMOÇÃO
+            const updateResult = await client.query(`
             UPDATE promocoes
             SET nome = COALESCE($1, nome),
                 descricao = COALESCE($2, descricao),
@@ -1683,84 +1709,170 @@ module.exports = async function handler(req, res) {
             RETURNING *
           `, [nome, descricao, status, data_inicio, data_fim, numero_ganhadores, parseInt(id)]);
 
-          const newPromoData = updateResult.rows[0];
+            const newPromoData = updateResult.rows[0];
 
-          // 3️⃣ REGISTRAR AUDITORIA
-          await client.query(`
+            // 3️⃣ REGISTRAR AUDITORIA
+            await client.query(`
             INSERT INTO audit_logs (user_id, action, table_name, record_id, additional_data, ip_address)
             VALUES ($1, $2, $3, $4, $5::jsonb, $6)
           `, [
-            user.id,
-            'UPDATE_PROMOTION',
-            'promocoes',
-            parseInt(id),
-            JSON.stringify({
-              antes: { nome: oldPromoData.nome, status: oldPromoData.status },
-              depois: { nome: newPromoData.nome, status: newPromoData.status }
-            }),
-            req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
-          ]);
+              user.id,
+              'UPDATE_PROMOTION',
+              'promocoes',
+              parseInt(id),
+              JSON.stringify({
+                antes: { nome: oldPromoData.nome, status: oldPromoData.status },
+                depois: { nome: newPromoData.nome, status: newPromoData.status }
+              }),
+              req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
+            ]);
 
-          // 4️⃣ COMMIT
-          await client.query('COMMIT');
+            // 4️⃣ COMMIT
+            await client.query('COMMIT');
 
-          console.log(`✅ Promoção atualizada: ${newPromoData.nome} (ID: ${parseInt(id)})`);
+            console.log(`✅ Promoção atualizada: ${newPromoData.nome} (ID: ${parseInt(id)})`);
 
-          return res.status(200).json({
-            success: true,
-            data: newPromoData,
-            message: 'Promoção atualizada com sucesso',
-            timestamp: new Date().toISOString()
-          });
+            return res.status(200).json({
+              success: true,
+              data: newPromoData,
+              message: 'Promoção atualizada com sucesso',
+              timestamp: new Date().toISOString()
+            });
 
-        } catch (error) {
-          try {
-            await client.query('ROLLBACK');
-          } catch (rollbackError) {
-            console.error('❌ Erro ao fazer rollback:', rollbackError);
+          } catch (error) {
+            try {
+              await client.query('ROLLBACK');
+            } catch (rollbackError) {
+              console.error('❌ Erro ao fazer rollback:', rollbackError);
+            }
+
+            console.error('❌ Erro ao atualizar promoção:', error.message, error);
+
+            return res.status(500).json({
+              success: false,
+              error: 'Erro ao atualizar promoção. Tente novamente.',
+              message: error.message,
+              details: error.message,
+              stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+              timestamp: new Date().toISOString()
+            });
+
+          } finally {
+            client.release();
+          }
+        }
+
+        // DELETE - Excluir promoção com transação
+        if (req.method === 'DELETE') {
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator
+          const user = await getAuthenticatedUser(req, ['admin', 'moderator']);
+          const { id } = req.query || {};
+
+          if (!id) {
+            return res.status(400).json({
+              success: false,
+              message: 'ID da promoção é obrigatório',
+              timestamp: new Date().toISOString()
+            });
           }
 
-          console.error('❌ Erro ao atualizar promoção:', error.message, error);
+          // ✅ SEGURANÇA (ALTO-001): Transação para deletar promoção
+          const client = await databasePool.connect();
 
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao atualizar promoção. Tente novamente.',
-            message: error.message,
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-            timestamp: new Date().toISOString()
-          });
+          try {
+            await client.query('BEGIN');
 
-        } finally {
-          client.release();
+            // 1️⃣ BUSCAR DADOS PARA AUDITORIA
+            const promoResult = await client.query('SELECT id, nome FROM promocoes WHERE id = $1', [parseInt(id)]);
+
+            if (promoResult.rows.length === 0) {
+              await client.query('ROLLBACK');
+              return res.status(404).json({
+                success: false,
+                message: 'Promoção não encontrada',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            const promoData = promoResult.rows[0];
+
+            // 2️⃣ SOFT DELETE PROMOÇÃO
+            // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
+            const deleteResult = await client.query(`
+            UPDATE promocoes
+            SET deleted_at = NOW(), deleted_by = $1
+            WHERE id = $2
+            RETURNING id, nome, deleted_at, deleted_by
+          `, [user.id, parseInt(id)]);
+
+            // 3️⃣ REGISTRAR AUDITORIA
+            await client.query(`
+            INSERT INTO audit_logs (user_id, action, table_name, record_id, additional_data, ip_address)
+            VALUES ($1, $2, $3, $4, $5::jsonb, $6)
+          `, [
+              user.id,
+              'DELETE_PROMOTION',
+              'promocoes',
+              parseInt(id),
+              JSON.stringify({ nome: promoData.nome, deleted_at: new Date().toISOString() }),
+              req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
+            ]);
+
+            // 4️⃣ COMMIT
+            await client.query('COMMIT');
+
+            console.log(`✅ Promoção excluída: ${promoData.nome} (ID: ${parseInt(id)})`);
+
+            return res.status(200).json({
+              success: true,
+              data: deleteResult.rows[0],
+              message: 'Promoção excluída com sucesso',
+              timestamp: new Date().toISOString()
+            });
+
+          } catch (error) {
+            try {
+              await client.query('ROLLBACK');
+            } catch (rollbackError) {
+              console.error('❌ Erro ao fazer rollback:', rollbackError);
+            }
+
+            console.error('❌ Erro ao deletar promoção:', error);
+
+            return res.status(500).json({
+              success: false,
+              error: 'Erro ao deletar promoção. Tente novamente.',
+              timestamp: new Date().toISOString()
+            });
+
+          } finally {
+            client.release();
+          }
         }
-      }
 
-      // DELETE - Excluir promoção com transação
-      if (req.method === 'DELETE') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator
-        const user = await getAuthenticatedUser(req, ['admin', 'moderator']);
-        const { id } = req.query || {};
+        // PATCH - Atualizar apenas status da promoção
+        if (req.method === 'PATCH') {
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          await getAuthenticatedUser(req, ['admin']);
+          const { id } = req.query || {};
+          const { status } = req.body || {};
 
-        if (!id) {
-          return res.status(400).json({
-            success: false,
-            message: 'ID da promoção é obrigatório',
-            timestamp: new Date().toISOString()
-          });
-        }
+          if (!id || !status) {
+            return res.status(400).json({
+              success: false,
+              message: 'ID da promoção e status são obrigatórios',
+              timestamp: new Date().toISOString()
+            });
+          }
 
-        // ✅ SEGURANÇA (ALTO-001): Transação para deletar promoção
-        const client = await databasePool.connect();
+          const updateResult = await query(`
+          UPDATE promocoes
+          SET status = $1
+          WHERE id = $2
+          RETURNING *
+        `, [status, parseInt(id)]);
 
-        try {
-          await client.query('BEGIN');
-
-          // 1️⃣ BUSCAR DADOS PARA AUDITORIA
-          const promoResult = await client.query('SELECT id, nome FROM promocoes WHERE id = $1', [parseInt(id)]);
-
-          if (promoResult.rows.length === 0) {
-            await client.query('ROLLBACK');
+          if (updateResult.rows.length === 0) {
             return res.status(404).json({
               success: false,
               message: 'Promoção não encontrada',
@@ -1768,181 +1880,95 @@ module.exports = async function handler(req, res) {
             });
           }
 
-          const promoData = promoResult.rows[0];
-
-          // 2️⃣ SOFT DELETE PROMOÇÃO
-          // ✅ SEGURANÇA (ALTO-005): Soft Delete - permite recuperação de dados e auditabilidade
-          const deleteResult = await client.query(`
-            UPDATE promocoes
-            SET deleted_at = NOW(), deleted_by = $1
-            WHERE id = $2
-            RETURNING id, nome, deleted_at, deleted_by
-          `, [user.id, parseInt(id)]);
-
-          // 3️⃣ REGISTRAR AUDITORIA
-          await client.query(`
-            INSERT INTO audit_logs (user_id, action, table_name, record_id, additional_data, ip_address)
-            VALUES ($1, $2, $3, $4, $5::jsonb, $6)
-          `, [
-            user.id,
-            'DELETE_PROMOTION',
-            'promocoes',
-            parseInt(id),
-            JSON.stringify({ nome: promoData.nome, deleted_at: new Date().toISOString() }),
-            req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
-          ]);
-
-          // 4️⃣ COMMIT
-          await client.query('COMMIT');
-
-          console.log(`✅ Promoção excluída: ${promoData.nome} (ID: ${parseInt(id)})`);
-
           return res.status(200).json({
             success: true,
-            data: deleteResult.rows[0],
-            message: 'Promoção excluída com sucesso',
-            timestamp: new Date().toISOString()
-          });
-
-        } catch (error) {
-          try {
-            await client.query('ROLLBACK');
-          } catch (rollbackError) {
-            console.error('❌ Erro ao fazer rollback:', rollbackError);
-          }
-
-          console.error('❌ Erro ao deletar promoção:', error);
-
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao deletar promoção. Tente novamente.',
-            timestamp: new Date().toISOString()
-          });
-
-        } finally {
-          client.release();
-        }
-      }
-
-      // PATCH - Atualizar apenas status da promoção
-      if (req.method === 'PATCH') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        await getAuthenticatedUser(req, ['admin']);
-        const { id } = req.query || {};
-        const { status } = req.body || {};
-
-        if (!id || !status) {
-          return res.status(400).json({
-            success: false,
-            message: 'ID da promoção e status são obrigatórios',
+            data: updateResult.rows[0],
+            message: `Status da promoção alterado para '${status}' com sucesso`,
             timestamp: new Date().toISOString()
           });
         }
 
-        const updateResult = await query(`
-          UPDATE promocoes
-          SET status = $1
-          WHERE id = $2
-          RETURNING *
-        `, [status, parseInt(id)]);
+      } catch (error) {
+        console.error('❌ Erro ao gerenciar promoções:', error.message, error);
 
-        if (updateResult.rows.length === 0) {
-          return res.status(404).json({
+        // Se for erro de autenticação, retornar 401
+        if (error.message.includes('Token') || error.message.includes('autenticação') || error.message.includes('não autorizado')) {
+          return res.status(401).json({
             success: false,
-            message: 'Promoção não encontrada',
+            error: 'Acesso não autorizado. Faça login novamente.',
             timestamp: new Date().toISOString()
           });
         }
 
-        return res.status(200).json({
-          success: true,
-          data: updateResult.rows[0],
-          message: `Status da promoção alterado para '${status}' com sucesso`,
-          timestamp: new Date().toISOString()
-        });
-      }
-
-    } catch (error) {
-      console.error('❌ Erro ao gerenciar promoções:', error.message, error);
-
-      // Se for erro de autenticação, retornar 401
-      if (error.message.includes('Token') || error.message.includes('autenticação') || error.message.includes('não autorizado')) {
-        return res.status(401).json({
+        return res.status(500).json({
           success: false,
-          error: 'Acesso não autorizado. Faça login novamente.',
+          error: 'Erro ao gerenciar promoções',
+          message: error.message,
+          details: error.message,
+          stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
           timestamp: new Date().toISOString()
         });
       }
-
-      return res.status(500).json({
-        success: false,
-        error: 'Erro ao gerenciar promoções',
-        message: error.message,
-        details: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-        timestamp: new Date().toISOString()
-      });
-    }
-  }
-
-  // Rota para dashboard (dados do banco PostgreSQL)
-  if (route === 'dashboard') {
-    const { action } = req.query;
-
-    // Roteamento por ação específica
-    if (action === 'participantes-por-promocao') {
-      return await getParticipantesPorPromocao(req, res);
-    }
-    if (action === 'origem-cadastros') {
-      return await getOrigemCadastros(req, res);
     }
 
-    // === USER DASHBOARD ENDPOINTS ===
-    if (action === 'user-stats') {
-      return await getUserStats(req, res);
-    }
-    if (action === 'user-activity') {
-      return await getUserActivity(req, res);
-    }
-    if (action === 'available-promotions') {
-      return await getAvailablePromotions(req, res);
-    }
+    // Rota para dashboard (dados do banco PostgreSQL)
+    if (route === 'dashboard') {
+      const { action } = req.query;
 
-    // === MODERATOR DASHBOARD ENDPOINTS ===
-    if (action === 'moderator-stats') {
-      return await getModeratorStats(req, res);
-    }
-    if (action === 'pending-actions') {
-      return await getPendingActions(req, res);
-    }
-    if (action === 'recent-promotions') {
-      return await getRecentPromotions(req, res);
-    }
-    if (action === 'sorteio-stats') {
-      return await getSorteioStats(req, res);
-    }
+      // Roteamento por ação específica
+      if (action === 'participantes-por-promocao') {
+        return await getParticipantesPorPromocao(req, res);
+      }
+      if (action === 'origem-cadastros') {
+        return await getOrigemCadastros(req, res);
+      }
 
-    // === VIEWER DASHBOARD ENDPOINTS ===
-    if (action === 'reports-summary') {
-      return await getReportsSummary(req, res);
-    }
-    if (action === 'analytics-data') {
-      return await getAnalyticsData(req, res);
-    }
-    if (action === 'charts-data') {
-      return await getChartsData(req, res);
-    }
+      // === USER DASHBOARD ENDPOINTS ===
+      if (action === 'user-stats') {
+        return await getUserStats(req, res);
+      }
+      if (action === 'user-activity') {
+        return await getUserActivity(req, res);
+      }
+      if (action === 'available-promotions') {
+        return await getAvailablePromotions(req, res);
+      }
 
-    // DEFAULT: Admin stats (quando não há action específica)
-    try {
-      // 🔐 SEGURANÇA: Verificar autenticação
-      const user = await getAuthenticatedUser(req, ['admin']);
-      console.log('[DASHBOARD] Usuário autenticado:', user.usuario);
+      // === MODERATOR DASHBOARD ENDPOINTS ===
+      if (action === 'moderator-stats') {
+        return await getModeratorStats(req, res);
+      }
+      if (action === 'pending-actions') {
+        return await getPendingActions(req, res);
+      }
+      if (action === 'recent-promotions') {
+        return await getRecentPromotions(req, res);
+      }
+      if (action === 'sorteio-stats') {
+        return await getSorteioStats(req, res);
+      }
 
-      console.log('📊 [DASHBOARD] Buscando estatísticas com deduplicação...');
+      // === VIEWER DASHBOARD ENDPOINTS ===
+      if (action === 'reports-summary') {
+        return await getReportsSummary(req, res);
+      }
+      if (action === 'analytics-data') {
+        return await getAnalyticsData(req, res);
+      }
+      if (action === 'charts-data') {
+        return await getChartsData(req, res);
+      }
 
-      // Query unificada com deduplicação por telefone (alinhada com endpoint unificado)
-      const stats = await query(`
+      // DEFAULT: Admin stats (quando não há action específica)
+      try {
+        // 🔐 SEGURANÇA: Verificar autenticação
+        const user = await getAuthenticatedUser(req, ['admin']);
+        console.log('[DASHBOARD] Usuário autenticado:', user.usuario);
+
+        console.log('📊 [DASHBOARD] Buscando estatísticas com deduplicação...');
+
+        // Query unificada com deduplicação por telefone (alinhada com endpoint unificado)
+        const stats = await query(`
         WITH participantes_unificados AS (
           -- Participantes regulares
           SELECT
@@ -1980,85 +2006,85 @@ module.exports = async function handler(req, res) {
           (SELECT COUNT(*) FROM promocoes WHERE deleted_at IS NULL) as promocoes_mes
       `);
 
-      console.log('✅ [DASHBOARD] Estatísticas calculadas:', {
-        participantes_total: stats.rows[0].participantes_total,
-        participantes_24h: stats.rows[0].participantes_24h
-      });
+        console.log('✅ [DASHBOARD] Estatísticas calculadas:', {
+          participantes_total: stats.rows[0].participantes_total,
+          participantes_24h: stats.rows[0].participantes_24h
+        });
 
-      // Simplificar atividades recentes para não depender de colunas específicas
-      const recent_activities = [
-        { id: 1, acao: 'Sistema conectado', usuario: 'sistema', data: new Date().toISOString() },
-        { id: 2, acao: 'Dashboard carregado', usuario: 'admin', data: new Date().toISOString() }
-      ];
+        // Simplificar atividades recentes para não depender de colunas específicas
+        const recent_activities = [
+          { id: 1, acao: 'Sistema conectado', usuario: 'sistema', data: new Date().toISOString() },
+          { id: 2, acao: 'Dashboard carregado', usuario: 'admin', data: new Date().toISOString() }
+        ];
 
-      return res.status(200).json({
-        success: true,
-        data: {
-          promocoes_ativas: parseInt(stats.rows[0].promocoes_ativas) || 0,
-          participantes_total: parseInt(stats.rows[0].participantes_total) || 0,
-          participantes_24h: parseInt(stats.rows[0].participantes_24h) || 0,
-          usuarios_ativos: parseInt(stats.rows[0].usuarios_ativos) || 0,
-          promocoes_mes: parseInt(stats.rows[0].promocoes_mes) || 0,
-          taxa_conversao: '0%',
-          recent_activities
-        },
-        source: 'database',
-        timestamp: new Date().toISOString()
-      });
+        return res.status(200).json({
+          success: true,
+          data: {
+            promocoes_ativas: parseInt(stats.rows[0].promocoes_ativas) || 0,
+            participantes_total: parseInt(stats.rows[0].participantes_total) || 0,
+            participantes_24h: parseInt(stats.rows[0].participantes_24h) || 0,
+            usuarios_ativos: parseInt(stats.rows[0].usuarios_ativos) || 0,
+            promocoes_mes: parseInt(stats.rows[0].promocoes_mes) || 0,
+            taxa_conversao: '0%',
+            recent_activities
+          },
+          source: 'database',
+          timestamp: new Date().toISOString()
+        });
 
-    } catch (error) {
-      console.error('❌ Erro ao buscar dados do dashboard:', error.message);
+      } catch (error) {
+        console.error('❌ Erro ao buscar dados do dashboard:', error.message);
 
-      // Se for erro de autenticação, retornar 401
-      if (error.message.includes('Token') || error.message.includes('autenticação') || error.message.includes('não autorizado')) {
-        return res.status(401).json({
+        // Se for erro de autenticação, retornar 401
+        if (error.message.includes('Token') || error.message.includes('autenticação') || error.message.includes('não autorizado')) {
+          return res.status(401).json({
+            success: false,
+            error: 'Acesso não autorizado. Faça login novamente.',
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        return res.status(500).json({
           success: false,
-          error: 'Acesso não autorizado. Faça login novamente.',
+          error: 'Erro ao buscar dados do dashboard',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined,
           timestamp: new Date().toISOString()
         });
       }
-
-      return res.status(500).json({
-        success: false,
-        error: 'Erro ao buscar dados do dashboard',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
-        timestamp: new Date().toISOString()
-      });
     }
-  }
 
-  // Rota para participantes - LISTAR TODOS SEM DEDUPLICACAO
-  if (route === 'participantes') {
-    // ✅ FIX: Verificar método HTTP - delegar POST/PUT/DELETE para handler
-    if (req.method !== 'GET') {
-      console.log(`📝 [INDEX] Delegando ${req.method} /api/participantes para handler`);
+    // Rota para participantes - LISTAR TODOS SEM DEDUPLICACAO
+    if (route === 'participantes') {
+      // ✅ FIX: Verificar método HTTP - delegar POST/PUT/DELETE para handler
+      if (req.method !== 'GET') {
+        console.log(`📝 [INDEX] Delegando ${req.method} /api/participantes para handler`);
 
-      // Verificar se handler foi carregado corretamente
-      if (!participantesHandler || typeof participantesHandler !== 'function') {
-        console.error('❌ [INDEX] participantesHandler não está disponível, tentando recarregar...');
-        try {
-          participantesHandler = require('./_handlers/participantes.js');
-          console.log('✅ [INDEX] participantesHandler recarregado com sucesso');
-        } catch (reloadError) {
-          console.error('❌ [INDEX] Falha ao recarregar participantesHandler:', reloadError.message);
-          return res.status(500).json({
-            success: false,
-            error: 'Handler de participantes não disponível',
-            details: reloadError.message
-          });
+        // Verificar se handler foi carregado corretamente
+        if (!participantesHandler || typeof participantesHandler !== 'function') {
+          console.error('❌ [INDEX] participantesHandler não está disponível, tentando recarregar...');
+          try {
+            participantesHandler = require('./_handlers/participantes.js');
+            console.log('✅ [INDEX] participantesHandler recarregado com sucesso');
+          } catch (reloadError) {
+            console.error('❌ [INDEX] Falha ao recarregar participantesHandler:', reloadError.message);
+            return res.status(500).json({
+              success: false,
+              error: 'Handler de participantes não disponível',
+              details: reloadError.message
+            });
+          }
         }
+
+        return participantesHandler(req, res);
       }
 
-      return participantesHandler(req, res);
-    }
+      console.log('🚨🚨🚨 [INDEX-DIRECT] Listando TODOS os participantes SEM deduplicacao - BYPASS handler');
 
-    console.log('🚨🚨🚨 [INDEX-DIRECT] Listando TODOS os participantes SEM deduplicacao - BYPASS handler');
+      try {
+        const databasePool = require('./_lib/database');
 
-    try {
-      const databasePool = require('./_lib/database');
-
-      // Query direta: TODOS os participantes regulares
-      const regularResult = await databasePool.query(`
+        // Query direta: TODOS os participantes regulares
+        const regularResult = await databasePool.query(`
         SELECT
           p.id,
           p.nome AS name,
@@ -2080,13 +2106,13 @@ module.exports = async function handler(req, res) {
         ORDER BY p.participou_em DESC
       `);
 
-      console.log(`✅ [INDEX-DIRECT] ${regularResult.rows.length} participantes regulares encontrados`);
+        console.log(`✅ [INDEX-DIRECT] ${regularResult.rows.length} participantes regulares encontrados`);
 
-      // TODOS os participantes públicos
-      let allParticipants = [...regularResult.rows];
+        // TODOS os participantes públicos
+        let allParticipants = [...regularResult.rows];
 
-      try {
-        const publicResult = await databasePool.query(`
+        try {
+          const publicResult = await databasePool.query(`
           SELECT
             pp.id,
             pp.name,
@@ -2102,44 +2128,44 @@ module.exports = async function handler(req, res) {
           ORDER BY pp.created_at DESC
         `);
 
-        console.log(`✅ [INDEX-DIRECT] ${publicResult.rows.length} participantes públicos encontrados`);
-        allParticipants = [...allParticipants, ...publicResult.rows];
-      } catch (publicError) {
-        console.log('⚠️ [INDEX-DIRECT] Erro ao buscar públicos:', publicError.message);
-      }
-
-      console.log(`🎯 [INDEX-DIRECT] TOTAL: ${allParticipants.length} participantes (SEM deduplicacao)`);
-
-      return res.status(200).json({
-        success: true,
-        data: allParticipants,
-        stats: {
-          total: allParticipants.length,
-          regular: allParticipants.filter(p => p.participant_type === 'regular').length,
-          public: allParticipants.filter(p => p.participant_type === 'public').length,
-          duplicates_removed: 0,
-          note: 'LISTAGEM DIRETA - SEM DEDUPLICACAO'
+          console.log(`✅ [INDEX-DIRECT] ${publicResult.rows.length} participantes públicos encontrados`);
+          allParticipants = [...allParticipants, ...publicResult.rows];
+        } catch (publicError) {
+          console.log('⚠️ [INDEX-DIRECT] Erro ao buscar públicos:', publicError.message);
         }
-      });
 
-    } catch (error) {
-      console.error('❌ [INDEX-DIRECT] Erro:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+        console.log(`🎯 [INDEX-DIRECT] TOTAL: ${allParticipants.length} participantes (SEM deduplicacao)`);
+
+        return res.status(200).json({
+          success: true,
+          data: allParticipants,
+          stats: {
+            total: allParticipants.length,
+            regular: allParticipants.filter(p => p.participant_type === 'regular').length,
+            public: allParticipants.filter(p => p.participant_type === 'public').length,
+            duplicates_removed: 0,
+            note: 'LISTAGEM DIRETA - SEM DEDUPLICACAO'
+          }
+        });
+
+      } catch (error) {
+        console.error('❌ [INDEX-DIRECT] Erro:', error);
+        return res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }
     }
-  }
 
-  // Rota para sorteios
-  if (route === 'sorteio') {
-    try {
-      const { action, id, promocaoId } = req.query || {};
+    // Rota para sorteios
+    if (route === 'sorteio') {
+      try {
+        const { action, id, promocaoId } = req.query || {};
 
-      // GET /api/sorteio?action=encerradas - Buscar promoções encerradas
-      if (req.method === 'GET' && action === 'encerradas') {
-        // ✅ FIXED: SQL aggregation - explicit GROUP BY
-        const promocoesResult = await query(`
+        // GET /api/sorteio?action=encerradas - Buscar promoções encerradas
+        if (req.method === 'GET' && action === 'encerradas') {
+          // ✅ FIXED: SQL aggregation - explicit GROUP BY
+          const promocoesResult = await query(`
           SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                  p.status, p.link_participacao, p.criado_em, p.emissora_id,
                  p.numero_ganhadores, p.deleted_at, p.deleted_by,
@@ -2154,10 +2180,10 @@ module.exports = async function handler(req, res) {
           LIMIT 5
         `);
 
-        // Para cada promoção, buscar os ganhadores
-        const promocoesComGanhadores = await Promise.all(
-          promocoesResult.rows.map(async (promocao) => {
-            const ganhadoresResult = await query(`
+          // Para cada promoção, buscar os ganhadores
+          const promocoesComGanhadores = await Promise.all(
+            promocoesResult.rows.map(async (promocao) => {
+              const ganhadoresResult = await query(`
               SELECT g.id as ganhador_id, g.posicao, g.premio, g.sorteado_em,
                      p.nome as participante_nome, p.telefone, p.cidade
               FROM ganhadores g
@@ -2166,25 +2192,25 @@ module.exports = async function handler(req, res) {
               ORDER BY g.posicao ASC
             `, [promocao.id]);
 
-            return {
-              ...promocao,
-              ganhadores: ganhadoresResult.rows
-            };
-          })
-        );
+              return {
+                ...promocao,
+                ganhadores: ganhadoresResult.rows
+              };
+            })
+          );
 
-        return res.status(200).json({
-          success: true,
-          data: promocoesComGanhadores,
-          total: promocoesComGanhadores.length,
-          source: 'database',
-          timestamp: new Date().toISOString()
-        });
-      }
+          return res.status(200).json({
+            success: true,
+            data: promocoesComGanhadores,
+            total: promocoesComGanhadores.length,
+            source: 'database',
+            timestamp: new Date().toISOString()
+          });
+        }
 
-      // GET /api/sorteio?action=ganhadores&id={promocaoId} - Buscar ganhadores de uma promoção
-      if (req.method === 'GET' && action === 'ganhadores' && id) {
-        const result = await query(`
+        // GET /api/sorteio?action=ganhadores&id={promocaoId} - Buscar ganhadores de uma promoção
+        if (req.method === 'GET' && action === 'ganhadores' && id) {
+          const result = await query(`
           SELECT g.*,
                  p.nome as participante_nome,
                  p.telefone as participante_telefone,
@@ -2198,19 +2224,19 @@ module.exports = async function handler(req, res) {
           ORDER BY g.sorteado_em DESC
         `, [parseInt(id)]);
 
-        return res.status(200).json({
-          success: true,
-          ganhadores: result.rows,
-          api_version: '2.0.0',
-          quantidade_configurada: result.rows.length,
-          timestamp_servidor: new Date().toISOString(),
-          timestamp: new Date().toISOString() // Mantido para compatibilidade
-        });
-      }
+          return res.status(200).json({
+            success: true,
+            ganhadores: result.rows,
+            api_version: '2.0.0',
+            quantidade_configurada: result.rows.length,
+            timestamp_servidor: new Date().toISOString(),
+            timestamp: new Date().toISOString() // Mantido para compatibilidade
+          });
+        }
 
-      // GET /api/sorteio?action=participantes&promocaoId={promocaoId} - Buscar participantes disponíveis
-      if (req.method === 'GET' && action === 'participantes' && promocaoId) {
-        const result = await query(`
+        // GET /api/sorteio?action=participantes&promocaoId={promocaoId} - Buscar participantes disponíveis
+        if (req.method === 'GET' && action === 'participantes' && promocaoId) {
+          const result = await query(`
           SELECT p.*
           FROM participantes p
           LEFT JOIN ganhadores g ON p.id = g.participante_id AND g.promocao_id = $1 AND g.cancelado = false
@@ -2218,17 +2244,17 @@ module.exports = async function handler(req, res) {
           ORDER BY p.nome ASC
         `, [parseInt(promocaoId)]);
 
-        return res.status(200).json({
-          success: true,
-          participantes: result.rows,
-          total: result.rows.length,
-          timestamp: new Date().toISOString()
-        });
-      }
+          return res.status(200).json({
+            success: true,
+            participantes: result.rows,
+            total: result.rows.length,
+            timestamp: new Date().toISOString()
+          });
+        }
 
-      // GET /api/sorteio?action=estatisticas - Obter estatísticas
-      if (req.method === 'GET' && action === 'estatisticas') {
-        const estatisticasResult = await query(`
+        // GET /api/sorteio?action=estatisticas - Obter estatísticas
+        if (req.method === 'GET' && action === 'estatisticas') {
+          const estatisticasResult = await query(`
           SELECT
             COUNT(DISTINCT g.id) as total_sorteios,
             COUNT(DISTINCT g.participante_id) as total_ganhadores,
@@ -2238,72 +2264,72 @@ module.exports = async function handler(req, res) {
           WHERE g.cancelado = false
         `);
 
-        return res.status(200).json({
-          success: true,
-          ...estatisticasResult.rows[0],
-          timestamp: new Date().toISOString()
-        });
-      }
-
-      // POST /api/sorteio?action=sortear - Realizar sorteio com transação e lock
-      // ✅ SEGURANÇA (CRÍTICO-002): Usa BEGIN/COMMIT + FOR UPDATE NOWAIT para prevenir race conditions
-      if (req.method === 'POST' && action === 'sortear') {
-        // ✅ SEGURANÇA: Rate limiting persistente para sorteios (3 req / 5 min)
-        const sorteioBlocked = await rateLimitSorteio(req, res);
-        if (sorteioBlocked) return;
-
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        const user = await getAuthenticatedUser(req, ['admin']);
-        const { promocaoId } = req.body || {};
-
-        if (!promocaoId) {
-          return res.status(400).json({
-            success: false,
-            message: 'ID da promoção é obrigatório',
+          return res.status(200).json({
+            success: true,
+            ...estatisticasResult.rows[0],
             timestamp: new Date().toISOString()
           });
         }
 
-        // ✅ NOVA: Obter cliente do pool para transação
-        const client = await databasePool.connect();
+        // POST /api/sorteio?action=sortear - Realizar sorteio com transação e lock
+        // ✅ SEGURANÇA (CRÍTICO-002): Usa BEGIN/COMMIT + FOR UPDATE NOWAIT para prevenir race conditions
+        if (req.method === 'POST' && action === 'sortear') {
+          // ✅ SEGURANÇA: Rate limiting persistente para sorteios (3 req / 5 min)
+          const sorteioBlocked = await rateLimitSorteio(req, res);
+          if (sorteioBlocked) return;
 
-        try {
-          // 1️⃣ INICIAR TRANSAÇÃO
-          await client.query('BEGIN');
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          const user = await getAuthenticatedUser(req, ['admin']);
+          const { promocaoId } = req.body || {};
 
-          // 2️⃣ ADQUIRIR LOCK EXCLUSIVO COM FOR UPDATE NOWAIT
-          const lockCheck = await client.query(`
+          if (!promocaoId) {
+            return res.status(400).json({
+              success: false,
+              message: 'ID da promoção é obrigatório',
+              timestamp: new Date().toISOString()
+            });
+          }
+
+          // ✅ NOVA: Obter cliente do pool para transação
+          const client = await databasePool.connect();
+
+          try {
+            // 1️⃣ INICIAR TRANSAÇÃO
+            await client.query('BEGIN');
+
+            // 2️⃣ ADQUIRIR LOCK EXCLUSIVO COM FOR UPDATE NOWAIT
+            const lockCheck = await client.query(`
             SELECT id, status, is_drawing, numero_ganhadores, nome
             FROM promocoes
             WHERE id = $1
             FOR UPDATE NOWAIT
           `, [parseInt(promocaoId)]);
 
-          if (lockCheck.rows.length === 0) {
-            throw new Error('Promoção não encontrada');
-          }
+            if (lockCheck.rows.length === 0) {
+              throw new Error('Promoção não encontrada');
+            }
 
-          const promocao = lockCheck.rows[0];
+            const promocao = lockCheck.rows[0];
 
-          // 3️⃣ VERIFICAR SE JÁ ESTÁ SORTEANDO
-          if (promocao.is_drawing) {
-            throw new Error('Sorteio já está em andamento para esta promoção. Aguarde alguns instantes e tente novamente.');
-          }
+            // 3️⃣ VERIFICAR SE JÁ ESTÁ SORTEANDO
+            if (promocao.is_drawing) {
+              throw new Error('Sorteio já está em andamento para esta promoção. Aguarde alguns instantes e tente novamente.');
+            }
 
-          // 4️⃣ VERIFICAR STATUS DA PROMOÇÃO
-          if (promocao.status === 'encerrada') {
-            throw new Error('Esta promoção já foi encerrada');
-          }
+            // 4️⃣ VERIFICAR STATUS DA PROMOÇÃO
+            if (promocao.status === 'encerrada') {
+              throw new Error('Esta promoção já foi encerrada');
+            }
 
-          // 5️⃣ MARCAR COMO "SORTEANDO" (LOCK OTIMISTA)
-          await client.query(`
+            // 5️⃣ MARCAR COMO "SORTEANDO" (LOCK OTIMISTA)
+            await client.query(`
             UPDATE promocoes
             SET is_drawing = true
             WHERE id = $1
           `, [parseInt(promocaoId)]);
 
-          // 6️⃣ BUSCAR PARTICIPANTES DISPONÍVEIS
-          const participantesQuery = await client.query(`
+            // 6️⃣ BUSCAR PARTICIPANTES DISPONÍVEIS
+            const participantesQuery = await client.query(`
             SELECT p.id, p.nome, p.telefone, p.bairro
             FROM participantes p
             WHERE p.promocao_id = $1
@@ -2316,181 +2342,181 @@ module.exports = async function handler(req, res) {
             ORDER BY RANDOM()
           `, [parseInt(promocaoId)]);
 
-          const participantesDisponiveis = participantesQuery.rows;
-          const quantidadeGanhadores = parseInt(promocao.numero_ganhadores) || 1;
+            const participantesDisponiveis = participantesQuery.rows;
+            const quantidadeGanhadores = parseInt(promocao.numero_ganhadores) || 1;
 
-          // 7️⃣ VALIDAR QUANTIDADE SUFICIENTE
-          if (participantesDisponiveis.length === 0) {
-            throw new Error('Não há participantes disponíveis para o sorteio');
-          }
+            // 7️⃣ VALIDAR QUANTIDADE SUFICIENTE
+            if (participantesDisponiveis.length === 0) {
+              throw new Error('Não há participantes disponíveis para o sorteio');
+            }
 
-          if (participantesDisponiveis.length < quantidadeGanhadores) {
-            throw new Error(
-              `Participantes insuficientes. Disponíveis: ${participantesDisponiveis.length}, ` +
-              `Necessários: ${quantidadeGanhadores}`
-            );
-          }
+            if (participantesDisponiveis.length < quantidadeGanhadores) {
+              throw new Error(
+                `Participantes insuficientes. Disponíveis: ${participantesDisponiveis.length}, ` +
+                `Necessários: ${quantidadeGanhadores}`
+              );
+            }
 
-          // 8️⃣ SORTEAR N GANHADORES SEM DUPLICATAS
-          const ganhadores = [];
-          const copiaParticipantes = [...participantesDisponiveis];
+            // 8️⃣ SORTEAR N GANHADORES SEM DUPLICATAS
+            const ganhadores = [];
+            const copiaParticipantes = [...participantesDisponiveis];
 
-          for (let i = 0; i < quantidadeGanhadores; i++) {
-            // Selecionar aleatoriamente e REMOVER da lista (sem duplicatas)
-            const randomIndex = Math.floor(Math.random() * copiaParticipantes.length);
-            const ganhador = copiaParticipantes.splice(randomIndex, 1)[0];
+            for (let i = 0; i < quantidadeGanhadores; i++) {
+              // Selecionar aleatoriamente e REMOVER da lista (sem duplicatas)
+              const randomIndex = Math.floor(Math.random() * copiaParticipantes.length);
+              const ganhador = copiaParticipantes.splice(randomIndex, 1)[0];
 
-            // Definir prêmio baseado na posição
-            let premio;
-            if (i === 0) premio = '1º Lugar';
-            else if (i === 1) premio = '2º Lugar';
-            else if (i === 2) premio = '3º Lugar';
-            else premio = `${i + 1}º Lugar`;
+              // Definir prêmio baseado na posição
+              let premio;
+              if (i === 0) premio = '1º Lugar';
+              else if (i === 1) premio = '2º Lugar';
+              else if (i === 2) premio = '3º Lugar';
+              else premio = `${i + 1}º Lugar`;
 
-            // Inserir ganhador na tabela
-            const insertResult = await client.query(`
+              // Inserir ganhador na tabela
+              const insertResult = await client.query(`
               INSERT INTO ganhadores (participante_id, promocao_id, sorteado_em, sorteado_por, cancelado, posicao, premio)
               VALUES ($1, $2, NOW(), $3, false, $4, $5)
               RETURNING id
             `, [ganhador.id, parseInt(promocaoId), user.id, i + 1, premio]);
 
-            ganhadores.push({
-              id: ganhador.id,
-              ganhador_id: insertResult.rows[0].id,
-              nome: ganhador.nome,
-              telefone: ganhador.telefone,
-              bairro: ganhador.bairro,
-              posicao: i + 1,
-              premio: premio
-            });
-          }
+              ganhadores.push({
+                id: ganhador.id,
+                ganhador_id: insertResult.rows[0].id,
+                nome: ganhador.nome,
+                telefone: ganhador.telefone,
+                bairro: ganhador.bairro,
+                posicao: i + 1,
+                premio: premio
+              });
+            }
 
-          // 9️⃣ ATUALIZAR STATUS DA PROMOÇÃO E DESMARCAR is_drawing
-          await client.query(`
+            // 9️⃣ ATUALIZAR STATUS DA PROMOÇÃO E DESMARCAR is_drawing
+            await client.query(`
             UPDATE promocoes
             SET status = 'encerrada', is_drawing = false
             WHERE id = $1
           `, [parseInt(promocaoId)]);
 
-          // 🔟 REGISTRAR EM AUDIT LOG
-          await client.query(`
+            // 🔟 REGISTRAR EM AUDIT LOG
+            await client.query(`
             INSERT INTO audit_logs (user_id, action, table_name, record_id, additional_data, ip_address)
             VALUES ($1, $2, $3, $4, $5::jsonb, $6)
           `, [
-            user.id,
-            'SORTEIO_REALIZADO',
-            'promocoes',
-            parseInt(promocaoId),
-            JSON.stringify({
-              ganhadores: ganhadores.map(g => ({ id: g.id, nome: g.nome })),
-              quantidade: ganhadores.length,
-              promocao: promocao.nome
-            }),
-            req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
-          ]);
+              user.id,
+              'SORTEIO_REALIZADO',
+              'promocoes',
+              parseInt(promocaoId),
+              JSON.stringify({
+                ganhadores: ganhadores.map(g => ({ id: g.id, nome: g.nome })),
+                quantidade: ganhadores.length,
+                promocao: promocao.nome
+              }),
+              req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
+            ]);
 
-          // 1️⃣1️⃣ COMMIT DA TRANSAÇÃO
-          await client.query('COMMIT');
+            // 1️⃣1️⃣ COMMIT DA TRANSAÇÃO
+            await client.query('COMMIT');
 
-          console.log(`✅ Sorteio realizado com sucesso para promoção ${promocaoId}: ${ganhadores.length} ganhador(es)`);
+            console.log(`✅ Sorteio realizado com sucesso para promoção ${promocaoId}: ${ganhadores.length} ganhador(es)`);
 
-          // ✅ RETORNAR SUCESSO
-          return res.status(200).json({
-            success: true,
-            data: ganhadores,
-            ganhador: ganhadores[0],
-            total: ganhadores.length,
-            message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`,
-            api_version: '2.2.0',
-            timestamp: new Date().toISOString()
-          });
+            // ✅ RETORNAR SUCESSO
+            return res.status(200).json({
+              success: true,
+              data: ganhadores,
+              ganhador: ganhadores[0],
+              total: ganhadores.length,
+              message: `Sorteio realizado com sucesso! ${ganhadores.length} ganhador(es) selecionado(s).`,
+              api_version: '2.2.0',
+              timestamp: new Date().toISOString()
+            });
 
-        } catch (error) {
-          // ⚠️ ROLLBACK EM CASO DE ERRO
-          try {
-            await client.query('ROLLBACK');
-          } catch (rollbackError) {
-            console.error('❌ Erro ao fazer rollback:', rollbackError);
-          }
+          } catch (error) {
+            // ⚠️ ROLLBACK EM CASO DE ERRO
+            try {
+              await client.query('ROLLBACK');
+            } catch (rollbackError) {
+              console.error('❌ Erro ao fazer rollback:', rollbackError);
+            }
 
-          // Desmarcar is_drawing (mesmo em caso de erro)
-          try {
-            await client.query(`
+            // Desmarcar is_drawing (mesmo em caso de erro)
+            try {
+              await client.query(`
               UPDATE promocoes
               SET is_drawing = false
               WHERE id = $1
             `, [parseInt(promocaoId)]);
-          } catch (cleanupError) {
-            console.error('❌ Erro ao limpar flag is_drawing:', cleanupError);
-          }
+            } catch (cleanupError) {
+              console.error('❌ Erro ao limpar flag is_drawing:', cleanupError);
+            }
 
-          console.error('❌ Erro ao realizar sorteio:', error);
+            console.error('❌ Erro ao realizar sorteio:', error);
 
-          // Retornar erro apropriado
-          const errorMessage = error.message || 'Erro ao realizar sorteio. Tente novamente.';
+            // Retornar erro apropriado
+            const errorMessage = error.message || 'Erro ao realizar sorteio. Tente novamente.';
 
-          // Verificar se é erro de lock (quando outra transação está em andamento)
-          if (error.message?.includes('NOWAIT')) {
-            return res.status(409).json({
+            // Verificar se é erro de lock (quando outra transação está em andamento)
+            if (error.message?.includes('NOWAIT')) {
+              return res.status(409).json({
+                success: false,
+                error: 'Sorteio já está em andamento. Aguarde alguns instantes e tente novamente.',
+                timestamp: new Date().toISOString()
+              });
+            }
+
+            return res.status(500).json({
               success: false,
-              error: 'Sorteio já está em andamento. Aguarde alguns instantes e tente novamente.',
+              error: errorMessage,
+              timestamp: new Date().toISOString()
+            });
+
+          } finally {
+            // 1️⃣2️⃣ SEMPRE LIBERAR CONEXÃO
+            client.release();
+          }
+        }
+
+        // DELETE /api/sorteio?action=ganhadores&id={ganhadorId} - Cancelar sorteio
+        if (req.method === 'DELETE' && action === 'ganhadores' && id) {
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          await getAuthenticatedUser(req, ['admin']);
+          const deleteResult = await query(`
+          UPDATE ganhadores SET cancelado = true WHERE id = $1 AND cancelado = false RETURNING *
+        `, [parseInt(id)]);
+
+          if (deleteResult.rows.length === 0) {
+            return res.status(404).json({
+              success: false,
+              message: 'Ganhador não encontrado',
               timestamp: new Date().toISOString()
             });
           }
 
-          return res.status(500).json({
-            success: false,
-            error: errorMessage,
-            timestamp: new Date().toISOString()
-          });
-
-        } finally {
-          // 1️⃣2️⃣ SEMPRE LIBERAR CONEXÃO
-          client.release();
-        }
-      }
-
-      // DELETE /api/sorteio?action=ganhadores&id={ganhadorId} - Cancelar sorteio
-      if (req.method === 'DELETE' && action === 'ganhadores' && id) {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        await getAuthenticatedUser(req, ['admin']);
-        const deleteResult = await query(`
-          UPDATE ganhadores SET cancelado = true WHERE id = $1 AND cancelado = false RETURNING *
-        `, [parseInt(id)]);
-
-        if (deleteResult.rows.length === 0) {
-          return res.status(404).json({
-            success: false,
-            message: 'Ganhador não encontrado',
+          return res.status(200).json({
+            success: true,
+            message: 'Sorteio cancelado com sucesso',
+            data: deleteResult.rows[0],
             timestamp: new Date().toISOString()
           });
         }
 
-        return res.status(200).json({
-          success: true,
-          message: 'Sorteio cancelado com sucesso',
-          data: deleteResult.rows[0],
+      } catch (error) {
+        console.error('❌ Erro ao gerenciar sorteios:', error.message, error);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro ao processar solicitação de sorteio',
+          details: error.message,
+          stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
           timestamp: new Date().toISOString()
         });
       }
-
-    } catch (error) {
-      console.error('❌ Erro ao gerenciar sorteios:', error.message, error);
-      return res.status(500).json({
-        success: false,
-        error: 'Erro ao processar solicitação de sorteio',
-        details: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-        timestamp: new Date().toISOString()
-      });
     }
-  }
 
-  // Rota para todos os ganhadores - /api/sorteio/ganhadores
-  if (req.url && req.url.includes('/sorteio/ganhadores')) {
-    try {
-      if (req.method === 'GET') {
-        const result = await query(`
+    // Rota para todos os ganhadores - /api/sorteio/ganhadores
+    if (req.url && req.url.includes('/sorteio/ganhadores')) {
+      try {
+        if (req.method === 'GET') {
+          const result = await query(`
           SELECT g.*, p.nome as participante_nome, pr.nome as promocao_nome
           FROM ganhadores g
           JOIN participantes p ON g.participante_id = p.id
@@ -2498,50 +2524,50 @@ module.exports = async function handler(req, res) {
           ORDER BY g.sorteado_em DESC
         `);
 
-        return res.status(200).json({
-          success: true,
-          ganhadores: result.rows,
-          total: result.rows.length,
+          return res.status(200).json({
+            success: true,
+            ganhadores: result.rows,
+            total: result.rows.length,
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao buscar todos os ganhadores:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro ao buscar ganhadores',
+
           timestamp: new Date().toISOString()
         });
       }
-    } catch (error) {
-      console.error('Erro ao buscar todos os ganhadores:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Erro ao buscar ganhadores',
-        
-        timestamp: new Date().toISOString()
-      });
     }
-  }
 
-  // Rota debug-users removida por questões de segurança.
+    // Rota debug-users removida por questões de segurança.
 
-  // Rota debug removida por questões de segurança.
+    // Rota debug removida por questões de segurança.
 
-  // Rota para auditoria
-  if (route === 'audit') {
-    const { action } = req.query;
+    // Rota para auditoria
+    if (route === 'audit') {
+      const { action } = req.query;
 
-    try {
-      
-      // GET /api/?route=audit&action=stats - Estatísticas de auditoria
-      if (req.method === 'GET' && action === 'stats') {
-        const { days = 30 } = req.query;
+      try {
 
-        console.log('🔍 Buscando estatísticas de auditoria para:', { days });
+        // GET /api/?route=audit&action=stats - Estatísticas de auditoria
+        if (req.method === 'GET' && action === 'stats') {
+          const { days = 30 } = req.query;
 
-        // Buscar estatísticas reais da tabela audit_logs - QUERY SEGURA
-        const daysParam = parseInt(days) || 30; // Sanitizar entrada
-        if (daysParam < 1 || daysParam > 365) {
-          return res.status(400).json({
-            success: false,
-            error: 'Parâmetro days deve estar entre 1 e 365'
-          });
-        }
+          console.log('🔍 Buscando estatísticas de auditoria para:', { days });
 
-        const auditStats = await query(`
+          // Buscar estatísticas reais da tabela audit_logs - QUERY SEGURA
+          const daysParam = parseInt(days) || 30; // Sanitizar entrada
+          if (daysParam < 1 || daysParam > 365) {
+            return res.status(400).json({
+              success: false,
+              error: 'Parâmetro days deve estar entre 1 e 365'
+            });
+          }
+
+          const auditStats = await query(`
           SELECT
             COUNT(*) as total_actions,
             COUNT(*) FILTER (WHERE action = 'CREATE') as creates,
@@ -2553,119 +2579,119 @@ module.exports = async function handler(req, res) {
           WHERE created_at >= NOW() - INTERVAL $1
         `, [`${daysParam} days`]);
 
-        const stats = auditStats.rows[0] || {
-          total_actions: 0,
-          creates: 0,
-          updates: 0,
-          deletes: 0,
-          views: 0,
-          recent_errors: 0
-        };
+          const stats = auditStats.rows[0] || {
+            total_actions: 0,
+            creates: 0,
+            updates: 0,
+            deletes: 0,
+            views: 0,
+            recent_errors: 0
+          };
 
-        console.log('📊 Estatísticas calculadas:', stats);
+          console.log('📊 Estatísticas calculadas:', stats);
 
-        return res.status(200).json({
-          success: true,
-          total_actions: parseInt(stats.total_actions) || 0,
-          creates: parseInt(stats.creates) || 0,
-          updates: parseInt(stats.updates) || 0,
-          deletes: parseInt(stats.deletes) || 0,
-          views: parseInt(stats.views) || 0,
-          recent_errors: parseInt(stats.recent_errors) || 0,
-          timestamp: new Date().toISOString()
-        });
-      }
+          return res.status(200).json({
+            success: true,
+            total_actions: parseInt(stats.total_actions) || 0,
+            creates: parseInt(stats.creates) || 0,
+            updates: parseInt(stats.updates) || 0,
+            deletes: parseInt(stats.deletes) || 0,
+            views: parseInt(stats.views) || 0,
+            recent_errors: parseInt(stats.recent_errors) || 0,
+            timestamp: new Date().toISOString()
+          });
+        }
 
-      // POST /api/?route=audit&action=cleanup - Limpeza de logs antigos conforme LGPD
-      if (req.method === 'POST' && action === 'cleanup') {
-        try {
-          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-          await getAuthenticatedUser(req, ['admin']);
-          let totalDeleted = 0;
-          const results = [];
+        // POST /api/?route=audit&action=cleanup - Limpeza de logs antigos conforme LGPD
+        if (req.method === 'POST' && action === 'cleanup') {
+          try {
+            // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+            await getAuthenticatedUser(req, ['admin']);
+            let totalDeleted = 0;
+            const results = [];
 
-          // 1. LOGS DE AUDITORIA (CRÍTICOS) - Retenção: 2 anos conforme LGPD
-          // Preservar LOGIN, LOGOUT, DELETE, CREATE, UPDATE por serem logs de auditoria
-          const auditQuery = `
+            // 1. LOGS DE AUDITORIA (CRÍTICOS) - Retenção: 2 anos conforme LGPD
+            // Preservar LOGIN, LOGOUT, DELETE, CREATE, UPDATE por serem logs de auditoria
+            const auditQuery = `
             DELETE FROM audit_logs
             WHERE created_at < NOW() - INTERVAL '2 years'
             AND action IN ('LOGIN', 'LOGOUT', 'DELETE', 'CREATE', 'UPDATE')
           `;
-          const auditResult = await pool.query(auditQuery);
-          const auditDeleted = auditResult.rowCount || 0;
-          totalDeleted += auditDeleted;
-          results.push(`Logs de auditoria: ${auditDeleted} removidos (>2 anos)`);
+            const auditResult = await pool.query(auditQuery);
+            const auditDeleted = auditResult.rowCount || 0;
+            totalDeleted += auditDeleted;
+            results.push(`Logs de auditoria: ${auditDeleted} removidos (>2 anos)`);
 
-          // 2. LOGS DE SISTEMA (BAIXA CRITICIDADE) - Retenção: 6 meses
-          // VIEW, EXPORT, ERROR são logs operacionais/sistema
-          const systemQuery = `
+            // 2. LOGS DE SISTEMA (BAIXA CRITICIDADE) - Retenção: 6 meses
+            // VIEW, EXPORT, ERROR são logs operacionais/sistema
+            const systemQuery = `
             DELETE FROM audit_logs
             WHERE created_at < NOW() - INTERVAL '6 months'
             AND action IN ('VIEW', 'EXPORT', 'ERROR', 'PAGE_ACCESS')
           `;
-          const systemResult = await pool.query(systemQuery);
-          const systemDeleted = systemResult.rowCount || 0;
-          totalDeleted += systemDeleted;
-          results.push(`Logs de sistema: ${systemDeleted} removidos (>6 meses)`);
+            const systemResult = await pool.query(systemQuery);
+            const systemDeleted = systemResult.rowCount || 0;
+            totalDeleted += systemDeleted;
+            results.push(`Logs de sistema: ${systemDeleted} removidos (>6 meses)`);
 
-          // 3. LOGS OPERACIONAIS (MÉDIA CRITICIDADE) - Retenção: 1 ano
-          // DRAW, REPORT são logs importantes mas não críticos
-          const operationalQuery = `
+            // 3. LOGS OPERACIONAIS (MÉDIA CRITICIDADE) - Retenção: 1 ano
+            // DRAW, REPORT são logs importantes mas não críticos
+            const operationalQuery = `
             DELETE FROM audit_logs
             WHERE created_at < NOW() - INTERVAL '1 year'
             AND action IN ('DRAW', 'VIEW_REPORT', 'EXPORT_AUDIT')
           `;
-          const operationalResult = await pool.query(operationalQuery);
-          const operationalDeleted = operationalResult.rowCount || 0;
-          totalDeleted += operationalDeleted;
-          results.push(`Logs operacionais: ${operationalDeleted} removidos (>1 ano)`);
+            const operationalResult = await pool.query(operationalQuery);
+            const operationalDeleted = operationalResult.rowCount || 0;
+            totalDeleted += operationalDeleted;
+            results.push(`Logs operacionais: ${operationalDeleted} removidos (>1 ano)`);
 
-          console.log(`🧹 Limpeza LGPD executada: ${totalDeleted} logs removidos total`);
-          console.log('📋 Detalhes:', results);
+            console.log(`🧹 Limpeza LGPD executada: ${totalDeleted} logs removidos total`);
+            console.log('📋 Detalhes:', results);
 
-          return res.status(200).json({
-            success: true,
-            deleted_count: totalDeleted,
-            message: `Limpeza LGPD: ${totalDeleted} logs removidos`,
-            details: results,
-            compliance: 'LGPD - Art. 7º, II e IX'
-          });
-        } catch (error) {
-          console.error('❌ Erro ao executar limpeza LGPD:', error);
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao executar limpeza de logs conforme LGPD',
+            return res.status(200).json({
+              success: true,
+              deleted_count: totalDeleted,
+              message: `Limpeza LGPD: ${totalDeleted} logs removidos`,
+              details: results,
+              compliance: 'LGPD - Art. 7º, II e IX'
+            });
+          } catch (error) {
+            console.error('❌ Erro ao executar limpeza LGPD:', error);
+            return res.status(500).json({
+              success: false,
+              error: 'Erro ao executar limpeza de logs conforme LGPD',
 
-          });
+            });
+          }
         }
-      }
 
-      // GET /api/?route=audit&action=logs - Buscar logs de auditoria
-      if (req.method === 'GET' && action === 'logs') {
-        try {
-          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-          await getAuthenticatedUser(req, ['admin']);
-          // Buscar logs reais do banco de dados
-          const {
-            limit = 50,
-            offset = 0,
-            user_id,
-            action_filter: filterAction,
-            table_name,
-            start_date,
-            end_date
-          } = req.query;
+        // GET /api/?route=audit&action=logs - Buscar logs de auditoria
+        if (req.method === 'GET' && action === 'logs') {
+          try {
+            // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+            await getAuthenticatedUser(req, ['admin']);
+            // Buscar logs reais do banco de dados
+            const {
+              limit = 50,
+              offset = 0,
+              user_id,
+              action_filter: filterAction,
+              table_name,
+              start_date,
+              end_date
+            } = req.query;
 
-          console.log('🔍 Parâmetros recebidos:', {
-            limit,
-            offset,
-            user_id,
-            filterAction,
-            table_name,
-            all_query_params: req.query
-          });
+            console.log('🔍 Parâmetros recebidos:', {
+              limit,
+              offset,
+              user_id,
+              filterAction,
+              table_name,
+              all_query_params: req.query
+            });
 
-          let selectQuery = `
+            let selectQuery = `
             SELECT
               al.id, al.user_id, al.action, al.table_name, al.record_id,
               al.ip_address, al.created_at, al.response_status, al.additional_data,
@@ -2676,162 +2702,162 @@ module.exports = async function handler(req, res) {
             LEFT JOIN usuarios u ON u.id = al.user_id
             WHERE 1=1
           `;
-          const queryParams = [];
-          let paramCount = 0;
+            const queryParams = [];
+            let paramCount = 0;
 
-          // Filtros opcionais
-          if (user_id) {
-            selectQuery += ` AND al.user_id = $${++paramCount}`;
-            queryParams.push(user_id);
-          }
-
-          if (filterAction) {
-            selectQuery += ` AND al.action = $${++paramCount}`;
-            queryParams.push(filterAction);
-          }
-
-          if (table_name) {
-            selectQuery += ` AND al.table_name = $${++paramCount}`;
-            queryParams.push(table_name);
-          }
-
-          selectQuery += ` ORDER BY al.created_at DESC LIMIT $${++paramCount} OFFSET $${++paramCount}`;
-          queryParams.push(limit, offset);
-
-          console.log('🔍 Buscando logs de auditoria:', {
-            query: selectQuery,
-            params: queryParams,
-            req_query: req.query,
-            user_id,
-            filterAction,
-            table_name,
-            limit,
-            offset
-          });
-
-          // Adicionar filtros de data
-          if (start_date) {
-            selectQuery += ` AND created_at >= $${++paramCount}`;
-            queryParams.push(start_date);
-          }
-
-          if (end_date) {
-            selectQuery += ` AND created_at <= $${++paramCount}`;
-            queryParams.push(end_date);
-          }
-
-          selectQuery += ` ORDER BY created_at DESC LIMIT $${++paramCount} OFFSET $${++paramCount}`;
-          queryParams.push(limit, offset);
-
-          // Query segura com parâmetros preparados
-          let enhancedQuery = `
-            SELECT
-              al.id, al.user_id, al.action, al.table_name, al.record_id,
-              al.ip_address, al.created_at, al.response_status, al.additional_data,
-              al.user_agent, al.request_method, al.request_url,
-              al.old_values, al.new_values,
-              COALESCE(u.usuario, 'Sistema') as user_name
-            FROM audit_logs al
-            LEFT JOIN usuarios u ON u.id = al.user_id
-            WHERE 1=1
-          `;
-
-          const enhancedParams = [];
-          let paramIndex = 0;
-
-          // Adicionar filtros usando parâmetros seguros
-          if (filterAction) {
-            enhancedQuery += ` AND al.action = $${++paramIndex}`;
-            enhancedParams.push(filterAction);
-          }
-
-          if (table_name) {
-            enhancedQuery += ` AND al.table_name = $${++paramIndex}`;
-            enhancedParams.push(table_name);
-          }
-
-          if (start_date) {
-            enhancedQuery += ` AND al.created_at >= $${++paramIndex}`;
-            enhancedParams.push(start_date);
-          }
-
-          if (end_date) {
-            enhancedQuery += ` AND al.created_at <= $${++paramIndex}`;
-            enhancedParams.push(end_date);
-          }
-
-          enhancedQuery += ` ORDER BY al.created_at DESC LIMIT $${++paramIndex} OFFSET $${++paramIndex}`;
-          enhancedParams.push(parseInt(limit), parseInt(offset));
-
-          console.log('🔍 Usando query segura com parâmetros:', enhancedQuery);
-          console.log('📊 Parâmetros:', enhancedParams);
-          const result = await query(enhancedQuery, enhancedParams);
-
-          console.log('📊 Resultado da busca:', {
-            rows_found: result.rows.length,
-            first_row: result.rows[0] || 'nenhum',
-            query_executed: selectQuery
-          });
-
-          // Buscar contagem total simplificada - sempre contar todos os registros
-          const countResult = await query('SELECT COUNT(*) as total FROM audit_logs');
-          const totalLogs = parseInt(countResult.rows[0]?.total || 0);
-
-          console.log('📊 Logs encontrados:', result.rows.length, 'de', totalLogs, 'total');
-
-          return res.status(200).json({
-            success: true,
-            logs: result.rows,
-            total: totalLogs,
-            limit: parseInt(limit),
-            offset: parseInt(offset)
-          });
-
-        } catch (error) {
-          console.error('❌ Erro ao buscar logs de auditoria:', error);
-
-          // Fallback para logs simulados em caso de erro
-          const mockLogs = [
-            {
-              id: 1,
-              user_id: 1,
-              action: 'LOGIN',
-              table_name: 'usuarios_admin',
-              record_id: 1,
-              ip_address: '127.0.0.1',
-              created_at: new Date().toISOString(),
-              response_status: 200
-            },
-            {
-              id: 2,
-              user_id: 1,
-              action: 'VIEW',
-              table_name: 'participantes',
-              record_id: 101,
-              ip_address: '127.0.0.1',
-              created_at: new Date(Date.now() - 3600000).toISOString(),
-              response_status: 200
+            // Filtros opcionais
+            if (user_id) {
+              selectQuery += ` AND al.user_id = $${++paramCount}`;
+              queryParams.push(user_id);
             }
-          ];
 
-          console.log('⚠️ Usando logs simulados devido ao erro');
+            if (filterAction) {
+              selectQuery += ` AND al.action = $${++paramCount}`;
+              queryParams.push(filterAction);
+            }
 
-          return res.status(200).json({
-            success: true,
-            logs: mockLogs,
-            total: mockLogs.length,
-            error: 'Usando dados simulados: ' + error.message
-          });
+            if (table_name) {
+              selectQuery += ` AND al.table_name = $${++paramCount}`;
+              queryParams.push(table_name);
+            }
+
+            selectQuery += ` ORDER BY al.created_at DESC LIMIT $${++paramCount} OFFSET $${++paramCount}`;
+            queryParams.push(limit, offset);
+
+            console.log('🔍 Buscando logs de auditoria:', {
+              query: selectQuery,
+              params: queryParams,
+              req_query: req.query,
+              user_id,
+              filterAction,
+              table_name,
+              limit,
+              offset
+            });
+
+            // Adicionar filtros de data
+            if (start_date) {
+              selectQuery += ` AND created_at >= $${++paramCount}`;
+              queryParams.push(start_date);
+            }
+
+            if (end_date) {
+              selectQuery += ` AND created_at <= $${++paramCount}`;
+              queryParams.push(end_date);
+            }
+
+            selectQuery += ` ORDER BY created_at DESC LIMIT $${++paramCount} OFFSET $${++paramCount}`;
+            queryParams.push(limit, offset);
+
+            // Query segura com parâmetros preparados
+            let enhancedQuery = `
+            SELECT
+              al.id, al.user_id, al.action, al.table_name, al.record_id,
+              al.ip_address, al.created_at, al.response_status, al.additional_data,
+              al.user_agent, al.request_method, al.request_url,
+              al.old_values, al.new_values,
+              COALESCE(u.usuario, 'Sistema') as user_name
+            FROM audit_logs al
+            LEFT JOIN usuarios u ON u.id = al.user_id
+            WHERE 1=1
+          `;
+
+            const enhancedParams = [];
+            let paramIndex = 0;
+
+            // Adicionar filtros usando parâmetros seguros
+            if (filterAction) {
+              enhancedQuery += ` AND al.action = $${++paramIndex}`;
+              enhancedParams.push(filterAction);
+            }
+
+            if (table_name) {
+              enhancedQuery += ` AND al.table_name = $${++paramIndex}`;
+              enhancedParams.push(table_name);
+            }
+
+            if (start_date) {
+              enhancedQuery += ` AND al.created_at >= $${++paramIndex}`;
+              enhancedParams.push(start_date);
+            }
+
+            if (end_date) {
+              enhancedQuery += ` AND al.created_at <= $${++paramIndex}`;
+              enhancedParams.push(end_date);
+            }
+
+            enhancedQuery += ` ORDER BY al.created_at DESC LIMIT $${++paramIndex} OFFSET $${++paramIndex}`;
+            enhancedParams.push(parseInt(limit), parseInt(offset));
+
+            console.log('🔍 Usando query segura com parâmetros:', enhancedQuery);
+            console.log('📊 Parâmetros:', enhancedParams);
+            const result = await query(enhancedQuery, enhancedParams);
+
+            console.log('📊 Resultado da busca:', {
+              rows_found: result.rows.length,
+              first_row: result.rows[0] || 'nenhum',
+              query_executed: selectQuery
+            });
+
+            // Buscar contagem total simplificada - sempre contar todos os registros
+            const countResult = await query('SELECT COUNT(*) as total FROM audit_logs');
+            const totalLogs = parseInt(countResult.rows[0]?.total || 0);
+
+            console.log('📊 Logs encontrados:', result.rows.length, 'de', totalLogs, 'total');
+
+            return res.status(200).json({
+              success: true,
+              logs: result.rows,
+              total: totalLogs,
+              limit: parseInt(limit),
+              offset: parseInt(offset)
+            });
+
+          } catch (error) {
+            console.error('❌ Erro ao buscar logs de auditoria:', error);
+
+            // Fallback para logs simulados em caso de erro
+            const mockLogs = [
+              {
+                id: 1,
+                user_id: 1,
+                action: 'LOGIN',
+                table_name: 'usuarios_admin',
+                record_id: 1,
+                ip_address: '127.0.0.1',
+                created_at: new Date().toISOString(),
+                response_status: 200
+              },
+              {
+                id: 2,
+                user_id: 1,
+                action: 'VIEW',
+                table_name: 'participantes',
+                record_id: 101,
+                ip_address: '127.0.0.1',
+                created_at: new Date(Date.now() - 3600000).toISOString(),
+                response_status: 200
+              }
+            ];
+
+            console.log('⚠️ Usando logs simulados devido ao erro');
+
+            return res.status(200).json({
+              success: true,
+              logs: mockLogs,
+              total: mockLogs.length,
+              error: 'Usando dados simulados: ' + error.message
+            });
+          }
         }
-      }
 
-      // GET /api/?route=audit&action=export - Exportar todos os logs reais
-      if (req.method === 'GET' && action === 'export') {
-        try {
-          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-          await getAuthenticatedUser(req, ['admin']);
-          // Buscar TODOS os logs reais (sem limit)
-          const exportQuery = `
+        // GET /api/?route=audit&action=export - Exportar todos os logs reais
+        if (req.method === 'GET' && action === 'export') {
+          try {
+            // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+            await getAuthenticatedUser(req, ['admin']);
+            // Buscar TODOS os logs reais (sem limit)
+            const exportQuery = `
             SELECT
               al.id, al.user_id, al.action, al.table_name, al.record_id,
               al.ip_address, al.created_at, al.response_status, al.additional_data,
@@ -2843,60 +2869,60 @@ module.exports = async function handler(req, res) {
             ORDER BY al.created_at DESC
           `;
 
-          const result = await query(exportQuery);
-          console.log('📄 Exportando', result.rows.length, 'logs de auditoria');
+            const result = await query(exportQuery);
+            console.log('📄 Exportando', result.rows.length, 'logs de auditoria');
 
-          // Gerar CSV com todos os dados
-          let csvData = "Data/Hora,Usuario,Acao,Tabela,Registro ID,Valores,IP,Status,User Agent\n";
+            // Gerar CSV com todos os dados
+            let csvData = "Data/Hora,Usuario,Acao,Tabela,Registro ID,Valores,IP,Status,User Agent\n";
 
-          result.rows.forEach(log => {
-            const date = new Date(log.created_at).toLocaleString('pt-BR');
-            const values = log.old_values || log.new_values ?
-              JSON.stringify({old: log.old_values, new: log.new_values}).replace(/"/g, '""') : '-';
+            result.rows.forEach(log => {
+              const date = new Date(log.created_at).toLocaleString('pt-BR');
+              const values = log.old_values || log.new_values ?
+                JSON.stringify({ old: log.old_values, new: log.new_values }).replace(/"/g, '""') : '-';
 
-            csvData += `"${date}","${log.user_name}","${log.action}","${log.table_name}","${log.record_id || '-'}","${values}","${log.ip_address}","${log.response_status}","${log.user_agent || '-'}"\n`;
-          });
+              csvData += `"${date}","${log.user_name}","${log.action}","${log.table_name}","${log.record_id || '-'}","${values}","${log.ip_address}","${log.response_status}","${log.user_agent || '-'}"\n`;
+            });
 
-          res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-          res.setHeader('Content-Disposition', 'attachment; filename="audit-logs.csv"');
-          return res.status(200).send(csvData);
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', 'attachment; filename="audit-logs.csv"');
+            return res.status(200).send(csvData);
 
-        } catch (error) {
-          console.error('Erro ao exportar logs:', error);
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao exportar logs de auditoria',
-            message: error.message
-          });
-        }
-      }
-
-      // POST /api/?route=audit&action=log - Salvar log de auditoria
-      if (req.method === 'POST' && action === 'log') {
-        try {
-          const { action: logAction, table_name, record_id, additional_data, old_values, new_values } = req.body;
-
-          if (!logAction || !table_name) {
-            return res.status(400).json({
+          } catch (error) {
+            console.error('Erro ao exportar logs:', error);
+            return res.status(500).json({
               success: false,
-              error: 'Campos obrigatórios: action, table_name'
+              error: 'Erro ao exportar logs de auditoria',
+              message: error.message
             });
           }
+        }
 
-          // Verificar se a tabela existe (opcional)
-          const existingTables = ['usuarios_admin', 'participantes', 'promocoes', 'ganhadores', 'reports'];
+        // POST /api/?route=audit&action=log - Salvar log de auditoria
+        if (req.method === 'POST' && action === 'log') {
+          try {
+            const { action: logAction, table_name, record_id, additional_data, old_values, new_values } = req.body;
 
-          console.log('📝 Salvando log de auditoria:', {
-            action: logAction,
-            table_name,
-            record_id,
-            additional_data,
-            old_values,
-            new_values
-          });
+            if (!logAction || !table_name) {
+              return res.status(400).json({
+                success: false,
+                error: 'Campos obrigatórios: action, table_name'
+              });
+            }
 
-          // Inserir log na tabela audit_logs com old_values e new_values
-          const insertQuery = `
+            // Verificar se a tabela existe (opcional)
+            const existingTables = ['usuarios_admin', 'participantes', 'promocoes', 'ganhadores', 'reports'];
+
+            console.log('📝 Salvando log de auditoria:', {
+              action: logAction,
+              table_name,
+              record_id,
+              additional_data,
+              old_values,
+              new_values
+            });
+
+            // Inserir log na tabela audit_logs com old_values e new_values
+            const insertQuery = `
             INSERT INTO audit_logs (
               user_id, action, table_name, record_id,
               old_values, new_values,
@@ -2906,58 +2932,58 @@ module.exports = async function handler(req, res) {
             RETURNING id
           `;
 
-          const clientIP = req.headers['x-forwarded-for'] ||
-                          req.connection?.remoteAddress ||
-                          req.socket?.remoteAddress ||
-                          '127.0.0.1';
+            const clientIP = req.headers['x-forwarded-for'] ||
+              req.connection?.remoteAddress ||
+              req.socket?.remoteAddress ||
+              '127.0.0.1';
 
-          // Decodificar JWT token para obter user_id
-          const authenticatedUser = await getAuthenticatedUser(req);
-          const userId = authenticatedUser.id;
+            // Decodificar JWT token para obter user_id
+            const authenticatedUser = await getAuthenticatedUser(req);
+            const userId = authenticatedUser.id;
 
-          const values = [
-            userId, // user_id from JWT token
-            logAction,
-            table_name,
-            record_id || null,
-            old_values ? JSON.stringify(old_values) : null,
-            new_values ? JSON.stringify(new_values) : null,
-            clientIP,
-            req.headers['user-agent'] || null,
-            'AUDIT_LOG',
-            req.originalUrl || '/api',
-            200,
-            additional_data ? JSON.stringify(additional_data) : null,
-            new Date().toISOString()
-          ];
+            const values = [
+              userId, // user_id from JWT token
+              logAction,
+              table_name,
+              record_id || null,
+              old_values ? JSON.stringify(old_values) : null,
+              new_values ? JSON.stringify(new_values) : null,
+              clientIP,
+              req.headers['user-agent'] || null,
+              'AUDIT_LOG',
+              req.originalUrl || '/api',
+              200,
+              additional_data ? JSON.stringify(additional_data) : null,
+              new Date().toISOString()
+            ];
 
-          const result = await query(insertQuery, values);
+            const result = await query(insertQuery, values);
 
-          console.log('✅ Log de auditoria salvo com ID:', result.rows[0]?.id);
+            console.log('✅ Log de auditoria salvo com ID:', result.rows[0]?.id);
 
-          return res.status(200).json({
-            success: true,
-            message: 'Log de auditoria registrado com sucesso',
-            id: result.rows[0]?.id
-          });
+            return res.status(200).json({
+              success: true,
+              message: 'Log de auditoria registrado com sucesso',
+              id: result.rows[0]?.id
+            });
 
-        } catch (error) {
-          console.error('❌ Erro ao salvar log de auditoria:', error);
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao salvar log de auditoria',
-            message: error.message
-          });
+          } catch (error) {
+            console.error('❌ Erro ao salvar log de auditoria:', error);
+            return res.status(500).json({
+              success: false,
+              error: 'Erro ao salvar log de auditoria',
+              message: error.message
+            });
+          }
         }
-      }
 
-      // POST /api/?route=audit&action=setup - Criar tabelas de auditoria
-      if (req.method === 'POST' && action === 'setup') {
-        try {
-          console.log('🔧 Iniciando setup das tabelas de auditoria...');
+        // POST /api/?route=audit&action=setup - Criar tabelas de auditoria
+        if (req.method === 'POST' && action === 'setup') {
+          try {
+            console.log('🔧 Iniciando setup das tabelas de auditoria...');
 
-          // Script SQL completo para criar tabelas
-          const setupSQL = `
+            // Script SQL completo para criar tabelas
+            const setupSQL = `
             -- Tabela principal de logs de auditoria
             CREATE TABLE IF NOT EXISTS audit_logs (
                 id SERIAL PRIMARY KEY,
@@ -2993,69 +3019,69 @@ module.exports = async function handler(req, res) {
             ON CONFLICT DO NOTHING;
           `;
 
-          // Executar o SQL
-          await query(setupSQL);
+            // Executar o SQL
+            await query(setupSQL);
 
-          console.log('✅ Tabelas de auditoria criadas com sucesso');
+            console.log('✅ Tabelas de auditoria criadas com sucesso');
 
-          return res.status(200).json({
-            success: true,
-            message: 'Tabelas de auditoria criadas com sucesso',
-            setup_completed: true
-          });
+            return res.status(200).json({
+              success: true,
+              message: 'Tabelas de auditoria criadas com sucesso',
+              setup_completed: true
+            });
 
-        } catch (error) {
-          console.error('❌ Erro ao criar tabelas de auditoria:', error);
-          return res.status(500).json({
-            success: false,
-            error: 'Erro ao criar tabelas de auditoria',
-            message: error.message
-          });
+          } catch (error) {
+            console.error('❌ Erro ao criar tabelas de auditoria:', error);
+            return res.status(500).json({
+              success: false,
+              error: 'Erro ao criar tabelas de auditoria',
+              message: error.message
+            });
+          }
         }
-      }
 
-      // GET /api/?route=audit&action=test-user-id - Testar extração de user_id
-      if (req.method === 'GET' && action === 'test-user-id') {
-        try {
-          const userId = getUserIdFromRequest(req);
-          return res.status(200).json({
-            success: true,
-            userId: userId,
-            headers: req.headers.authorization || null,
-            message: 'Teste de extração de user_id'
-          });
-        } catch (error) {
-          return res.status(500).json({
-            success: false,
-            error: error.message,
-            headers: req.headers.authorization || null
-          });
+        // GET /api/?route=audit&action=test-user-id - Testar extração de user_id
+        if (req.method === 'GET' && action === 'test-user-id') {
+          try {
+            const userId = getUserIdFromRequest(req);
+            return res.status(200).json({
+              success: true,
+              userId: userId,
+              headers: req.headers.authorization || null,
+              message: 'Teste de extração de user_id'
+            });
+          } catch (error) {
+            return res.status(500).json({
+              success: false,
+              error: error.message,
+              headers: req.headers.authorization || null
+            });
+          }
         }
-      }
 
-      // GET /api/?route=audit&action=debug - Debug da tabela audit_logs
-      if (req.method === 'GET' && action === 'debug') {
-        try {
-          // Verificar se a tabela existe
-          const tableExistsQuery = `
+        // GET /api/?route=audit&action=debug - Debug da tabela audit_logs
+        if (req.method === 'GET' && action === 'debug') {
+          try {
+            // Verificar se a tabela existe
+            const tableExistsQuery = `
             SELECT EXISTS (
               SELECT FROM information_schema.tables
               WHERE table_name = 'audit_logs'
             );
           `;
-          const tableExists = await query(tableExistsQuery);
+            const tableExists = await query(tableExistsQuery);
 
-          // Contar total de registros
-          const countQuery = 'SELECT COUNT(*) as total FROM audit_logs';
-          const countResult = await query(countQuery);
+            // Contar total de registros
+            const countQuery = 'SELECT COUNT(*) as total FROM audit_logs';
+            const countResult = await query(countQuery);
 
-          // Buscar primeiros 5 registros
-          // ✅ SEGURANÇA (ALTO-003): Campos explícitos
-          const sampleQuery = 'SELECT id, user_id, action, table_name, record_id, old_values, new_values, created_at, ip_address FROM audit_logs ORDER BY created_at DESC LIMIT 5';
-          const sampleResult = await query(sampleQuery);
+            // Buscar primeiros 5 registros
+            // ✅ SEGURANÇA (ALTO-003): Campos explícitos
+            const sampleQuery = 'SELECT id, user_id, action, table_name, record_id, old_values, new_values, created_at, ip_address FROM audit_logs ORDER BY created_at DESC LIMIT 5';
+            const sampleResult = await query(sampleQuery);
 
-          // Testar query similar à da busca principal
-          const testQuery = `
+            // Testar query similar à da busca principal
+            const testQuery = `
             SELECT id, user_id, action, table_name, record_id,
                    ip_address, created_at, response_status, additional_data,
                    user_agent, request_method, request_url
@@ -3063,185 +3089,185 @@ module.exports = async function handler(req, res) {
             WHERE 1=1
             ORDER BY created_at DESC LIMIT 50 OFFSET 0
           `;
-          const testResult = await query(testQuery);
+            const testResult = await query(testQuery);
 
-          return res.status(200).json({
-            success: true,
-            debug: {
-              table_exists: tableExists.rows[0].exists,
-              total_records: countResult.rows[0].total,
-              sample_records: sampleResult.rows,
-              test_query_result: testResult.rows,
-              test_query_count: testResult.rows.length,
-              query_test: 'SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 5'
-            },
-            timestamp: new Date().toISOString()
-          });
+            return res.status(200).json({
+              success: true,
+              debug: {
+                table_exists: tableExists.rows[0].exists,
+                total_records: countResult.rows[0].total,
+                sample_records: sampleResult.rows,
+                test_query_result: testResult.rows,
+                test_query_count: testResult.rows.length,
+                query_test: 'SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 5'
+              },
+              timestamp: new Date().toISOString()
+            });
 
-        } catch (error) {
-          return res.status(500).json({
-            success: false,
-            error: 'Erro no debug',
-            message: error.message,
-            timestamp: new Date().toISOString()
-          });
+          } catch (error) {
+            return res.status(500).json({
+              success: false,
+              error: 'Erro no debug',
+              message: error.message,
+              timestamp: new Date().toISOString()
+            });
+          }
         }
+
+        // Outras ações de auditoria podem ser adicionadas aqui
+        return res.status(200).json({
+          success: true,
+          message: 'API Audit funcionando!',
+          actions: ['stats', 'cleanup', 'logs', 'export', 'setup', 'debug'],
+          timestamp: new Date().toISOString()
+        });
+
+      } catch (error) {
+        console.error('Erro na API de auditoria:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro na API de auditoria',
+
+          timestamp: new Date().toISOString()
+        });
       }
-
-      // Outras ações de auditoria podem ser adicionadas aqui
-      return res.status(200).json({
-        success: true,
-        message: 'API Audit funcionando!',
-        actions: ['stats', 'cleanup', 'logs', 'export', 'setup', 'debug'],
-        timestamp: new Date().toISOString()
-      });
-
-    } catch (error) {
-      console.error('Erro na API de auditoria:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Erro na API de auditoria',
-        
-        timestamp: new Date().toISOString()
-      });
     }
-  }
 
-  // Rota para o jogo Caixa Misteriosa (formato original)
-  if (req.originalUrl && req.originalUrl.startsWith('/api/caixa-misteriosa')) {
-    console.log('🎮 [INDEX] Detectou rota caixa-misteriosa - originalUrl:', req.originalUrl);
-    const caixaMisteriosaHandler = require('./caixa-misteriosa.js');
-    // Ajustar URL para o padrão original
-    const originalUrl = req.originalUrl;
-    const path = originalUrl.replace('/api/caixa-misteriosa', '');
-    req.originalPath = path;
-    console.log('🎮 [INDEX] Path extraído:', path, 'originalPath setado:', req.originalPath);
-    return await caixaMisteriosaHandler(req, res);
-  }
+    // Rota para o jogo Caixa Misteriosa (formato original)
+    if (req.originalUrl && req.originalUrl.startsWith('/api/caixa-misteriosa')) {
+      console.log('🎮 [INDEX] Detectou rota caixa-misteriosa - originalUrl:', req.originalUrl);
+      const caixaMisteriosaHandler = require('./caixa-misteriosa.js');
+      // Ajustar URL para o padrão original
+      const originalUrl = req.originalUrl;
+      const path = originalUrl.replace('/api/caixa-misteriosa', '');
+      req.originalPath = path;
+      console.log('🎮 [INDEX] Path extraído:', path, 'originalPath setado:', req.originalPath);
+      return await caixaMisteriosaHandler(req, res);
+    }
 
-  // Rota para o jogo Caixa Misteriosa (formato query)
-  if (route === 'caixa-misteriosa') {
-    const caixaMisteriosaHandler = require('./caixa-misteriosa.js');
-    // FIX: Adiciona a manipulação de path que estava faltando
-    const originalUrl = req.originalUrl || req.url;
-    const path = originalUrl.replace('/api/caixa-misteriosa', '').split('?')[0];
-    req.originalPath = path;
-    return await caixaMisteriosaHandler(req, res);
-  }
+    // Rota para o jogo Caixa Misteriosa (formato query)
+    if (route === 'caixa-misteriosa') {
+      const caixaMisteriosaHandler = require('./caixa-misteriosa.js');
+      // FIX: Adiciona a manipulação de path que estava faltando
+      const originalUrl = req.originalUrl || req.url;
+      const path = originalUrl.replace('/api/caixa-misteriosa', '').split('?')[0];
+      req.originalPath = path;
+      return await caixaMisteriosaHandler(req, res);
+    }
 
-  // Rota para gerenciar usuários
-  if (route === 'usuarios') {
-    try {
-      // GET - Listar usuários (Admin Only)
-      if (req.method === 'GET') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        await getAuthenticatedUser(req, ['admin']);
-        const result = await query(`
+    // Rota para gerenciar usuários
+    if (route === 'usuarios') {
+      try {
+        // GET - Listar usuários (Admin Only)
+        if (req.method === 'GET') {
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          await getAuthenticatedUser(req, ['admin']);
+          const result = await query(`
           SELECT id, usuario, role, created_at
           FROM usuarios
           ORDER BY id ASC
         `);
 
-        return res.status(200).json({
-          success: true,
-          data: result.rows,
-          total: result.rows.length,
-          timestamp: new Date().toISOString()
-        });
-      }
-
-      // PATCH - Atualizar senha de usuário
-      if (req.method === 'PATCH') {
-        const authenticatedUser = await getAuthenticatedUser(req);
-        const { id: targetUserId } = req.query || {};
-        const { senha } = req.body || {};
-
-        if (!targetUserId) {
-          return res.status(400).json({
-            success: false,
-            message: 'ID do usuário é obrigatório'
+          return res.status(200).json({
+            success: true,
+            data: result.rows,
+            total: result.rows.length,
+            timestamp: new Date().toISOString()
           });
         }
 
-        if (!senha) {
-          return res.status(400).json({
-            success: false,
-            message: 'Nova senha é obrigatória'
-          });
-        }
+        // PATCH - Atualizar senha de usuário
+        if (req.method === 'PATCH') {
+          const authenticatedUser = await getAuthenticatedUser(req);
+          const { id: targetUserId } = req.query || {};
+          const { senha } = req.body || {};
 
-        // Authorization Check: Admin can change anyone's password. User can only change their own.
-        if (authenticatedUser.role !== 'admin' && authenticatedUser.id.toString() !== targetUserId.toString()) {
-          return res.status(403).json({ 
-            success: false, 
-            message: 'Acesso negado. Você não tem permissão para alterar a senha deste usuário.' 
-          });
-        }
+          if (!targetUserId) {
+            return res.status(400).json({
+              success: false,
+              message: 'ID do usuário é obrigatório'
+            });
+          }
 
-        // Proceed with password update
-        const hashedPassword = await bcrypt.hash(senha, 10);
-        await query(
-          `UPDATE usuarios SET senha_hash = $1 WHERE id = $2`,
-          [hashedPassword, parseInt(targetUserId)]
-        );
+          if (!senha) {
+            return res.status(400).json({
+              success: false,
+              message: 'Nova senha é obrigatória'
+            });
+          }
 
-        return res.status(200).json({
-          success: true,
-          message: 'Senha atualizada com sucesso'
-        });
-      }
+          // Authorization Check: Admin can change anyone's password. User can only change their own.
+          if (authenticatedUser.role !== 'admin' && authenticatedUser.id.toString() !== targetUserId.toString()) {
+            return res.status(403).json({
+              success: false,
+              message: 'Acesso negado. Você não tem permissão para alterar a senha deste usuário.'
+            });
+          }
 
-      // POST - Atualizar senhas em lote (Admin Only)
-      if (req.method === 'POST') {
-        // ✅ SEGURANÇA (ALTO-004): Validar autenticação
-        await getAuthenticatedUser(req, ['admin']);
-        const { action, senha_padrao } = req.body || {};
-
-        if (action === 'update_all_passwords' && senha_padrao) {
-          const hashedPassword = await bcrypt.hash(senha_padrao, 10);
-          const result = await query(
-            `UPDATE usuarios SET senha_hash = $1`,
-            [hashedPassword]
+          // Proceed with password update
+          const hashedPassword = await bcrypt.hash(senha, 10);
+          await query(
+            `UPDATE usuarios SET senha_hash = $1 WHERE id = $2`,
+            [hashedPassword, parseInt(targetUserId)]
           );
 
           return res.status(200).json({
             success: true,
-            message: `${result.rowCount} usuários atualizados com senha padrão`,
-            affected_rows: result.rowCount
+            message: 'Senha atualizada com sucesso'
           });
         }
 
-        return res.status(400).json({
+        // POST - Atualizar senhas em lote (Admin Only)
+        if (req.method === 'POST') {
+          // ✅ SEGURANÇA (ALTO-004): Validar autenticação
+          await getAuthenticatedUser(req, ['admin']);
+          const { action, senha_padrao } = req.body || {};
+
+          if (action === 'update_all_passwords' && senha_padrao) {
+            const hashedPassword = await bcrypt.hash(senha_padrao, 10);
+            const result = await query(
+              `UPDATE usuarios SET senha_hash = $1`,
+              [hashedPassword]
+            );
+
+            return res.status(200).json({
+              success: true,
+              message: `${result.rowCount} usuários atualizados com senha padrão`,
+              affected_rows: result.rowCount
+            });
+          }
+
+          return res.status(400).json({
+            success: false,
+            message: 'Ação não reconhecida ou dados faltando'
+          });
+        }
+
+        // If no method matches
+        return res.status(405).json({ success: false, message: `Método ${req.method} não permitido para a rota /usuarios` });
+
+      } catch (error) {
+        console.error('Erro na rota de usuários:', error);
+        // Distinguish between auth failure and other errors
+        if (error.message.includes('autenticação') || error.message.includes('autorizado') || error.message.includes('expirado')) {
+          return res.status(401).json({ success: false, message: error.message });
+        }
+        if (error.message.includes('Acesso negado')) {
+          return res.status(403).json({ success: false, message: error.message });
+        }
+        return res.status(500).json({
           success: false,
-          message: 'Ação não reconhecida ou dados faltando'
+          error: 'Erro ao gerenciar usuários',
+
         });
       }
+    }
 
-      // If no method matches
-      return res.status(405).json({ success: false, message: `Método ${req.method} não permitido para a rota /usuarios` });
-
-    } catch (error) {
-      console.error('Erro na rota de usuários:', error);
-      // Distinguish between auth failure and other errors
-      if (error.message.includes('autenticação') || error.message.includes('autorizado') || error.message.includes('expirado')) {
-        return res.status(401).json({ success: false, message: error.message });
-      } 
-      if (error.message.includes('Acesso negado')) {
-        return res.status(403).json({ success: false, message: error.message });
+    // Rota para encurtar links
+    if (route === 'encurtar-link') {
+      if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, message: 'Método não permitido. Use POST.' });
       }
-      return res.status(500).json({
-        success: false,
-        error: 'Erro ao gerenciar usuários',
-        
-      });
-    }
-  }
-
-  // Rota para encurtar links
-  if (route === 'encurtar-link') {
-    if (req.method !== 'POST') {
-      return res.status(405).json({ success: false, message: 'Método não permitido. Use POST.' });
-    }
 
       const { url: longUrl } = req.body;
 
@@ -3255,10 +3281,10 @@ module.exports = async function handler(req, res) {
 
       // Verificar se é URL local (localhost, 127.0.0.1, etc.)
       const isLocalUrl = longUrl.includes('localhost') ||
-                        longUrl.includes('127.0.0.1') ||
-                        longUrl.includes('192.168.') ||
-                        longUrl.includes('10.0.') ||
-                        longUrl.includes('172.16.');
+        longUrl.includes('127.0.0.1') ||
+        longUrl.includes('192.168.') ||
+        longUrl.includes('10.0.') ||
+        longUrl.includes('172.16.');
 
       if (isLocalUrl) {
         console.log('🏠 URL local detectada, usando TinyURL diretamente');
@@ -3286,115 +3312,115 @@ module.exports = async function handler(req, res) {
       } else {
         // Para URLs públicas, tentar is.gd primeiro
         try {
-        // 1ª Opção: is.gd (gratuito, sem propaganda)
-        console.log('🔄 Tentando is.gd para URL:', longUrl);
-        const isGdUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
-        console.log('🌐 URL da requisição is.gd:', isGdUrl);
+          // 1ª Opção: is.gd (gratuito, sem propaganda)
+          console.log('🔄 Tentando is.gd para URL:', longUrl);
+          const isGdUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
+          console.log('🌐 URL da requisição is.gd:', isGdUrl);
 
-        const isGdResponse = await fetch(isGdUrl, {
-          method: 'GET',
-          headers: {
-            'User-Agent': 'NexoGeo/1.0 (Link Shortener)'
-          },
-          timeout: 10000 // Aumentar timeout para 10 segundos
-        });
-
-        console.log('📡 Resposta is.gd:', isGdResponse.status, isGdResponse.statusText);
-
-        if (isGdResponse.ok) {
-          const isGdResult = await isGdResponse.text();
-          console.log('📄 Resultado is.gd raw:', JSON.stringify(isGdResult));
-
-          const cleanResult = isGdResult.trim();
-          if (cleanResult.startsWith('http')) {
-            shortUrl = cleanResult;
-            serviceUsed = 'is.gd';
-            console.log('✅ URL encurtada com is.gd (sem propaganda):', shortUrl);
-          } else {
-            console.log('❌ is.gd retornou erro:', cleanResult);
-            throw new Error('is.gd retornou erro: ' + cleanResult);
-          }
-        } else {
-          console.log('❌ is.gd status não OK:', isGdResponse.status);
-          throw new Error(`is.gd retornou status ${isGdResponse.status}`);
-        }
-      } catch (isGdError) {
-        console.log('⚠️ is.gd falhou, tentando TinyURL:', isGdError.message);
-
-        try {
-          // 2ª Opção: TinyURL (backup)
-          const tinyUrlResponse = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`, {
+          const isGdResponse = await fetch(isGdUrl, {
             method: 'GET',
-            timeout: 5000
+            headers: {
+              'User-Agent': 'NexoGeo/1.0 (Link Shortener)'
+            },
+            timeout: 10000 // Aumentar timeout para 10 segundos
           });
 
-          if (tinyUrlResponse.ok) {
-            shortUrl = await tinyUrlResponse.text();
-            serviceUsed = 'tinyurl';
-            console.log('⚠️ URL encurtada com TinyURL (tem propaganda):', shortUrl);
+          console.log('📡 Resposta is.gd:', isGdResponse.status, isGdResponse.statusText);
+
+          if (isGdResponse.ok) {
+            const isGdResult = await isGdResponse.text();
+            console.log('📄 Resultado is.gd raw:', JSON.stringify(isGdResult));
+
+            const cleanResult = isGdResult.trim();
+            if (cleanResult.startsWith('http')) {
+              shortUrl = cleanResult;
+              serviceUsed = 'is.gd';
+              console.log('✅ URL encurtada com is.gd (sem propaganda):', shortUrl);
+            } else {
+              console.log('❌ is.gd retornou erro:', cleanResult);
+              throw new Error('is.gd retornou erro: ' + cleanResult);
+            }
           } else {
-            throw new Error('TinyURL não disponível');
+            console.log('❌ is.gd status não OK:', isGdResponse.status);
+            throw new Error(`is.gd retornou status ${isGdResponse.status}`);
           }
-        } catch (tinyError) {
-          console.log('❌ Ambos serviços falharam, usando fallback local:', tinyError.message);
+        } catch (isGdError) {
+          console.log('⚠️ is.gd falhou, tentando TinyURL:', isGdError.message);
 
-          // 3ª Opção: Fallback local
-          const crypto = require('crypto');
-          const hash = crypto.createHash('md5').update(longUrl).digest('hex').substring(0, 8);
-          shortUrl = `${req.headers.host}/s/${hash}`;
-          serviceUsed = 'local';
-          console.log('🔧 URL encurtada com fallback local:', shortUrl);
+          try {
+            // 2ª Opção: TinyURL (backup)
+            const tinyUrlResponse = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`, {
+              method: 'GET',
+              timeout: 5000
+            });
+
+            if (tinyUrlResponse.ok) {
+              shortUrl = await tinyUrlResponse.text();
+              serviceUsed = 'tinyurl';
+              console.log('⚠️ URL encurtada com TinyURL (tem propaganda):', shortUrl);
+            } else {
+              throw new Error('TinyURL não disponível');
+            }
+          } catch (tinyError) {
+            console.log('❌ Ambos serviços falharam, usando fallback local:', tinyError.message);
+
+            // 3ª Opção: Fallback local
+            const crypto = require('crypto');
+            const hash = crypto.createHash('md5').update(longUrl).digest('hex').substring(0, 8);
+            shortUrl = `${req.headers.host}/s/${hash}`;
+            serviceUsed = 'local';
+            console.log('🔧 URL encurtada com fallback local:', shortUrl);
+          }
         }
+        // Fechar o bloco else para URLs públicas (comment only)
+
+        return res.status(200).json({
+          success: true,
+          shortUrl: shortUrl,
+          originalUrl: longUrl,
+          service: serviceUsed,
+          message: serviceUsed === 'is.gd' ? 'Link encurtado sem propaganda' :
+            serviceUsed === 'tinyurl' ? 'Link encurtado (pode ter propaganda)' :
+              'Link encurtado localmente'
+        });
+
       }
-      // Fechar o bloco else para URLs públicas (comment only)
 
-      return res.status(200).json({
-        success: true,
-        shortUrl: shortUrl,
-        originalUrl: longUrl,
-        service: serviceUsed,
-        message: serviceUsed === 'is.gd' ? 'Link encurtado sem propaganda' :
-                serviceUsed === 'tinyurl' ? 'Link encurtado (pode ter propaganda)' :
-                'Link encurtado localmente'
-      });
+    } // Fecha o bloco if (route === 'encurtar-link')
 
-    }
-
-  } // Fecha o bloco if (route === 'encurtar-link')
-
-  // Rota padrão (index)
-  return res.status(200).json({
-    success: true,
-    message: 'API Index funcionando!',
-    method: req.method,
-    url: req.url,
-    routes: [
-      'GET /api/ - Index da API',
-      'GET /api/?route=auth - Status da autenticação',
-      'POST /api/?route=auth&endpoint=login - Login',
-      'POST /api/?route=auth&endpoint=logout - Logout',
-      'GET /api/?route=auth&endpoint=verify - Verificar token',
-      'GET /api/?route=configuracoes - Configurações do sistema',
-      'GET /api/?route=promocoes - Lista de promoções',
-      'POST /api/?route=promocoes - Criar promoção',
-      'PUT /api/?route=promocoes&id={id} - Atualizar promoção',
-      'GET /api/?route=dashboard - Dados do dashboard',
-      'GET /api/?route=participantes - Lista de participantes',
-      'POST /api/?route=participantes - Cadastrar participante',
-      'PUT /api/?route=participantes&id={id} - Atualizar participante',
-      'GET /api/?route=usuarios - Lista de usuários',
-      'PATCH /api/?route=usuarios&id={id} - Atualizar senha de usuário',
-      'POST /api/?route=usuarios - Atualizar senhas em lote',
-      'GET /api/?route=sorteio&action=encerradas - Promoções encerradas',
-      'POST /api/?route=sorteio&action=sortear - Realizar sorteio',
-      'GET /api/?route=sorteio&action=ganhadores&id={promocaoId} - Ganhadores',
-      'GET /api/?route=sorteio&action=participantes&promocaoId={id} - Participantes disponíveis',
-      'GET /api/?route=sorteio&action=estatisticas - Estatísticas de sorteios',
-      'DELETE /api/?route=sorteio&action=ganhadores&id={ganhadorId} - Cancelar sorteio'
-    ],
-    timestamp: new Date().toISOString()
-  });
-} catch (error) {
+    // Rota padrão (index)
+    return res.status(200).json({
+      success: true,
+      message: 'API Index funcionando!',
+      method: req.method,
+      url: req.url,
+      routes: [
+        'GET /api/ - Index da API',
+        'GET /api/?route=auth - Status da autenticação',
+        'POST /api/?route=auth&endpoint=login - Login',
+        'POST /api/?route=auth&endpoint=logout - Logout',
+        'GET /api/?route=auth&endpoint=verify - Verificar token',
+        'GET /api/?route=configuracoes - Configurações do sistema',
+        'GET /api/?route=promocoes - Lista de promoções',
+        'POST /api/?route=promocoes - Criar promoção',
+        'PUT /api/?route=promocoes&id={id} - Atualizar promoção',
+        'GET /api/?route=dashboard - Dados do dashboard',
+        'GET /api/?route=participantes - Lista de participantes',
+        'POST /api/?route=participantes - Cadastrar participante',
+        'PUT /api/?route=participantes&id={id} - Atualizar participante',
+        'GET /api/?route=usuarios - Lista de usuários',
+        'PATCH /api/?route=usuarios&id={id} - Atualizar senha de usuário',
+        'POST /api/?route=usuarios - Atualizar senhas em lote',
+        'GET /api/?route=sorteio&action=encerradas - Promoções encerradas',
+        'POST /api/?route=sorteio&action=sortear - Realizar sorteio',
+        'GET /api/?route=sorteio&action=ganhadores&id={promocaoId} - Ganhadores',
+        'GET /api/?route=sorteio&action=participantes&promocaoId={id} - Participantes disponíveis',
+        'GET /api/?route=sorteio&action=estatisticas - Estatísticas de sorteios',
+        'DELETE /api/?route=sorteio&action=ganhadores&id={ganhadorId} - Cancelar sorteio'
+      ],
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
     // ✅ CRITICAL: Global error handler - ensures ALL errors return JSON (never plain text)
     // This prevents Vercel's default "A server error has occurred" plain text response
     console.error('❌ FATAL ERROR in API handler:', {
