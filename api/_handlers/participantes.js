@@ -179,8 +179,8 @@ module.exports = async (req, res) => {
           // 2. Se existe e enviamos promocao_id, verificar se JÁ está nesta promoção específica
           if (exists && promocaoId) {
             const promoCheck = await databasePool.query(`
-              SELECT id, nome, telefone, bairro, city AS cidade FROM participantes_unificados 
-              WHERE phone IN ($1, $2) AND promocao_id = $3
+              SELECT id, nome, telefone, bairro, cidade FROM participantes 
+              WHERE (telefone = $1 OR telefone = $2) AND promocao_id = $3 AND deleted_at IS NULL
               LIMIT 1
             `, [telefoneClean, doubleClean, promocaoId]);
 
@@ -188,7 +188,7 @@ module.exports = async (req, res) => {
               jaNaPromocao = true;
               // IMPORTANTE: Retornar os dados e o ID específicos desta participação
               data = {
-                ...dbResult.rows[0], // Mantém base se houver campos extras
+                ...dbResult.rows[0],
                 id: promoCheck.rows[0].id,
                 nome: promoCheck.rows[0].nome,
                 telefone: promoCheck.rows[0].telefone,

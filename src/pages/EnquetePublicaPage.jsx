@@ -110,7 +110,9 @@ const EnquetePublicaPage = () => {
                     const vRes = await fetch(`/api/?route=enquetes&endpoint=verificar_voto&enquete_id=${enquete.id}&participante_id=${pId}`);
                     const vData = await vRes.json();
                     if (vData.ja_votou) {
+                        console.log('🚫 [ENQUETE] Usuário já votou nesta enquete.');
                         setVotoComputado(true);
+                        setStep(4); // Força ir para tela de agradecimento
                         return;
                     }
                 } catch (vErr) { console.error(vErr); }
@@ -264,8 +266,10 @@ const EnquetePublicaPage = () => {
 
             if (res.ok) {
                 setVotoComputado(true);
+                setStep(4); // Vai para tela de agradecimento
             } else if (res.status === 409) {
-                setVotoComputado(true); // Se der erro 409 é porque o cara já tentou votar e o backend bloqueou via indice unq_voto_por_participante
+                setVotoComputado(true);
+                setStep(4); // Força ir para tela de agradecimento se já votou
                 alert('Você só pode votar 1 vez por enquete. Seu primeiro voto já foi validado! 😉 Acompanhe o resultado na TV!');
             } else if (res.status === 403) {
                 setError('Esta enquete já foi encerrada. Fique de olho na TV para a próxima!');
