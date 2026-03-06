@@ -30,7 +30,7 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
         return (
             <div style={styles.card}>
                 <h3 style={styles.h3}>Dados Incompletos</h3>
-                <p style={{color: '#F59E0B', marginBottom: '1rem', fontWeight: '500'}}>
+                <p style={{ color: '#F59E0B', marginBottom: '1rem', fontWeight: '500' }}>
                     ⚠️ Os dados do jogo estão incompletos ou em formato antigo. Por favor, recarregue ou reset o jogo.
                 </p>
                 <button
@@ -44,7 +44,7 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                     Recarregar Dados
                 </button>
                 <button
-                    style={{...styles.button.danger, marginTop: '1rem'}}
+                    style={{ ...styles.button.danger, marginTop: '1rem' }}
                     onClick={() => window.confirm('Tem certeza?') && actions.resetGame()}
                     disabled={loading}
                 >
@@ -60,15 +60,15 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
             <div style={styles.column}>
                 <div style={styles.card}>
                     <h3 style={styles.h3}>Controles do Jogo</h3>
-                    <p style={{color: getCSSVar('--color-text') || '#1F2937'}}>
+                    <p style={{ color: getCSSVar('--color-text') || '#1F2937' }}>
                         Sorteio atual: <strong>{giveaway?.product?.name || 'Produto não informado'}</strong>
                     </p>
-                    <p style={{color: getCSSVar('--color-text') || '#1F2937'}}>
+                    <p style={{ color: getCSSVar('--color-text') || '#1F2937' }}>
                         Status: <span style={styles.status(status)}>{
                             status === 'accepting' ? 'Aceitando Palpites' :
-                            status === 'closed' ? 'Encerrado' :
-                            status === 'finished' ? 'Finalizado' :
-                            status || 'Desconhecido'
+                                status === 'closed' ? 'Encerrado' :
+                                    status === 'finished' ? 'Finalizado' :
+                                        status || 'Desconhecido'
                         }</span>
                     </p>
 
@@ -80,11 +80,11 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                         marginTop: '1rem',
                         border: '1px solid #059669'
                     }}>
-                        <h4 style={{color: 'white', margin: '0 0 0.5rem 0', fontWeight: '600'}}>🔗 Link Público para Participantes</h4>
-                        <p style={{color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.9rem', margin: '0 0 1rem 0'}}>
-                            Compartilhe este link com participantes que não têm login:
+                        <h4 style={{ color: 'white', margin: '0 0 0.5rem 0', fontWeight: '600' }}>🔗 Link Público para Participações</h4>
+                        <p style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.9rem', margin: '0 0 1rem 0' }}>
+                            Compartilhe este link para novas participações:
                         </p>
-                        <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                             <input
                                 type="text"
                                 value={`${window.location.origin}/caixa-misteriosa-pub`}
@@ -124,7 +124,7 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                         </div>
                     </div>
                     <div style={styles.buttonGroup}>
-                        <button 
+                        <button
                             style={styles.button.primary}
                             onClick={actions.revealClue}
                             disabled={loading || (revealedCluesCount || 0) >= 5 || status !== 'accepting'}
@@ -132,7 +132,7 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                             {(revealedCluesCount || 0) >= 5 ? 'Todas as dicas reveladas' : `Revelar Dica (${(revealedCluesCount || 0) + 1}/5)`}
                         </button>
                         {status === 'accepting' && (
-                            <button 
+                            <button
                                 style={styles.button.warning}
                                 onClick={actions.endSubmissions}
                                 disabled={loading}
@@ -157,17 +157,17 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                                 marginTop: '1rem',
                                 border: '1px solid #7C3AED'
                             }}>
-                                <h4 style={{color: 'white', margin: '0 0 0.5rem 0', fontWeight: '600'}}>🏆 Jogo Finalizado!</h4>
+                                <h4 style={{ color: 'white', margin: '0 0 0.5rem 0', fontWeight: '600' }}>🏆 Jogo Finalizado!</h4>
                                 {liveGame.winner ? (
-                                    <p style={{color: 'rgba(255, 255, 255, 0.95)', margin: '0 0 1rem 0'}}>
-                                        Vencedor: <strong>{liveGame.winner.userName}</strong><br/>
+                                    <p style={{ color: 'rgba(255, 255, 255, 0.95)', margin: '0 0 1rem 0' }}>
+                                        Vencedor: <strong>{liveGame.winner.userName}</strong><br />
                                         Palpite: <strong>{liveGame.winner.guess}</strong>
                                     </p>
                                 ) : (
-                                    <p style={{color: 'rgba(255, 255, 255, 0.9)', margin: '0 0 1rem 0'}}>Jogo finalizado sem vencedor.</p>
+                                    <p style={{ color: 'rgba(255, 255, 255, 0.9)', margin: '0 0 1rem 0' }}>Jogo finalizado sem vencedor.</p>
                                 )}
                                 <button
-                                    style={{...styles.button.primary, background: 'white', color: '#8B5CF6', fontWeight: '600'}}
+                                    style={{ ...styles.button.primary, background: 'white', color: '#8B5CF6', fontWeight: '600' }}
                                     onClick={() => window.confirm('Iniciar um novo jogo? Isso limpará todos os dados atuais.') && actions.resetGame()}
                                     disabled={loading}
                                 >
@@ -176,8 +176,8 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                             </div>
                         )}
                     </div>
-                    <button 
-                        style={{...styles.button.danger, marginTop: '1rem'}}
+                    <button
+                        style={{ ...styles.button.danger, marginTop: '1rem' }}
                         onClick={() => window.confirm('Tem certeza?') && actions.resetGame()}
                         disabled={loading}
                     >
@@ -187,7 +187,7 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
 
                 <div style={styles.card}>
                     <h3 style={styles.h3}>Dicas</h3>
-                    <ul style={{listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                    <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         {(giveaway?.product?.clues || []).map((clue, i) => (
                             <li key={i} style={styles.clue(i < (revealedCluesCount || 0))}>
                                 <strong>Dica {i + 1}:</strong> {clue}
@@ -226,35 +226,35 @@ const LiveControlView = ({ liveGame, actions, loading }) => {
                         {(submissions || []).length > 0 ? (
                             [...(submissions || [])].reverse().map((sub, index) => (
                                 <div key={index} style={styles.submissionItem}>
-                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                        <div style={{color: getCSSVar('--color-text') || '#1F2937'}}>
-                                            <strong style={{color: getCSSVar('--color-primary') || '#6D28D9'}}>{sub.userName || sub.user_name}:</strong> {sub.guess}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ color: getCSSVar('--color-text') || '#1F2937' }}>
+                                            <strong style={{ color: getCSSVar('--color-primary') || '#6D28D9' }}>{sub.userName || sub.user_name}:</strong> {sub.guess}
                                             {sub.submissionNumber && (
-                                                <span style={{color: getCSSVar('--color-text-secondary') || '#6B7280', fontSize: '0.8rem', marginLeft: '0.5rem'}}>
+                                                <span style={{ color: getCSSVar('--color-text-secondary') || '#6B7280', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
                                                     (#{sub.submissionNumber})
                                                 </span>
                                             )}
                                         </div>
                                         {sub.created_at && (
-                                            <small style={{color: getCSSVar('--color-text-secondary') || '#6B7280'}}>
+                                            <small style={{ color: getCSSVar('--color-text-secondary') || '#6B7280' }}>
                                                 {new Date(sub.created_at).toLocaleString('pt-BR')}
                                             </small>
                                         )}
                                     </div>
                                     {sub.phone && (
-                                        <div style={{color: getCSSVar('--color-text-secondary') || '#6B7280', fontSize: '0.8rem', marginTop: '0.25rem'}}>
+                                        <div style={{ color: getCSSVar('--color-text-secondary') || '#6B7280', fontSize: '0.8rem', marginTop: '0.25rem' }}>
                                             📱 {sub.phone} • {sub.neighborhood}, {sub.city}
                                         </div>
                                     )}
                                 </div>
                             ))
                         ) : (
-                            <div style={{textAlign: 'center', color: getCSSVar('--color-text-secondary') || '#6B7280', padding: '2rem'}}>
+                            <div style={{ textAlign: 'center', color: getCSSVar('--color-text-secondary') || '#6B7280', padding: '2rem' }}>
                                 <p>Aguardando o primeiro palpite...</p>
-                                <p style={{fontSize: '0.9rem', marginTop: '1rem'}}>
+                                <p style={{ fontSize: '0.9rem', marginTop: '1rem' }}>
                                     📝 Os palpites aparecerão aqui conforme forem enviados pelos participantes.
                                 </p>
-                                <p style={{fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.8}}>
+                                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.8 }}>
                                     Dica: Clique em "Atualizar Palpites" para verificar novos envios.
                                 </p>
                             </div>
@@ -290,8 +290,8 @@ const styles = {
     status: (status) => ({
         fontWeight: 'bold',
         color: status === 'accepting' ? '#34D399' :
-               status === 'closed' ? '#F59E0B' :
-               status === 'finished' ? '#8B5CF6' : getCSSVar('--color-text-secondary') || '#6B7280'
+            status === 'closed' ? '#F59E0B' :
+                status === 'finished' ? '#8B5CF6' : getCSSVar('--color-text-secondary') || '#6B7280'
     }),
     buttonGroup: { display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' },
     button: {

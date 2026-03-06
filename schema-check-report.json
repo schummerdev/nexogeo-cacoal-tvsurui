@@ -1,11 +1,14 @@
 {
-  "timestamp": "2025-11-16T21:06:06.483Z",
+  "timestamp": "2026-03-06T20:10:31.102Z",
   "tabelas": {
     "existentes": [
       "audit_logs",
       "configuracoes_emissora",
       "consent_logs",
       "data_access_logs",
+      "enquete_opcoes",
+      "enquete_votos",
+      "enquetes",
       "games",
       "ganhadores",
       "participantes",
@@ -14,6 +17,7 @@
       "public_participants",
       "rate_limits",
       "referral_rewards",
+      "schema_migrations",
       "sponsors",
       "submissions",
       "system_logs",
@@ -38,7 +42,11 @@
     ],
     "faltantes": [],
     "extras": [
-      "referral_rewards"
+      "enquete_opcoes",
+      "enquete_votos",
+      "enquetes",
+      "referral_rewards",
+      "schema_migrations"
     ]
   },
   "views": {
@@ -53,7 +61,7 @@
     "faltantes": []
   },
   "indices": {
-    "total": 67,
+    "total": 87,
     "por_tabela": {
       "audit_logs": [
         {
@@ -67,6 +75,10 @@
         {
           "nome": "idx_audit_logs_created_at",
           "definicao": "CREATE INDEX idx_audit_logs_created_at ON public.audit_logs USING btree (created_at)"
+        },
+        {
+          "nome": "idx_audit_logs_record_id",
+          "definicao": "CREATE INDEX idx_audit_logs_record_id ON public.audit_logs USING btree (record_id)"
         },
         {
           "nome": "idx_audit_logs_table_name",
@@ -123,6 +135,40 @@
           "definicao": "CREATE INDEX idx_data_access_logs_user_id ON public.data_access_logs USING btree (user_id)"
         }
       ],
+      "enquete_opcoes": [
+        {
+          "nome": "enquete_opcoes_pkey",
+          "definicao": "CREATE UNIQUE INDEX enquete_opcoes_pkey ON public.enquete_opcoes USING btree (id)"
+        }
+      ],
+      "enquete_votos": [
+        {
+          "nome": "enquete_votos_pkey",
+          "definicao": "CREATE UNIQUE INDEX enquete_votos_pkey ON public.enquete_votos USING btree (id)"
+        },
+        {
+          "nome": "idx_enquete_votos_enquete_id",
+          "definicao": "CREATE INDEX idx_enquete_votos_enquete_id ON public.enquete_votos USING btree (enquete_id)"
+        },
+        {
+          "nome": "idx_enquete_votos_participante_id",
+          "definicao": "CREATE INDEX idx_enquete_votos_participante_id ON public.enquete_votos USING btree (participante_id)"
+        },
+        {
+          "nome": "unq_voto_por_participante",
+          "definicao": "CREATE UNIQUE INDEX unq_voto_por_participante ON public.enquete_votos USING btree (enquete_id, participante_id)"
+        }
+      ],
+      "enquetes": [
+        {
+          "nome": "enquetes_pkey",
+          "definicao": "CREATE UNIQUE INDEX enquetes_pkey ON public.enquetes USING btree (id)"
+        },
+        {
+          "nome": "idx_enquetes_status",
+          "definicao": "CREATE INDEX idx_enquetes_status ON public.enquetes USING btree (status) WHERE (deleted_at IS NULL)"
+        }
+      ],
       "games": [
         {
           "nome": "games_pkey",
@@ -131,6 +177,10 @@
         {
           "nome": "idx_games_deleted_at",
           "definicao": "CREATE INDEX idx_games_deleted_at ON public.games USING btree (deleted_at)"
+        },
+        {
+          "nome": "idx_games_product_id",
+          "definicao": "CREATE INDEX idx_games_product_id ON public.games USING btree (product_id)"
         },
         {
           "nome": "idx_games_status",
@@ -173,6 +223,18 @@
           "definicao": "CREATE UNIQUE INDEX idx_participante_unico_por_promocao ON public.participantes USING btree (promocao_id, telefone)"
         },
         {
+          "nome": "idx_participantes_bairro",
+          "definicao": "CREATE INDEX idx_participantes_bairro ON public.participantes USING btree (bairro) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "idx_participantes_cidade",
+          "definicao": "CREATE INDEX idx_participantes_cidade ON public.participantes USING btree (cidade) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "idx_participantes_criado_em",
+          "definicao": "CREATE INDEX idx_participantes_criado_em ON public.participantes USING btree (participou_em DESC) WHERE (deleted_at IS NULL)"
+        },
+        {
           "nome": "idx_participantes_deleted_at",
           "definicao": "CREATE INDEX idx_participantes_deleted_at ON public.participantes USING btree (deleted_at)"
         },
@@ -181,8 +243,16 @@
           "definicao": "CREATE INDEX idx_participantes_geolocalizacao ON public.participantes USING btree (latitude, longitude)"
         },
         {
+          "nome": "idx_participantes_nome",
+          "definicao": "CREATE INDEX idx_participantes_nome ON public.participantes USING btree (nome) WHERE (deleted_at IS NULL)"
+        },
+        {
           "nome": "idx_participantes_promocao_id",
           "definicao": "CREATE INDEX idx_participantes_promocao_id ON public.participantes USING btree (promocao_id) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "nome": "idx_participantes_soft_delete",
+          "definicao": "CREATE INDEX idx_participantes_soft_delete ON public.participantes USING btree (deleted_at)"
         },
         {
           "nome": "idx_participantes_telefone",
@@ -269,8 +339,16 @@
           "definicao": "CREATE INDEX idx_rate_limits_cleanup ON public.rate_limits USING btree (created_at)"
         },
         {
+          "nome": "idx_rate_limits_key_endpoint",
+          "definicao": "CREATE INDEX idx_rate_limits_key_endpoint ON public.rate_limits USING btree (key, endpoint)"
+        },
+        {
           "nome": "idx_rate_limits_lookup",
           "definicao": "CREATE INDEX idx_rate_limits_lookup ON public.rate_limits USING btree (ip, user_id, endpoint, created_at DESC)"
+        },
+        {
+          "nome": "idx_rate_limits_window",
+          "definicao": "CREATE INDEX idx_rate_limits_window ON public.rate_limits USING btree (window_start)"
         },
         {
           "nome": "rate_limits_pkey",
@@ -287,7 +365,17 @@
           "definicao": "CREATE UNIQUE INDEX referral_rewards_pkey ON public.referral_rewards USING btree (id)"
         }
       ],
+      "schema_migrations": [
+        {
+          "nome": "schema_migrations_pkey",
+          "definicao": "CREATE UNIQUE INDEX schema_migrations_pkey ON public.schema_migrations USING btree (id)"
+        }
+      ],
       "sponsors": [
+        {
+          "nome": "idx_sponsors_deleted_at",
+          "definicao": "CREATE INDEX idx_sponsors_deleted_at ON public.sponsors USING btree (deleted_at)"
+        },
         {
           "nome": "sponsors_pkey",
           "definicao": "CREATE UNIQUE INDEX sponsors_pkey ON public.sponsors USING btree (id)"
@@ -339,6 +427,14 @@
       ],
       "usuarios": [
         {
+          "nome": "idx_usuarios_google_id",
+          "definicao": "CREATE INDEX idx_usuarios_google_id ON public.usuarios USING btree (google_id)"
+        },
+        {
+          "nome": "idx_usuarios_role",
+          "definicao": "CREATE INDEX idx_usuarios_role ON public.usuarios USING btree (role)"
+        },
+        {
           "nome": "usuarios_email_key",
           "definicao": "CREATE UNIQUE INDEX usuarios_email_key ON public.usuarios USING btree (email)"
         },
@@ -360,7 +456,8 @@
   "funcoes": {
     "existentes": [
       "cleanup_old_logs",
-      "cleanup_old_rate_limits"
+      "cleanup_old_rate_limits",
+      "normalize_bairro"
     ]
   },
   "problemas": [],
@@ -1280,6 +1377,47 @@
         "coluna": "id"
       }
     ],
+    "enquete_opcoes": [
+      {
+        "nome": "enquete_opcoes_enquete_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "enquete_id"
+      },
+      {
+        "nome": "enquete_opcoes_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "enquete_votos": [
+      {
+        "nome": "enquete_votos_enquete_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "enquete_id"
+      },
+      {
+        "nome": "enquete_votos_opcao_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "opcao_id"
+      },
+      {
+        "nome": "enquete_votos_participante_id_fkey",
+        "tipo": "FOREIGN KEY",
+        "coluna": "participante_id"
+      },
+      {
+        "nome": "enquete_votos_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
+    "enquetes": [
+      {
+        "nome": "enquetes_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
     "games": [
       {
         "nome": "fk_winner_submission",
@@ -1421,6 +1559,13 @@
         "coluna": "referrer_id"
       }
     ],
+    "schema_migrations": [
+      {
+        "nome": "schema_migrations_pkey",
+        "tipo": "PRIMARY KEY",
+        "coluna": "id"
+      }
+    ],
     "sponsors": [
       {
         "nome": "sponsors_pkey",
@@ -1481,10 +1626,10 @@
     ]
   },
   "estatisticas": {
-    "total_participantes": "364",
+    "total_participantes": "1084",
     "total_public_participants": "46",
-    "total_promocoes": "11",
-    "total_ganhadores": "24",
-    "total_usuarios": "4"
+    "total_promocoes": "15",
+    "total_ganhadores": "40",
+    "total_usuarios": "5"
   }
 }

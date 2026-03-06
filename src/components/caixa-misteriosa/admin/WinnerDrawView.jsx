@@ -369,8 +369,8 @@ const WinnerDrawView = ({ liveGame, actions, loading }) => {
         if (correctParticipants.length === 0) {
             const confirmar = window.confirm(
                 '⚠️ Ninguém acertou o produto!\n\n' +
-                `Total de participantes: ${stats.totalSubmissions}\n\n` +
-                'Deseja sortear entre TODOS os participantes mesmo assim?'
+                `Total de participações: ${stats.totalSubmissions}\n\n` +
+                'Deseja sortear entre TODAS as participações mesmo assim?'
             );
 
             if (!confirmar) return;
@@ -431,7 +431,7 @@ const WinnerDrawView = ({ liveGame, actions, loading }) => {
             <div style={styles.container}>
                 <div style={styles.card}>
                     <h3 style={styles.h3}>Dados Incompletos</h3>
-                    <p style={{color: currentThemeData.warning}}>Os dados do jogo estão incompletos.</p>
+                    <p style={{ color: currentThemeData.warning }}>Os dados do jogo estão incompletos.</p>
                 </div>
             </div>
         );
@@ -467,136 +467,136 @@ const WinnerDrawView = ({ liveGame, actions, loading }) => {
             <div style={styles.container}>
                 {/* Header com Estatísticas */}
                 <div style={styles.statsGrid}>
-                <div style={{...styles.statCard, borderLeft: '4px solid #10B981'}}>
-                    <div style={styles.statValue}>{stats.totalParticipants}</div>
-                    <div style={styles.statLabel}>👥 Total Cadastrados</div>
-                </div>
-                <div style={{...styles.statCard, borderLeft: '4px solid #3B82F6'}}>
-                    <div style={styles.statValue}>{stats.uniqueParticipants}</div>
-                    <div style={styles.statLabel}>🎮 Participantes Ativos</div>
-                </div>
-                <div style={{...styles.statCard, borderLeft: '4px solid #A78BFA'}}>
-                    <div style={styles.statValue}>{stats.totalSubmissions}</div>
-                    <div style={styles.statLabel}>📝 Total de Palpites</div>
-                </div>
-                <div style={{...styles.statCard, borderLeft: '4px solid #F59E0B'}}>
-                    <div style={styles.statValue}>{stats.correctGuesses}</div>
-                    <div style={styles.statLabel}>✅ Palpites Corretos</div>
-                </div>
-            </div>
-
-            {/* Informações do Jogo */}
-            <div style={styles.card}>
-                <h3 style={styles.h3}>🎯 Sorteio: {giveaway.product.name}</h3>
-                <p style={{color: currentThemeData.textSecondary, marginBottom: '1rem'}}>
-                    <strong>Patrocinador:</strong> {giveaway.sponsor?.name || 'N/A'}
-                </p>
-                <p style={{color: currentThemeData.textSecondary}}>
-                    <strong>Status:</strong>{' '}
-                    <span style={{
-                        color: status === 'closed' ? currentThemeData.warning :
-                               status === 'finished' ? currentThemeData.primary : currentThemeData.textSecondary
-                    }}>
-                        {status === 'closed' ? '🟡 Aguardando Sorteio' :
-                         status === 'finished' ? '🏁 Finalizado' : status}
-                    </span>
-                </p>
-            </div>
-
-            {/* Countdown antes de revelar ganhador */}
-            {winner && !showWinner && (
-                <div style={styles.countdownSection}>
-                    <h3 style={styles.countdownTitle}>⏰ Revelando ganhador em:</h3>
-                    <div style={styles.countdownDisplay}>
-                        <div style={styles.countdownNumber}>{countdown}</div>
-                        <div style={styles.countdownLabel}>segundos</div>
+                    <div style={{ ...styles.statCard, borderLeft: '4px solid #10B981' }}>
+                        <div style={styles.statValue}>{stats.totalParticipants}</div>
+                        <div style={styles.statLabel}>👥 Total Cadastrados</div>
                     </div>
-                    <div style={styles.confettiAnimation}>🎉</div>
-                </div>
-            )}
-
-            {/* Ganhador em Destaque (após countdown) */}
-            {winner && showWinner && (
-                <div style={styles.winnerCard}>
-                    <h2 style={{...styles.h3, fontSize: '2rem', marginBottom: '1.5rem'}}>
-                        🏆 GANHADOR DO SORTEIO
-                    </h2>
-                    <div style={styles.winnerInfo}>
-                        <div style={styles.winnerName}>{winner.userName || winner.user_name}</div>
-                        <div style={styles.winnerDetail}>
-                            <strong>Bairro:</strong> {winner.userNeighborhood || winner.user_neighborhood}
-                        </div>
-                        <div style={styles.winnerDetail}>
-                            <strong>Palpite:</strong> "{winner.guess}"
-                        </div>
+                    <div style={{ ...styles.statCard, borderLeft: '4px solid #3B82F6' }}>
+                        <div style={styles.statValue}>{stats.uniqueParticipants}</div>
+                        <div style={styles.statLabel}>🎮 Participações Ativas</div>
+                    </div>
+                    <div style={{ ...styles.statCard, borderLeft: '4px solid #A78BFA' }}>
+                        <div style={styles.statValue}>{stats.totalSubmissions}</div>
+                        <div style={styles.statLabel}>📝 Total de Palpites</div>
+                    </div>
+                    <div style={{ ...styles.statCard, borderLeft: '4px solid #F59E0B' }}>
+                        <div style={styles.statValue}>{stats.correctGuesses}</div>
+                        <div style={styles.statLabel}>✅ Palpites Corretos</div>
                     </div>
                 </div>
-            )}
 
-            {/* Lista de Participantes que Acertaram */}
-            <div style={styles.card}>
-                <h3 style={styles.h3}>
-                    ✅ Participantes que Acertaram ({correctParticipants.length})
-                </h3>
+                {/* Informações do Jogo */}
+                <div style={styles.card}>
+                    <h3 style={styles.h3}>🎯 Sorteio: {giveaway.product.name}</h3>
+                    <p style={{ color: currentThemeData.textSecondary, marginBottom: '1rem' }}>
+                        <strong>Patrocinador:</strong> {giveaway.sponsor?.name || 'N/A'}
+                    </p>
+                    <p style={{ color: currentThemeData.textSecondary }}>
+                        <strong>Status:</strong>{' '}
+                        <span style={{
+                            color: status === 'closed' ? currentThemeData.warning :
+                                status === 'finished' ? currentThemeData.primary : currentThemeData.textSecondary
+                        }}>
+                            {status === 'closed' ? '🟡 Aguardando Sorteio' :
+                                status === 'finished' ? '🏁 Finalizado' : status}
+                        </span>
+                    </p>
+                </div>
 
-                {correctParticipants.length > 0 ? (
-                    <div style={styles.participantsList}>
-                        {correctParticipants.map((participant, index) => (
-                            <div key={participant.id} style={styles.participantItem}>
-                                <div style={styles.participantRank}>#{index + 1}</div>
-                                <div style={styles.participantInfo}>
-                                    <div style={styles.participantName}>{participant.name}</div>
-                                    <div style={styles.participantMeta}>
-                                        {participant.neighborhood} - {participant.guess}
-                                    </div>
-                                </div>
-                                {participant.createdAt && (
-                                    <div style={styles.participantTime}>
-                                        {new Date(participant.createdAt).toLocaleTimeString('pt-BR', {
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                    </div>
-                                )}
+                {/* Countdown antes de revelar ganhador */}
+                {winner && !showWinner && (
+                    <div style={styles.countdownSection}>
+                        <h3 style={styles.countdownTitle}>⏰ Revelando ganhador em:</h3>
+                        <div style={styles.countdownDisplay}>
+                            <div style={styles.countdownNumber}>{countdown}</div>
+                            <div style={styles.countdownLabel}>segundos</div>
+                        </div>
+                        <div style={styles.confettiAnimation}>🎉</div>
+                    </div>
+                )}
+
+                {/* Ganhador em Destaque (após countdown) */}
+                {winner && showWinner && (
+                    <div style={styles.winnerCard}>
+                        <h2 style={{ ...styles.h3, fontSize: '2rem', marginBottom: '1.5rem' }}>
+                            🏆 GANHADOR DO SORTEIO
+                        </h2>
+                        <div style={styles.winnerInfo}>
+                            <div style={styles.winnerName}>{winner.userName || winner.user_name}</div>
+                            <div style={styles.winnerDetail}>
+                                <strong>Bairro:</strong> {winner.userNeighborhood || winner.user_neighborhood}
                             </div>
-                        ))}
+                            <div style={styles.winnerDetail}>
+                                <strong>Palpite:</strong> "{winner.guess}"
+                            </div>
+                        </div>
                     </div>
-                ) : (
-                    <div style={styles.emptyState}>
-                        <p style={{fontSize: '3rem', margin: '0 0 1rem 0'}}>😔</p>
-                        <p style={{fontSize: '1.1rem', margin: '0 0 0.5rem 0'}}>
-                            Nenhum participante acertou o produto
-                        </p>
-                        <p style={{fontSize: '0.9rem', color: '#6B7280'}}>
-                            Você pode sortear entre todos os participantes
+                )}
+
+                {/* Lista de Participantes que Acertaram */}
+                <div style={styles.card}>
+                    <h3 style={styles.h3}>
+                        ✅ Participações que Acertaram ({correctParticipants.length})
+                    </h3>
+
+                    {correctParticipants.length > 0 ? (
+                        <div style={styles.participantsList}>
+                            {correctParticipants.map((participant, index) => (
+                                <div key={participant.id} style={styles.participantItem}>
+                                    <div style={styles.participantRank}>#{index + 1}</div>
+                                    <div style={styles.participantInfo}>
+                                        <div style={styles.participantName}>{participant.name}</div>
+                                        <div style={styles.participantMeta}>
+                                            {participant.neighborhood} - {participant.guess}
+                                        </div>
+                                    </div>
+                                    {participant.createdAt && (
+                                        <div style={styles.participantTime}>
+                                            {new Date(participant.createdAt).toLocaleTimeString('pt-BR', {
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div style={styles.emptyState}>
+                            <p style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>😔</p>
+                            <p style={{ fontSize: '1.1rem', margin: '0 0 0.5rem 0' }}>
+                                Nenhuma participação acertou o produto
+                            </p>
+                            <p style={{ fontSize: '0.9rem', color: '#6B7280' }}>
+                                Você pode sortear entre todas as participações
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Botão de Sorteio */}
+                {status === 'closed' && !winner && (
+                    <button
+                        onClick={handleDrawWinner}
+                        disabled={isDrawing || loading}
+                        style={{
+                            ...styles.drawButton,
+                            opacity: (isDrawing || loading) ? 0.5 : 1,
+                            cursor: (isDrawing || loading) ? 'not-allowed' : 'pointer'
+                        }}
+                    >
+                        {isDrawing ? '🎲 Sorteando...' : `🎲 Fazer o Sorteio Agora (${stats.correctGuesses} ${stats.correctGuesses === 1 ? 'candidato' : 'candidatos'})`}
+                    </button>
+                )}
+
+                {/* Mensagem após finalizar - SEM botão para não fechar a página */}
+                {status === 'finished' && winner && showWinner && (
+                    <div style={styles.finishedMessage}>
+                        <p style={{ fontSize: '1.2rem', color: 'white', margin: 0 }}>
+                            ✅ Sorteio finalizado! Use o botão "🎮 Controles" no topo para voltar aos controles.
                         </p>
                     </div>
                 )}
-            </div>
-
-            {/* Botão de Sorteio */}
-            {status === 'closed' && !winner && (
-                <button
-                    onClick={handleDrawWinner}
-                    disabled={isDrawing || loading}
-                    style={{
-                        ...styles.drawButton,
-                        opacity: (isDrawing || loading) ? 0.5 : 1,
-                        cursor: (isDrawing || loading) ? 'not-allowed' : 'pointer'
-                    }}
-                >
-                    {isDrawing ? '🎲 Sorteando...' : `🎲 Fazer o Sorteio Agora (${stats.correctGuesses} ${stats.correctGuesses === 1 ? 'candidato' : 'candidatos'})`}
-                </button>
-            )}
-
-            {/* Mensagem após finalizar - SEM botão para não fechar a página */}
-            {status === 'finished' && winner && showWinner && (
-                <div style={styles.finishedMessage}>
-                    <p style={{fontSize: '1.2rem', color: 'white', margin: 0}}>
-                        ✅ Sorteio finalizado! Use o botão "🎮 Controles" no topo para voltar aos controles.
-                    </p>
-                </div>
-            )}
             </div>
         </>
     );

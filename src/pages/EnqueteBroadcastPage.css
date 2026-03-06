@@ -1,0 +1,310 @@
+/* EnqueteBroadcastPage.css - Tela da TV para enquetes ao vivo */
+/* Usa tokens do projeto (index.css) para consistência visual */
+
+.broadcast-page {
+    width: 100vw;
+    min-height: 100vh;
+    overflow-y: auto;
+    background: var(--color-background, #0f172a);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+
+    /* Tokens padrão (tema nexogeo) */
+    --tv-primary: var(--color-primary, #3b82f6);
+    --tv-primary-light: var(--color-primary-light, #60a5fa);
+    --tv-gradient: var(--gradient-primary, linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%));
+}
+
+/* Temas - Sobrescrevem os tokens */
+.broadcast-page.ocean {
+    --tv-primary: #06b6d4;
+    --tv-primary-light: #22d3ee;
+    --tv-gradient: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+}
+
+.broadcast-page.sunset {
+    --tv-primary: #f59e0b;
+    --tv-primary-light: #fbbf24;
+    --tv-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+}
+
+.broadcast-page.forest {
+    --tv-primary: #10b981;
+    --tv-primary-light: #34d399;
+    --tv-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+.broadcast-page.purple {
+    --tv-primary: #8b5cf6;
+    --tv-primary-light: #a78bfa;
+    --tv-gradient: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+}
+
+.broadcast-page.dark {
+    --tv-primary: #64748b;
+    --tv-primary-light: #94a3b8;
+    --tv-gradient: linear-gradient(135deg, #334155 0%, #475569 100%);
+}
+
+/* Container principal - ocupa toda a tela sem bordas */
+.broadcast-container {
+    width: 100%;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        var(--color-background, #0f172a);
+    padding: 30px 50px;
+    position: relative;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+/* Borda sutil no topo com cor do tema */
+.broadcast-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--tv-gradient);
+}
+
+/* Header da Emissora (Logo + Nome) */
+.broadcast-emissora-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    align-self: flex-start;
+}
+
+.emissora-logo-tv {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.emissora-nome-tv {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Header: Pergunta + QR Code lado a lado */
+.broadcast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    gap: 30px;
+}
+
+.broadcast-pergunta {
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--tv-primary-light);
+    margin: 0;
+    flex: 1;
+}
+
+/* QR Code com destaque */
+.broadcast-qrcode-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 14px;
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: var(--shadow-lg);
+    flex-shrink: 0;
+}
+
+.qr-text {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.qr-placeholder img {
+    width: 160px;
+    height: 160px;
+    border-radius: var(--radius-sm, 6px);
+}
+
+/* Resultados das opções */
+.broadcast-resultados {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    justify-content: center;
+}
+
+.bar-wrapper {
+    width: 100%;
+}
+
+.bar-label-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 6px;
+}
+
+.opcao-nome {
+    font-size: clamp(0.9rem, 1.6vw, 1.4rem);
+    font-weight: 800;
+    color: var(--color-text, #e2e8f0);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.opcao-percent {
+    font-size: clamp(1rem, 2vw, 1.7rem);
+    font-weight: 900;
+    color: var(--tv-primary-light);
+}
+
+.bar-background {
+    height: 28px;
+    background: var(--color-surface, rgba(30, 41, 59, 0.8));
+    border-radius: var(--radius-full, 20px);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full, 20px);
+    transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes shine {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+/* Rodapé */
+.broadcast-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+    color: var(--color-text-secondary, rgba(255, 255, 255, 0.5));
+    font-size: 0.85rem;
+}
+
+.marca-dg {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--tv-primary-light);
+    opacity: 0.6;
+}
+
+/* Balões de engajamento */
+.balloons-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 150;
+}
+
+.balloon-item {
+    position: absolute;
+    bottom: -100px;
+    padding: 8px 18px;
+    border-radius: var(--radius-full, 30px);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
+    animation: float-up 7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.balloon-tail {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 14px solid;
+    margin-top: -2px;
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(0) scale(0.4) rotate(10deg);
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+        transform: translateY(-20vh) scale(1.1) rotate(-5deg);
+    }
+
+    100% {
+        transform: translateY(-120vh) scale(1) rotate(15deg);
+        opacity: 0;
+    }
+}
+
+/* Animações auxiliares */
+.float-slow {
+    animation: none;
+    /* Remove a flutuação que causa distração */
+}
+
+.bounce-in {
+    animation: bounce-in 0.8s var(--transition-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55));
+}
+
+@keyframes bounce-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

@@ -19,9 +19,9 @@ module.exports = async (req, res) => {
   // Rate limiting
   const clientId = req.headers['x-forwarded-for'] || req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown';
   const rateLimit = checkRateLimit(clientId, 100, 60000); // 100 requests per minute
-  
+
   if (!rateLimit.allowed) {
-    res.status(429).json({ 
+    res.status(429).json({
       message: 'Muitas requisições. Tente novamente mais tarde.',
       retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000)
     });
@@ -34,17 +34,20 @@ module.exports = async (req, res) => {
     try {
       await databasePool.query(`
         ALTER TABLE promocoes 
-        ADD COLUMN IF NOT EXISTS numero_ganhadores INTEGER DEFAULT 3
+        ADD COLUMN IF NOT EXISTS numero_ganhadores INTEGER DEFAULT 3;
+        
+        ALTER TABLE promocoes 
+        ADD COLUMN IF NOT EXISTS imagem_url TEXT;
       `);
     } catch (error) {
-      console.log('Erro ao adicionar coluna numero_ganhadores (pode ser normal se já existir):', error.message);
+      console.log('Erro ao adicionar colunas da tabela promocoes (pode ser normal se já existirem):', error.message);
     }
 
     if (req.method === 'GET') {
       const url = new URL(req.url, 'http://localhost');
       const promocaoId = url.searchParams.get('id');
       const status = url.searchParams.get('status');
-      
+
       // Verificar cache primeiro (apenas para listagem geral)
       if (!promocaoId && !status) {
         const cachedPromocoes = await cacheManager.getCachedPromocoes();
@@ -57,10 +60,10 @@ module.exports = async (req, res) => {
           });
         }
       }
-      
+
       let query;
       let params = [];
-      
+
       if (promocaoId) {
         // Buscar promoção específica por ID
         console.log('Buscando promoção por ID:', promocaoId);
@@ -68,7 +71,7 @@ module.exports = async (req, res) => {
         query = `
           SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                  p.status, p.link_participacao, p.criado_em, p.emissora_id,
-                 p.numero_ganhadores, p.deleted_at, p.deleted_by,
+                 p.numero_ganhadores, p.imagem_url, p.deleted_at, p.deleted_by,
                  e.nome as emissora_nome,
                  COALESCE(COUNT(pt.id), 0) as participantes
           FROM promocoes p
@@ -77,7 +80,7 @@ module.exports = async (req, res) => {
           WHERE p.id = $1
           GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                    p.status, p.link_participacao, p.criado_em, p.emissora_id,
-                   p.numero_ganhadores, p.deleted_at, p.deleted_by, e.nome
+                   p.numero_ganhadores, p.imagem_url, p.deleted_at, p.deleted_by, e.nome
         `;
         params = [promocaoId];
       } else {
@@ -88,7 +91,7 @@ module.exports = async (req, res) => {
           query = `
             SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                    p.status, p.link_participacao, p.criado_em, p.emissora_id,
-                   p.numero_ganhadores, p.deleted_at, p.deleted_by,
+                   p.numero_ganhadores, p.imagem_url, p.deleted_at, p.deleted_by,
                    e.nome as emissora_nome,
                    COALESCE(COUNT(pt.id), 0) as participantes
             FROM promocoes p
@@ -97,7 +100,7 @@ module.exports = async (req, res) => {
             WHERE p.status = $1
             GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                      p.status, p.link_participacao, p.criado_em, p.emissora_id,
-                     p.numero_ganhadores, p.deleted_at, p.deleted_by, e.nome
+                     p.numero_ganhadores, p.imagem_url, p.deleted_at, p.deleted_by, e.nome
             ORDER BY p.id DESC
           `;
           params = [status];
@@ -107,7 +110,7 @@ module.exports = async (req, res) => {
           query = `
             SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                    p.status, p.link_participacao, p.criado_em, p.emissora_id,
-                   p.numero_ganhadores, p.deleted_at, p.deleted_by,
+                   p.numero_ganhadores, p.imagem_url, p.deleted_at, p.deleted_by,
                    e.nome as emissora_nome,
                    COALESCE(COUNT(pt.id), 0) as participantes
             FROM promocoes p
@@ -115,32 +118,32 @@ module.exports = async (req, res) => {
             LEFT JOIN participantes pt ON p.id = pt.promocao_id
             GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim,
                      p.status, p.link_participacao, p.criado_em, p.emissora_id,
-                     p.numero_ganhadores, p.deleted_at, p.deleted_by, e.nome
+                     p.numero_ganhadores, p.imagem_url, p.deleted_at, p.deleted_by, e.nome
             ORDER BY p.id DESC
           `;
         }
       }
-      
+
       const result = await databasePool.query(query, params);
       console.log('Query executada, linhas:', result.rows.length);
-      
+
       // Cache a listagem geral de promoções
       if (!promocaoId && !status) {
         await cacheManager.cachePromocoes(result.rows, 300); // Cache por 5 minutos
         console.log('💾 Promoções salvas no cache');
       }
-      
+
       res.status(200).json({ success: true, data: result.rows, cached: false });
-      
+
     } else if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk.toString());
       req.on('end', async () => {
         try {
-          const { nome, descricao, data_inicio, data_fim, status, link_participacao, numero_ganhadores } = JSON.parse(body);
-          
+          const { nome, descricao, data_inicio, data_fim, status, link_participacao, numero_ganhadores, imagem_url } = JSON.parse(body);
+
           if (!nome || !data_inicio || !data_fim) {
-                  res.status(400).json({ message: 'Nome, data_inicio e data_fim são obrigatórios' });
+            res.status(400).json({ message: 'Nome, data_inicio e data_fim são obrigatórios' });
             return;
           }
 
@@ -163,28 +166,28 @@ module.exports = async (req, res) => {
           console.log('Criando promoção:', { nome, slug, linkParticipacao });
 
           const result = await databasePool.query(`
-            INSERT INTO promocoes (nome, descricao, data_inicio, data_fim, status, link_participacao, slug, numero_ganhadores) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+            INSERT INTO promocoes (nome, descricao, data_inicio, data_fim, status, link_participacao, slug, numero_ganhadores, imagem_url) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
             RETURNING *
-          `, [nome, descricao, data_inicio, data_fim, status || 'ativa', linkParticipacao, slug, numero_ganhadores || 3]);
-          
+          `, [nome, descricao, data_inicio, data_fim, status || 'ativa', linkParticipacao, slug, numero_ganhadores || 3, imagem_url]);
+
           // Invalidar cache após criar promoção
           await cacheManager.invalidatePromocoes();
           console.log('🗑️ Cache de promoções invalidado após criação');
-          
+
           res.status(201).json({ success: true, data: result.rows[0] });
-          
+
         } catch (parseError) {
-              res.status(400).json({ message: 'Dados inválidos' });
+          res.status(400).json({ message: 'Dados inválidos' });
         }
       });
-      
+
     } else if (req.method === 'PUT') {
       const url = new URL(req.url, 'http://localhost');
       const id = url.searchParams.get('id');
-      
+
       if (!id) {
-          res.status(400).json({ message: 'ID é obrigatório para atualização' });
+        res.status(400).json({ message: 'ID é obrigatório para atualização' });
         return;
       }
 
@@ -192,32 +195,32 @@ module.exports = async (req, res) => {
       req.on('data', chunk => body += chunk.toString());
       req.on('end', async () => {
         try {
-          const { nome, descricao, data_inicio, data_fim, status, link_participacao, numero_ganhadores } = JSON.parse(body);
-          
+          const { nome, descricao, data_inicio, data_fim, status, link_participacao, numero_ganhadores, imagem_url } = JSON.parse(body);
+
           const result = await databasePool.query(`
             UPDATE promocoes 
-            SET nome = $1, descricao = $2, data_inicio = $3, data_fim = $4, status = $5, link_participacao = $6, numero_ganhadores = $7
-            WHERE id = $8 
+            SET nome = $1, descricao = $2, data_inicio = $3, data_fim = $4, status = $5, link_participacao = $6, numero_ganhadores = $7, imagem_url = $8
+            WHERE id = $9 
             RETURNING *
-          `, [nome, descricao, data_inicio, data_fim, status, link_participacao, numero_ganhadores, id]);
-          
-              if (result.rows.length === 0) {
+          `, [nome, descricao, data_inicio, data_fim, status, link_participacao, numero_ganhadores, imagem_url, id]);
+
+          if (result.rows.length === 0) {
             res.status(404).json({ message: 'Promoção não encontrada' });
           } else {
             res.status(200).json({ success: true, data: result.rows[0] });
           }
-          
+
         } catch (parseError) {
-              res.status(400).json({ message: 'Dados inválidos' });
+          res.status(400).json({ message: 'Dados inválidos' });
         }
       });
-      
+
     } else if (req.method === 'DELETE') {
       const url = new URL(req.url, 'http://localhost');
       const id = url.searchParams.get('id');
-      
+
       if (!id) {
-          res.status(400).json({ message: 'ID é obrigatório para exclusão' });
+        res.status(400).json({ message: 'ID é obrigatório para exclusão' });
         return;
       }
 
@@ -231,52 +234,52 @@ module.exports = async (req, res) => {
             WHERE id = $2
             RETURNING id, nome, deleted_at, deleted_by
         `, [1, id]); // TODO: Get actual user_id from request context
-        
+
         // Invalidar cache após deletar promoção
         await cacheManager.invalidatePromocoes();
         console.log('🗑️ Cache de promoções invalidado após exclusão');
-        
-          if (result.rows.length === 0) {
+
+        if (result.rows.length === 0) {
           res.status(404).json({ message: 'Promoção não encontrada' });
         } else {
           res.status(200).json({ success: true, message: 'Promoção excluída com sucesso' });
         }
 
       } catch (deleteError) {
-          console.error('Erro ao excluir promoção:', deleteError);
-        
+        console.error('Erro ao excluir promoção:', deleteError);
+
         // Verificar se é erro de constraint de chave estrangeira
         if (deleteError.code === '23503') {
           // Tentar identificar que tipo de constraint foi violada
           if (deleteError.detail && deleteError.detail.includes('participantes')) {
-            res.status(400).json({ 
+            res.status(400).json({
               success: false,
-              message: 'Esta promoção não pode ser excluída pois possui participantes vinculados. Remova os participantes primeiro.' 
+              message: 'Esta promoção não pode ser excluída pois possui participantes vinculados. Remova os participantes primeiro.'
             });
           } else if (deleteError.detail && deleteError.detail.includes('ganhadores')) {
-            res.status(400).json({ 
+            res.status(400).json({
               success: false,
-              message: 'Esta promoção não pode ser excluída pois possui ganhadores vinculados. Cancele os sorteios primeiro.' 
+              message: 'Esta promoção não pode ser excluída pois possui ganhadores vinculados. Cancele os sorteios primeiro.'
             });
           } else {
-            res.status(400).json({ 
+            res.status(400).json({
               success: false,
-              message: 'Esta promoção não pode ser excluída pois possui dados vinculados. Remova participantes e ganhadores primeiro.' 
+              message: 'Esta promoção não pode ser excluída pois possui dados vinculados. Remova participantes e ganhadores primeiro.'
             });
           }
         } else {
-          res.status(500).json({ 
+          res.status(500).json({
             success: false,
-            message: 'Erro interno ao excluir promoção. Verifique se não há dados vinculados.' 
+            message: 'Erro interno ao excluir promoção. Verifique se não há dados vinculados.'
           });
         }
       }
-      
+
     } else if (req.method === 'PATCH') {
       // Handler para atualizar status da promoção
       const url = new URL(req.url, 'http://localhost');
       const action = url.searchParams.get('action');
-      
+
       if (action === 'status') {
         // Ler o corpo da requisição
         let body = '';
@@ -288,7 +291,7 @@ module.exports = async (req, res) => {
 
         // Validação básica
         if (!promocaoId || !status) {
-              return res.status(400).json({
+          return res.status(400).json({
             success: false,
             message: 'promocaoId e status são obrigatórios'
           });
@@ -297,7 +300,7 @@ module.exports = async (req, res) => {
         // Validar status permitidos
         const statusPermitidos = ['ativa', 'pausada', 'encerrada'];
         if (!statusPermitidos.includes(status)) {
-              return res.status(400).json({
+          return res.status(400).json({
             success: false,
             message: `Status inválido. Valores permitidos: ${statusPermitidos.join(', ')}`
           });
@@ -308,14 +311,14 @@ module.exports = async (req, res) => {
         const checkResult = await databasePool.query(checkQuery, [promocaoId]);
 
         if (checkResult.rows.length === 0) {
-              return res.status(404).json({ 
+          return res.status(404).json({
             success: false,
-            message: 'Promoção não encontrada.' 
+            message: 'Promoção não encontrada.'
           });
         }
 
         const promocaoAtual = checkResult.rows[0];
-        
+
         // Atualizar o status
         const updateQuery = 'UPDATE promocoes SET status = $1 WHERE id = $2 RETURNING id, nome, status';
         const result = await databasePool.query(updateQuery, [status, promocaoId]);
@@ -325,7 +328,7 @@ module.exports = async (req, res) => {
         // Invalidar cache após alterar status
         await cacheManager.invalidatePromocoes();
         console.log('🗑️ Cache de promoções invalidado após atualização de status');
-  
+
         res.status(200).json({
           success: true,
           message: `Status da promoção "${promocaoAtual.nome}" atualizado para "${status}" com sucesso!`,
@@ -338,7 +341,7 @@ module.exports = async (req, res) => {
           const promocoesResult = await databasePool.query('SELECT COUNT(*) as total FROM promocoes');
           const participantesResult = await databasePool.query('SELECT COUNT(*) as total FROM participantes');
           const ativasResult = await databasePool.query("SELECT COUNT(*) as total FROM promocoes WHERE status = 'ativa'");
-          
+
           // Buscar participações de hoje - tentar diferentes colunas de data
           let hojeResult;
           try {
@@ -378,23 +381,23 @@ module.exports = async (req, res) => {
               participacoesHoje: parseInt(participantesHoje)
             }
           });
-          
+
         } catch (error) {
           console.error('Erro ao buscar estatísticas do dashboard:', error);
           res.status(500).json({ message: 'Erro interno do servidor' });
         }
-        
+
       } else {
-        res.status(400).json({ 
+        res.status(400).json({
           success: false,
-          message: 'Parâmetro action é obrigatório para PATCH. Use action=status ou action=dashboard' 
+          message: 'Parâmetro action é obrigatório para PATCH. Use action=status ou action=dashboard'
         });
       }
-      
+
     } else {
       res.status(405).json({ message: 'Método não permitido' });
     }
-    
+
   } catch (error) {
     console.error('Erro na API promocoes:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });

@@ -11,7 +11,7 @@ export const fetchPromocoes = async () => {
     console.log('🔍 Iniciando fetchPromocoes...');
     // ✅ SEGURANÇA: Token agora é HttpOnly cookie
     console.log('🔑 Fazendo requisição para:', `${API_BASE_URL}/?route=promocoes`);
-
+    
     const response = await fetch(`${API_BASE_URL}/?route=promocoes`, {
       credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
@@ -44,7 +44,7 @@ export const fetchPromocoes = async () => {
 export const createPromocao = async (promocaoData) => {
   try {
     // ✅ SEGURANÇA: Token agora é HttpOnly cookie
-
+    
     const response = await fetch(`${API_BASE_URL}/?route=promocoes`, {
       method: 'POST',
       headers: {
@@ -53,26 +53,27 @@ export const createPromocao = async (promocaoData) => {
       credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify(promocaoData)
     });
-
+    
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Token expirado. Faça login novamente.');
       }
-
+      
       // Tentar extrair mensagem específica do backend
       let errorMessage = `Erro na requisição: ${response.status}`;
       try {
         const errorData = await response.json();
-        // Priorizar campo 'error' que contém a mensagem amigável que adicionamos no backend
-        errorMessage = errorData.error || errorData.message || errorMessage;
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
       } catch (parseError) {
         // Se não conseguir parsear, usar mensagem padrão
         errorMessage = `Erro na requisição: ${response.status} ${response.statusText}`;
       }
-
+      
       throw new Error(errorMessage);
     }
-
+    
     const data = await response.json();
 
     // Log de auditoria para criação de promoção
@@ -115,12 +116,12 @@ export const updatePromocao = async (id, promocaoData) => {
       credentials: 'include', // ✅ SEGURANÇA: Enviar cookies HttpOnly
       body: JSON.stringify(promocaoData)
     });
-
+    
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Token expirado. Faça login novamente.');
       }
-
+      
       // Tentar extrair mensagem específica do backend
       let errorMessage = `Erro na requisição: ${response.status}`;
       try {
@@ -132,7 +133,7 @@ export const updatePromocao = async (id, promocaoData) => {
         // Se não conseguir parsear, usar mensagem padrão
         errorMessage = `Erro na requisição: ${response.status} ${response.statusText}`;
       }
-
+      
       throw new Error(errorMessage);
     }
 
@@ -175,12 +176,12 @@ export const deletePromocao = async (id) => {
       method: 'DELETE',
       credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
-
+    
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Token expirado. Faça login novamente.');
       }
-
+      
       // Tentar extrair mensagem específica do backend
       let errorMessage = `Erro na requisição: ${response.status}`;
       try {
@@ -191,7 +192,7 @@ export const deletePromocao = async (id) => {
       } catch (parseError) {
         // Se não conseguir parsear, usar mensagem padrão
       }
-
+      
       throw new Error(errorMessage);
     }
 
@@ -215,18 +216,18 @@ export const deletePromocao = async (id) => {
 export const getPromocaoById = async (id) => {
   try {
     // ✅ SEGURANÇA: Token agora é HttpOnly cookie
-
+    
     const response = await fetch(`${API_BASE_URL}/?route=promocoes&id=${id}`, {
       credentials: 'include' // ✅ SEGURANÇA: Enviar cookies HttpOnly
     });
-
+    
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Token expirado. Faça login novamente.');
       }
       throw new Error(`Erro na requisição: ${response.status}`);
     }
-
+    
     const data = await response.json();
     return data.data;
   } catch (error) {

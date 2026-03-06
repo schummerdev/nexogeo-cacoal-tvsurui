@@ -12,13 +12,13 @@ import ExcelJS from 'exceljs';
 
 const ParticipantesPage = () => {
   const { showToast } = useToast();
-  const { 
-    canViewParticipants, 
-    canExportData, 
+  const {
+    canViewParticipants,
+    canExportData,
     canDeletePromotion,
-    userRole 
+    userRole
   } = useAuth();
-  
+
   const [participantes, setParticipantes] = useState([]);
   const [promocoes, setPromocoes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +77,8 @@ const ParticipantesPage = () => {
           referral_code: participante.referral_code || null,
           extra_guesses: participante.extra_guesses || 0,
           total_submissions: participante.total_submissions || 0,
-          correct_guesses: participante.correct_guesses || 0
+          correct_guesses: participante.correct_guesses || 0,
+          opcao_escolhida: participante.opcao_escolhida || null
         }));
 
         console.log('🔍 DEBUG - Após mapeamento:', {
@@ -168,7 +169,7 @@ const ParticipantesPage = () => {
 
   const confirmDeleteParticipante = async () => {
     if (!participanteToDelete) return;
-    
+
     try {
       await deleteParticipante(participanteToDelete.id);
       // Atualizar a lista local após exclusão bem-sucedida
@@ -191,14 +192,14 @@ const ParticipantesPage = () => {
   const handleSaveParticipante = async (updatedData) => {
     try {
       await updateParticipante(updatedData.id, updatedData);
-      
+
       // Atualizar a lista local
-      setParticipantes(prev => prev.map(p => 
-        p.id === updatedData.id 
+      setParticipantes(prev => prev.map(p =>
+        p.id === updatedData.id
           ? { ...p, ...updatedData }
           : p
       ));
-      
+
       setShowEditModal(false);
       setParticipanteToEdit(null);
       showToast('Participante atualizado com sucesso!', 'success');
@@ -213,7 +214,7 @@ const ParticipantesPage = () => {
       console.log('Iniciando exportação de dados');
       console.log('Número de participantes filtrados:', filteredParticipantes.length);
       console.log('Primeiros 3 participantes:', filteredParticipantes.slice(0, 3));
-      
+
       // Preparar os dados para exportação
       const exportData = filteredParticipantes.map(participante => ({
         'Nome': participante.nome,
@@ -221,30 +222,30 @@ const ParticipantesPage = () => {
         'Bairro': participante.bairro,
         'Cidade': participante.cidade,
         'Promoção': participante.promocao,
-        'Data de Participação': participante.dataParticipacao && !isNaN(new Date(participante.dataParticipacao)) 
+        'Data de Participação': participante.dataParticipacao && !isNaN(new Date(participante.dataParticipacao))
           ? new Date(participante.dataParticipacao).toLocaleDateString('pt-BR')
           : 'Data inválida'
       }));
-      
+
       console.log('Dados preparados para exportação:', exportData.slice(0, 3));
 
       // Criar workbook com ExcelJS
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Participantes');
-      
+
       // Definir colunas com larguras
       worksheet.columns = [
         { header: 'Nome', key: 'Nome', width: 20 },
         { header: 'Telefone', key: 'Telefone', width: 15 },
         { header: 'Bairro', key: 'Bairro', width: 15 },
         { header: 'Cidade', key: 'Cidade', width: 15 },
-        { header: 'Promoção', key: 'Promoção', width: 20 },
+        { header: 'Promoção', key: 'Promoção', width: 40 },
         { header: 'Data de Participação', key: 'Data de Participação', width: 15 }
       ];
-      
+
       // Adicionar dados
       worksheet.addRows(exportData);
-      
+
       // Estilizar cabeçalho
       worksheet.getRow(1).font = { bold: true };
       worksheet.getRow(1).fill = {
@@ -252,15 +253,15 @@ const ParticipantesPage = () => {
         pattern: 'solid',
         fgColor: { argb: 'FFE0E0E0' }
       };
-      
+
       console.log('Workbook criado, iniciando exportação para arquivo');
-      
+
       // Exportar como arquivo Excel
       const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
-      
+
       // Criar link de download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -291,13 +292,13 @@ const ParticipantesPage = () => {
   if (loading) {
     return (
       <>
-        <Header 
-          title="Gerenciar Participantes" 
-          subtitle="Visualize e gerencie os participantes das promoções"
+        <Header
+          title="Gerenciar Participações"
+          subtitle="Visualize e gerencie os registros de participação das promoções"
         />
         <div className="participantes-content">
           <div className="loading-message">
-            <p>Carregando participantes...</p>
+            <p>Carregando participações...</p>
           </div>
         </div>
       </>
@@ -307,9 +308,9 @@ const ParticipantesPage = () => {
   if (error) {
     return (
       <>
-        <Header 
-          title="Gerenciar Participantes" 
-          subtitle="Visualize e gerencie os participantes das promoções"
+        <Header
+          title="Gerenciar Participações"
+          subtitle="Visualize e gerencie os registros de participação das promoções"
         />
         <div className="participantes-content">
           <div className="error-message">
@@ -323,11 +324,11 @@ const ParticipantesPage = () => {
 
   return (
     <>
-      <Header 
-        title="Gerenciar Participantes" 
-        subtitle="Visualize e gerencie os participantes das promoções"
+      <Header
+        title="Gerenciar Participações"
+        subtitle="Visualize e gerencie os registros de participação das promoções"
       />
-      
+
       <div className="participantes-content">
         {/* Estatísticas */}
         <div className="grid grid-3" style={{ gap: '16px', marginBottom: '24px' }}>
@@ -346,7 +347,7 @@ const ParticipantesPage = () => {
               color: 'var(--color-text-secondary)',
               margin: 0
             }}>
-              Total de Participantes
+              Total de Participações
             </p>
           </div>
 
@@ -365,7 +366,7 @@ const ParticipantesPage = () => {
               color: 'var(--color-text-secondary)',
               margin: 0
             }}>
-              Participantes Regulares
+              Participações Regulares
             </p>
           </div>
 
@@ -392,18 +393,18 @@ const ParticipantesPage = () => {
         {/* Barra de Ações */}
         <div className="actions-bar">
           <div className="search-box">
-            <input 
-              type="text" 
-              placeholder="Buscar participantes..." 
+            <input
+              type="text"
+              placeholder="Buscar participações..."
               className="search-input"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
             <span className="search-icon">🔍</span>
           </div>
-          
+
           <div className="filter-box">
-            <select 
+            <select
               className="filter-select"
               value={filterPromocao}
               onChange={(e) => setFilterPromocao(e.target.value)}
@@ -414,7 +415,7 @@ const ParticipantesPage = () => {
               ))}
             </select>
           </div>
-          
+
           {canExportData() && (
             <button className="btn-primary" onClick={handleExportData}>
               <span className="btn-icon">📥</span>
@@ -434,8 +435,8 @@ const ParticipantesPage = () => {
             cursor: 'pointer',
             transition: 'all 0.2s'
           }}
-          onClick={() => setIncludeCaixaMisteriosa(!includeCaixaMisteriosa)}
-          title="Incluir participantes da Caixa Misteriosa"
+            onClick={() => setIncludeCaixaMisteriosa(!includeCaixaMisteriosa)}
+            title="Incluir participantes da Caixa Misteriosa"
           >
             <input
               type="checkbox"
@@ -486,13 +487,25 @@ const ParticipantesPage = () => {
                         fontWeight: '600',
                         background: participante.participant_type === 'public'
                           ? 'rgba(139, 92, 246, 0.1)'
-                          : 'rgba(59, 130, 246, 0.1)',
+                          : participante.participant_type === 'enquete'
+                            ? 'rgba(16, 185, 129, 0.1)'
+                            : 'rgba(59, 130, 246, 0.1)',
                         color: participante.participant_type === 'public'
                           ? '#8b5cf6'
-                          : '#3b82f6',
-                        border: `1px solid ${participante.participant_type === 'public' ? '#8b5cf6' : '#3b82f6'}`
+                          : participante.participant_type === 'enquete'
+                            ? '#10b981'
+                            : '#3b82f6',
+                        border: `1px solid ${participante.participant_type === 'public'
+                          ? '#8b5cf6'
+                          : participante.participant_type === 'enquete'
+                            ? '#10b981'
+                            : '#3b82f6'}`
                       }}>
-                        {participante.participant_type === 'public' ? '📦 Caixa Misteriosa' : '🎯 Regular'}
+                        {participante.participant_type === 'public'
+                          ? '📦 Caixa Misteriosa'
+                          : participante.participant_type === 'enquete'
+                            ? '📊 Enquete'
+                            : '🎯 Promoção'}
                       </span>
                     </td>
                     <td>{
@@ -502,7 +515,7 @@ const ParticipantesPage = () => {
                     }</td>
                     <td>
                       <div className="action-buttons">
-                        <button 
+                        <button
                           className="btn-icon-small"
                           onClick={() => handleEditParticipante(participante)}
                           title="Editar"
@@ -511,7 +524,7 @@ const ParticipantesPage = () => {
                           <span className="icon">✏️</span>
                         </button>
                         {canDeletePromotion() && (
-                          <button 
+                          <button
                             className="btn-icon-small"
                             onClick={() => handleDeleteParticipante(participante.id)}
                             title="Excluir"
@@ -528,11 +541,11 @@ const ParticipantesPage = () => {
                   <td colSpan="8">
                     <div className="empty-message">
                       <span className="empty-icon">📭</span>
-                      <p>Nenhum participante encontrado</p>
+                      <p>Nenhuma participação encontrada</p>
                       <p className="empty-subtitle">
-                        {searchText || filterPromocao !== 'todas' 
-                          ? 'Tente ajustar seus filtros de busca.' 
-                          : 'Os participantes aparecerão aqui quando se inscreverem nas promoções.'}
+                        {searchText || filterPromocao !== 'todas'
+                          ? 'Tente ajustar seus filtros de busca.'
+                          : 'As participações aparecerão aqui quando alguém se inscrever.'}
                       </p>
                     </div>
                   </td>

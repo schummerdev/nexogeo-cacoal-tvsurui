@@ -58,14 +58,14 @@
 
 .logo-icon {
   font-size: 1.5rem;
-  filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .logo-text {
   font-size: 1.25rem;
   font-weight: 900;
   color: #333;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   letter-spacing: -0.5px;
 }
 
@@ -87,6 +87,23 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Imagem da promoção (quando cadastrada) */
+.promocao-imagem-section {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem 0;
+}
+
+.imagem-promocao-principal {
+  max-width: 100%;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
 /* Nome da emissora quando não há logo */
 .emissora-nome-section {
   text-align: center;
@@ -102,7 +119,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Logo da emissora (fallback - manter para compatibilidade) */
@@ -138,7 +155,7 @@
   color: #333;
   font-weight: 900;
   line-height: 1.2;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .promocao-descricao {
@@ -178,6 +195,48 @@
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   transform: translateY(-1px);
+}
+
+/* Autocomplete de Bairros */
+.bairro-autocomplete {
+  position: relative;
+}
+
+.sugestoes-bairro {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sugestoes-bairro li {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.95rem;
+  color: #374151;
+  transition: background-color 0.15s ease;
+}
+
+.sugestoes-bairro li:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.sugestoes-bairro li:hover {
+  background-color: #f0f9ff;
+  color: #1d4ed8;
 }
 
 .form-footer button {
@@ -241,38 +300,38 @@
   .container-captura {
     padding: 0.5rem;
   }
-  
+
   .form-card {
     padding: 1.5rem;
     max-width: 100%;
   }
-  
+
   .form-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .form-header p {
     font-size: 0.875rem;
   }
-  
+
   .form-group {
     margin-bottom: 1rem;
   }
-  
+
   .form-group input {
     padding: 0.75rem;
     font-size: 1rem;
   }
-  
+
   .form-footer button {
     padding: 0.875rem;
     font-size: 1rem;
   }
-  
+
   .card-sucesso {
     padding: 2rem 1.5rem;
   }
-  
+
   .icone-sucesso {
     font-size: 3rem;
   }
@@ -283,7 +342,7 @@
     padding: 1.75rem;
     max-width: 500px;
   }
-  
+
   .card-sucesso {
     padding: 2.5rem;
   }
@@ -294,7 +353,7 @@
     padding: 2rem;
     max-width: 500px;
   }
-  
+
   .card-sucesso {
     padding: 2.75rem;
   }
@@ -305,7 +364,7 @@
     padding: 2rem;
     max-width: 500px;
   }
-  
+
   .card-sucesso {
     padding: 3rem;
   }
@@ -316,15 +375,15 @@
   .container-captura {
     padding: 0.5rem;
   }
-  
+
   .form-card {
     padding: 1.5rem;
   }
-  
+
   .form-group {
     margin-bottom: 0.75rem;
   }
-  
+
   .card-sucesso {
     padding: 2rem;
   }
@@ -336,6 +395,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -347,6 +407,7 @@
     transform: scale(0.95);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -358,7 +419,7 @@
   .form-footer button:hover {
     transform: translateY(-1px);
   }
-  
+
   .form-group input:hover {
     border-color: #9ca3af;
   }
@@ -369,7 +430,7 @@
   .form-footer button:active {
     transform: translateY(0);
   }
-  
+
   .form-group input:active {
     border-color: #9ca3af;
   }
@@ -556,9 +617,11 @@
   0% {
     background-color: #e0e0e0;
   }
+
   50% {
     background-color: #f0f0f0;
   }
+
   100% {
     background-color: #e0e0e0;
   }

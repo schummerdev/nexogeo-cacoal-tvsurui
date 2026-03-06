@@ -74,7 +74,7 @@ const AdminDashboardPage = () => {
         },
         ticks: {
           maxTicksLimit: 3,
-          callback: function(value, index) {
+          callback: function (value, index) {
             const label = this.getLabelForValue(value);
             return label.length > 20 ? label.substring(0, 20) + '...' : label;
           }
@@ -195,12 +195,14 @@ const AdminDashboardPage = () => {
           console.log('📋 Dados da API encontrados:', JSON.stringify(apiData, null, 2));
           setStats({
             promocoesAtivas: apiData.promocoes_ativas || 0,
-            totalParticipantes: apiData.participantes_total || 0,
+            totalParticipantes: apiData.participantes_total || 0, // Unique
+            totalParticipacoes: apiData.participacoes_total || 0, // Total entries
             participantes_24h: apiData.participantes_24h || 0
           });
           console.log('📈 Stats processadas (CORRIGIDO):', {
             promocoesAtivas: apiData.promocoes_ativas,
-            totalParticipantes: apiData.participantes_total,
+            unique: apiData.participantes_total,
+            total: apiData.participacoes_total,
             participantes_24h: apiData.participantes_24h
           });
         }
@@ -386,7 +388,7 @@ const AdminDashboardPage = () => {
 
   // Layout simplificado para janela externa de gráficos
   if (isExternalWindow && chartType) {
-    const chartTitle = chartType === 'participantes' ? '📊 Participantes por Promoção' : '🍰 Origem dos Cadastros';
+    const chartTitle = chartType === 'participantes' ? '📊 Participações por Promoção' : '🍰 Origem dos Cadastros';
     const currentChart = chartType === 'participantes' ? chartData?.participantesPorPromocao : chartData?.origemCadastros;
 
     return (
@@ -482,13 +484,13 @@ const AdminDashboardPage = () => {
         <div className="stats-grid three-cards">
           <div
             className="stat-card red clickable"
-            onClick={() => window.location.href = '/dashboard/promocoes'}
+            onClick={() => window.open('/promocoes-ativas', '_blank')}
           >
             <div className="stat-icon">🎯</div>
             <div className="stat-content">
               <div className="stat-number">{stats?.promocoesAtivas || 0}</div>
               <div className="stat-label">Promoções Ativas</div>
-              <div className="stat-action">👆 Gerenciar ativas</div>
+              <div className="stat-action">👆 Ver página pública</div>
             </div>
           </div>
 
@@ -496,11 +498,23 @@ const AdminDashboardPage = () => {
             className="stat-card teal clickable"
             onClick={() => window.location.href = '/dashboard/participantes'}
           >
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon">📱</div>
             <div className="stat-content">
               <div className="stat-number">{stats?.totalParticipantes || 0}</div>
-              <div className="stat-label">Total de Participantes</div>
-              <div className="stat-action">👆 Ver participantes</div>
+              <div className="stat-label">Participantes Únicos (Celular)</div>
+              <div className="stat-action">👆 Ver lista de únicos</div>
+            </div>
+          </div>
+
+          <div
+            className="stat-card blue clickable"
+            onClick={() => window.location.href = '/dashboard/participantes'}
+          >
+            <div className="stat-icon">👥</div>
+            <div className="stat-content">
+              <div className="stat-number">{stats?.totalParticipacoes || 0}</div>
+              <div className="stat-label">Total de Participações</div>
+              <div className="stat-action">👆 Ver todas as entradas</div>
             </div>
           </div>
 
@@ -522,7 +536,7 @@ const AdminDashboardPage = () => {
           {/* Gráfico de Barras - Participantes por Promoção */}
           <div className="chart-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 className="chart-title">📊 Participantes por Promoção</h3>
+              <h3 className="chart-title">📊 Participações por Promoção</h3>
             </div>
             <div className="chart-wrapper" style={{ position: 'relative' }}>
               {chartData?.participantesPorPromocao && (

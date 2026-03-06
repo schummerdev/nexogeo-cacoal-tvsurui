@@ -23,16 +23,16 @@ const Sidebar = () => {
             <span className="nav-icon">📊</span>
             Painel de Controle
           </NavLink>
-          
+
           <NavLink to="/dashboard/promocoes" className="nav-item">
             <span className="nav-icon">🎁</span>
             Promoções
           </NavLink>
-          
+
           {canViewParticipants() && (
             <NavLink to="/dashboard/participantes" className="nav-item">
               <span className="nav-icon">👥</span>
-              Participantes
+              Participações
             </NavLink>
           )}
 
@@ -40,26 +40,33 @@ const Sidebar = () => {
             <span className="nav-icon">🎲</span>
             Módulo de Sorteio
           </NavLink>
-          
+
+          {canManageSystem() && (
+            <NavLink to="/dashboard/enquetes" className="nav-item">
+              <span className="nav-icon">📊</span>
+              Gestão de Enquetes
+            </NavLink>
+          )}
+
           <NavLink to="/dashboard/caixa-misteriosa" className="nav-item">
             <span className="nav-icon">📦</span>
             Caixa Misteriosa
           </NavLink>
-          
+
           {canViewReports() && (
             <NavLink to="/dashboard/mapas" className="nav-item">
               <span className="nav-icon">🗺️</span>
               Mapas Interativos
             </NavLink>
           )}
-          
+
           {canViewReports() && (
             <NavLink to="/dashboard/mapa-participantes" className="nav-item">
               <span className="nav-icon">📊</span>
               Origem dos Links
             </NavLink>
           )}
-          
+
           {canManageSystem() && (
             <NavLink to="/dashboard/configuracoes" className="nav-item">
               <span className="nav-icon">⚙️</span>
@@ -67,14 +74,14 @@ const Sidebar = () => {
             </NavLink>
           )}
         </nav>
-        
+
         {/* Seletor de Tema */}
         <div className="theme-selector" style={{
           padding: '1rem',
           borderTop: '1px solid rgba(255, 255, 255, 0.2)',
           marginTop: 'auto'
         }}>
-          <div style={{ 
+          <div style={{
             marginBottom: '8px',
             fontSize: '0.75rem',
             color: 'rgba(255, 255, 255, 0.7)',
@@ -84,10 +91,10 @@ const Sidebar = () => {
           }}>
             🎨 Tema
           </div>
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: '8px' 
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px'
           }}>
             {Object.entries(themes).map(([key, theme]) => (
               <button

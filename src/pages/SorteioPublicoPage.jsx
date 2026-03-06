@@ -65,7 +65,7 @@ const SorteioPublicoPage = () => {
     const defaultLocalMedia = '/videos/sorteio.webp';
     return videoUrlParam || defaultLocalMedia;
   }, [searchParams]);
-  
+
   const [countdown, setCountdown] = useState(10);
   const [showWinners, setShowWinners] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -80,6 +80,7 @@ const SorteioPublicoPage = () => {
   // Refs para controlar execução única e evitar re-renders
   const hasLoadedData = useRef(false);
   const countdownStarted = useRef(false);
+  const audioRef = useRef(null);
 
   // Definir startCountdown antes dos useEffects para evitar Temporal Dead Zone
   const startCountdown = useCallback(() => {
@@ -190,7 +191,7 @@ const SorteioPublicoPage = () => {
   // Efeito para lidar com mudanças de áudio
   useEffect(() => {
     console.log(`🎵 Estado do áudio alterado para: ${audioEnabled ? 'ATIVADO' : 'DESATIVADO'}`);
-    
+
     // Para vídeos HTML5, podemos controlar o mute diretamente
     const videoElements = document.querySelectorAll('.custom-video-player');
     videoElements.forEach(video => {
@@ -202,6 +203,15 @@ const SorteioPublicoPage = () => {
       }
     });
   }, [audioEnabled]);
+
+  // Efeito para tocar aplausos quando ganhadores aparecem
+  useEffect(() => {
+    if (showWinners && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = audioEnabled ? 1 : 0;
+      audioRef.current.play().catch(e => console.log('Erro ao tocar aplausos:', e));
+    }
+  }, [showWinners, audioEnabled]);
 
   // Efeito para forçar reprodução automática (otimizado)
   useEffect(() => {
@@ -234,7 +244,7 @@ const SorteioPublicoPage = () => {
 
   const processVideoUrl = (url) => {
     if (!url) return null;
-    
+
     // Detectar caminho Windows (C:\... ou \\...)
     if (url.match(/^[A-Za-z]:\\/) || url.startsWith('\\\\')) {
       console.log('🎬 Caminho Windows detectado:', url);
@@ -243,7 +253,7 @@ const SorteioPublicoPage = () => {
       console.log('🔄 Convertido para:', fileUrl);
       return fileUrl;
     }
-    
+
     // Se já é file:// ou http/https, retornar como está
     return url;
   };
@@ -289,21 +299,53 @@ const SorteioPublicoPage = () => {
 
   return (
     <div className="sorteio-publico-page">
-      {/* Logo da Emissora */}
-      {emissora && emissora.logo_url && (
-        <div className="emissora-logo-section">
-          <img 
-            src={emissora.logo_url} 
-            alt={emissora.nome || 'Logo da Emissora'}
-            className="emissora-logo"
-            onError={(e) => {
-              console.error('Erro ao carregar logo da emissora:', emissora.logo_url);
-              e.target.style.display = 'none';
-            }}
-          />
+      <audio ref={audioRef} preload="auto">
+        <source src="/audio/sorteio-aplausos.mp3" type="audio/mpeg" />
+      </audio>
+      {/* Cabeçalho da Emissora */}
+      {emissora && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: '1.5rem',
+          textAlign: 'center',
+          width: '100%',
+          padding: '1rem 0'
+        }}>
+          {emissora.logo_url && (
+            <img
+              src={emissora.logo_url}
+              alt={emissora.nome || 'Logo da Emissora'}
+              style={{
+                height: '80px',
+                width: 'auto',
+                objectFit: 'contain',
+                marginBottom: '0.5rem',
+                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+              }}
+              onError={(e) => {
+                console.error('Erro ao carregar logo da emissora:', emissora.logo_url);
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
+          {emissora.nome && (
+            <h2 style={{
+              margin: 0,
+              fontSize: '1.4rem',
+              fontWeight: '800',
+              color: '#ffffff', // No sorteio público o fundo costuma ser escuro/gradiente
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            }}>
+              {emissora.nome}
+            </h2>
+          )}
         </div>
       )}
-      
+
       <div className="header-section">
         <h1>🎉 Resultado do Sorteio 🎉</h1>
         {promocao && (
@@ -322,7 +364,7 @@ const SorteioPublicoPage = () => {
             <div className="video-section-inline">
               <h3>🎬 Animação do Sorteio</h3>
               <div className="video-container-custom">
-                
+
                 {/* Verificar se é YouTube */}
                 {(videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) ? (
                   <iframe
@@ -364,11 +406,11 @@ const SorteioPublicoPage = () => {
                   />
                 ) : (
                   /* Player HTML5 para vídeos */
-                  <video 
+                  <video
                     key="local-player"
                     autoPlay
-                    muted 
-                    loop 
+                    muted
+                    loop
                     playsInline
                     className="custom-video-player"
                     width="100%"
@@ -381,7 +423,7 @@ const SorteioPublicoPage = () => {
                     <source src={processVideoUrl(videoUrl)} type="video/mp4" />
                     <source src={processVideoUrl(videoUrl)?.replace('.mp4', '.webm')} type="video/webm" />
                     <source src={processVideoUrl(videoUrl)?.replace('.mp4', '.mov')} type="video/quicktime" />
-                    <p style={{color: '#fff', textAlign: 'center', padding: '20px'}}>
+                    <p style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>
                       Mídia não disponível
                     </p>
                   </video>
@@ -406,21 +448,21 @@ const SorteioPublicoPage = () => {
       {showWinners && (
         <div className="winners-section">
           <div className="confetti-animation">🎊🎉✨🎊🎉✨🎊</div>
-          
+
           <h2 className="winners-title">
             🏆 {winners.length === 1 ? 'Ganhador' : 'Ganhadores'} 🏆
           </h2>
-          
+
           <div className={`winners-grid ${winners.length === 1 ? 'single-winner' : winners.length === 2 ? 'two-winners' : 'multiple-winners'}`}>
             {winners.map((winner, index) => (
               <div key={winner.ganhador_id || index} className="winner-card">
-                
+
                 <div className="winner-avatar">
                   <span className="winner-number">
                     {index + 1}
                   </span>
                 </div>
-                
+
                 <div className="winner-info">
                   <div className="winner-name-section">
                     <h3 className="winner-name">{winner.participante_nome || winner.nome || 'Nome não informado'}</h3>
@@ -438,19 +480,19 @@ const SorteioPublicoPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="winner-celebration">
                   <div className="celebration-emoji">🎉</div>
                 </div>
               </div>
             ))}
           </div>
-          
+
           <div className="congratulations-message">
             <h3>🎊 Parabéns aos ganhadores! 🎊</h3>
             <p>
-              {winners.length === 1 
-                ? 'Nosso ganhador será contactado em breve!' 
+              {winners.length === 1
+                ? 'Nosso ganhador será contactado em breve!'
                 : `Nossos ${winners.length} ganhadores serão contactados em breve!`
               }
             </p>
@@ -460,7 +502,7 @@ const SorteioPublicoPage = () => {
 
       <div className="footer-section">
         <p>Sorteio realizado de forma transparente e justa</p>
-        
+
         {/* Informações NexoGeo */}
         <div className="nexogeo-info">
           <div className="nexogeo-logo-container">
@@ -483,7 +525,7 @@ const SorteioPublicoPage = () => {
             📦 Conheça nossos pacotes
           </a>
         </div>
-        
+
         <small>© {new Date().getFullYear()} - Sistema de Sorteios NexoGeo</small>
       </div>
     </div>

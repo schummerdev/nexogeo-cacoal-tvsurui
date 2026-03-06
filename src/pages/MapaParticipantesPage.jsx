@@ -23,7 +23,7 @@ const MapaParticipantesPage = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        
+
         // Carregar participantes e promoções em paralelo
         const [participantesRes, promocoesRes] = await Promise.all([
           fetch('/api/?route=participantes&endpoint=list&include_public=true'),
@@ -60,13 +60,13 @@ const MapaParticipantesPage = () => {
         });
 
         setParticipantes(formattedParticipantes);
-        
+
         // Carregar promoções se a API responder
         if (promocoesRes.ok) {
           const promocoesData = await promocoesRes.json();
           setPromocoes(promocoesData.data || []);
         }
-        
+
       } catch (err) {
         setError('Falha ao carregar dados');
         console.error(err);
@@ -130,7 +130,7 @@ const MapaParticipantesPage = () => {
     });
 
     return Object.entries(stats)
-      .sort(([,a], [,b]) => b.count - a.count)
+      .sort(([, a], [, b]) => b.count - a.count)
       .slice(0, 10); // Top 10
   }, [filteredParticipantes]);
 
@@ -145,13 +145,13 @@ const MapaParticipantesPage = () => {
   if (loading) {
     return (
       <>
-        <Header 
-          title="Mapa de Participantes" 
-          subtitle="Visualize a origem dos participantes por link"
+        <Header
+          title="Mapa de Participações"
+          subtitle="Visualize a origem das participações por link"
         />
         <div className="dashboard-content">
           <div className="loading-message">
-            <p>Carregando participantes...</p>
+            <p>Carregando participações...</p>
           </div>
         </div>
       </>
@@ -161,9 +161,9 @@ const MapaParticipantesPage = () => {
   if (error) {
     return (
       <>
-        <Header 
-          title="Mapa de Participantes" 
-          subtitle="Visualize a origem dos participantes por link"
+        <Header
+          title="Mapa de Participações"
+          subtitle="Visualize a origem das participações por link"
         />
         <div className="dashboard-content">
           <div className="error-message">
@@ -178,10 +178,10 @@ const MapaParticipantesPage = () => {
   return (
     <>
       <Header
-        title="Mapa de Participantes"
-        subtitle="Visualize a origem dos participantes por link"
+        title="Mapa de Participações"
+        subtitle="Visualize a origem das participações por link"
       />
-      
+
       <div className="dashboard-content">
         {/* Filtros */}
         <div className="card">
@@ -247,7 +247,7 @@ const MapaParticipantesPage = () => {
                 <div className="stat-rank">#{index + 1}</div>
                 <div className="stat-info">
                   <div className="stat-label">{origem}</div>
-                  <div className="stat-value">{stats.count} participantes</div>
+                  <div className="stat-value">{stats.count} participações</div>
                 </div>
               </div>
             ))}
@@ -257,7 +257,7 @@ const MapaParticipantesPage = () => {
         {/* Tabela de Participantes */}
         <div className="card">
           <h3 className="card-title">
-            Participantes ({filteredParticipantes.length})
+            Participações ({filteredParticipantes.length})
           </h3>
 
           {filteredParticipantes.length > 0 ? (
@@ -290,8 +290,8 @@ const MapaParticipantesPage = () => {
                         })()}
                       </td>
                       <td>
-                        <span className="origem-badge">
-                          {participante.origem_source || 'direto'}
+                        <span className={`origem-badge ${participante.origem_source}`}>
+                          {['tv_enquete', 'tv_enquete_auto'].includes(participante.origem_source) ? '🗳️ ENQUETE TV' : (participante.origem_source || 'direto')}
                         </span>
                       </td>
                       <td>{participante.origem_medium || 'link'}</td>
@@ -327,7 +327,7 @@ const MapaParticipantesPage = () => {
             </div>
           ) : (
             <div className="empty-state">
-              <p>Nenhum participante encontrado com os filtros aplicados.</p>
+              <p>Nenhuma participação encontrada com os filtros aplicados.</p>
             </div>
           )}
 

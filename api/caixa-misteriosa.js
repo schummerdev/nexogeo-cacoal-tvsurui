@@ -6,40 +6,40 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // --- Função de Auditoria ---
 const logAuditAction = async (logData) => {
-  try {
-    await query(`
+    try {
+        await query(`
       INSERT INTO audit_logs (
         user_id, action, table_name, record_id, old_values, new_values,
         ip_address, user_agent, request_method, request_url,
         response_status, execution_time, error_message, additional_data
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `, [
-      logData.user_id || null,
-      logData.action,
-      logData.table_name || 'caixa_misteriosa',
-      logData.record_id || null,
-      logData.old_values || null,
-      logData.new_values || null,
-      logData.ip_address || null,
-      logData.user_agent || null,
-      logData.request_method || 'API',
-      logData.request_url || null,
-      logData.response_status || 200,
-      logData.execution_time || 0,
-      logData.error_message || null,
-      logData.additional_data || null
-    ]);
-  } catch (error) {
-    console.error('❌ Erro ao inserir log de auditoria:', error);
-  }
+            logData.user_id || null,
+            logData.action,
+            logData.table_name || 'caixa_misteriosa',
+            logData.record_id || null,
+            logData.old_values || null,
+            logData.new_values || null,
+            logData.ip_address || null,
+            logData.user_agent || null,
+            logData.request_method || 'API',
+            logData.request_url || null,
+            logData.response_status || 200,
+            logData.execution_time || 0,
+            logData.error_message || null,
+            logData.additional_data || null
+        ]);
+    } catch (error) {
+        console.error('❌ Erro ao inserir log de auditoria:', error);
+    }
 };
 
 const getClientIP = (req) => {
-  return req.ip ||
-         req.headers['x-forwarded-for']?.split(',')[0] ||
-         req.connection?.remoteAddress ||
-         req.socket?.remoteAddress ||
-         (req.connection?.socket ? req.connection.socket.remoteAddress : null);
+    return req.ip ||
+        req.headers['x-forwarded-for']?.split(',')[0] ||
+        req.connection?.remoteAddress ||
+        req.socket?.remoteAddress ||
+        (req.connection?.socket ? req.connection.socket.remoteAddress : null);
 };
 
 // --- Funções Auxiliares ---
@@ -1034,28 +1034,43 @@ async function registerParticipant(req, res) {
         } else {
             // Cria novo participante
             const ownReferralCode = `cm-${cleanPhone.slice(-4)}${Math.random().toString(36).substring(2, 6)}`;
+
+            // Busca ID do indicador se houver código de referência
+            let referredById = null;
+            if (referralCode) {
+                try {
+                    const referrerCheck = await query('SELECT id FROM public_participants WHERE own_referral_code = $1', [referralCode]);
+                    if (referrerCheck.rows.length > 0) {
+                        referredById = referrerCheck.rows[0].id;
+                    }
+                } catch (err) {
+                    console.warn('Erro ao buscar indicador:', err);
+                }
+            }
+
             try {
                 const insertResult = await query(
-                    'INSERT INTO public_participants (name, phone, neighborhood, city, own_referral_code, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-                    [name, cleanPhone, neighborhood, city, ownReferralCode, latitude, longitude]
+                    'INSERT INTO public_participants (name, phone, neighborhood, city, own_referral_code, latitude, longitude, referred_by_id, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+                    [name, cleanPhone, neighborhood, city, ownReferralCode, latitude, longitude, referredById, referralCode]
                 );
                 participant = insertResult.rows[0];
             } catch (dbError) {
                 dbError.message = `Erro na etapa de INSERT do participante: ${dbError.message}`;
                 throw dbError;
             }
-            console.log('✅ Novo participante criado:', { id: participant.id, name });
+            console.log('✅ Novo participante criado:', { id: participant.id, name, referredById });
 
             // Se usou um código de referência, dá um palpite extra para quem indicou
             if (referralCode) {
                 try {
                     console.log(`🔗 Tentando aplicar bônus de referência para o código: ${referralCode}`);
+                    // O bônus é aplicado usando o referralCode diretamente, o que já estava funcionando
                     const referrerResult = await query(
                         'UPDATE public_participants SET extra_guesses = extra_guesses + 1 WHERE own_referral_code = $1 RETURNING id, name, extra_guesses',
                         [referralCode]
                     );
                     if (!referrerResult.rows || referrerResult.rows.length === 0) {
-                        console.warn('⚠️ Referrer não encontrado ou não atualizado.');
+                        console.warn('⚠️ Referrer não encontrado ou não atualizado para bônus.');
                     } else {
                         console.log(`🎉 Bônus aplicado para: ${referrerResult.rows[0].name} (Total de palpites extras: ${referrerResult.rows[0].extra_guesses})`);
                     }
@@ -1079,8 +1094,8 @@ async function registerParticipant(req, res) {
 
     } catch (error) {
         console.error('❌ Erro em registerParticipant:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: 'Erro interno ao processar cadastro.',
             error: error.message,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
@@ -3709,6 +3724,51 @@ async function getGameParticipantsStats(req, res) {
 
 // --- Handler Principal ---
 
+async function getParticipantByPhone(req, res, phone) {
+    try {
+        // Limpar telefone (manter apenas números)
+        const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
+
+        if (!cleanPhone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Telefone inválido'
+            });
+        }
+
+        console.log(`🔍 [getParticipantByPhone] Buscando participante por telefone: ${cleanPhone}`);
+
+        // Busca por telefone (verificando formato limpo e original se necessário)
+        const result = await query(`
+            SELECT id, name, own_referral_code
+            FROM public_participants
+            WHERE phone = $1 OR REGEXP_REPLACE(phone, '[^0-9]', '', 'g') = $1
+            LIMIT 1
+        `, [cleanPhone]);
+
+        if (result.rows.length === 0) {
+            console.log(`⚠️ [getParticipantByPhone] Participante não encontrado: ${cleanPhone}`);
+            return res.status(404).json({
+                success: false,
+                message: 'Participante não encontrado'
+            });
+        }
+
+        console.log(`✅ [getParticipantByPhone] Participante encontrado: ${result.rows[0].name}`);
+
+        res.status(200).json({
+            success: true,
+            participant: result.rows[0]
+        });
+    } catch (error) {
+        console.error('❌ Erro ao buscar participante por telefone:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao buscar participante'
+        });
+    }
+}
+
 module.exports = async (req, res) => {
     // 🔥 [DEBUG] Log de entrada para todas as requisições
     console.log(`--- NEW REQUEST --- Method: ${req.method}, URL: ${req.originalUrl}`);
@@ -3719,7 +3779,7 @@ module.exports = async (req, res) => {
     const { endpoint, id } = req.query || {};
     // Usar req.originalPath se disponível (passado por api/index.js), senão extrair manualmente
     const path = req.originalPath ||
-                 (req.originalUrl ? req.originalUrl.replace('/api/caixa-misteriosa', '') : req.url.replace('/api/caixa-misteriosa', ''));
+        (req.originalUrl ? req.originalUrl.replace('/api/caixa-misteriosa', '') : req.url.replace('/api/caixa-misteriosa', ''));
 
     console.log('🕹️ [Caixa Misteriosa Handler] originalPath:', req.originalPath, 'originalUrl:', req.originalUrl, 'url:', req.url);
     console.log('🕹️ [Caixa Misteriosa Handler] Rota extraída:', path, 'Endpoint:', endpoint, 'ID:', id);
@@ -3777,6 +3837,16 @@ module.exports = async (req, res) => {
     if (path.startsWith('/register')) {
         return await registerParticipant(req, res);
     }
+
+    // Nova rota para buscar participante por Telefone (para referrals)
+    // 🔥 IMPORTANTE: Deve vir antes de /participants/:id para evitar conflito
+    if (path.startsWith('/participants/by-phone/')) {
+        // path ex: /participants/by-phone/123456789
+        const phone = path.split('/')[3];
+        console.log('🎯 Rota detectada: GET /participants/by-phone/', phone);
+        return await getParticipantByPhone(req, res, phone);
+    }
+
     // Nova rota para buscar participante por ID
     if (path.startsWith('/participants/') && path.split('/')[2]) {
         const participantId = path.split('/')[2];

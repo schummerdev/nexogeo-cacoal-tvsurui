@@ -22,9 +22,11 @@ const PromocoesPage = () => {
     nome: '',
     descricao: '',
     data_inicio: '',
+    data_inicio: '',
     data_fim: '',
     status: 'ativa',
-    numero_ganhadores: 3
+    numero_ganhadores: 3,
+    imagem_url: ''
   });
 
   const [promocoes, setPromocoes] = useState([]);
@@ -35,7 +37,6 @@ const PromocoesPage = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [promoToDelete, setPromoToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); // Página atual da paginação
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de envio do formulário
   const ITEMS_PER_PAGE = 50; // Limite de 50 registros por página
 
   // Buscar promoções ao carregar o componente
@@ -75,9 +76,11 @@ const PromocoesPage = () => {
         nome: promo.nome || '',
         descricao: promo.descricao || '',
         data_inicio: formatDateForInput(promo.data_inicio),
+        data_inicio: formatDateForInput(promo.data_inicio),
         data_fim: formatDateForInput(promo.data_fim),
         status: promo.status || 'ativa',
-        numero_ganhadores: promo.numero_ganhadores || 3
+        numero_ganhadores: promo.numero_ganhadores || 3,
+        imagem_url: promo.imagem_url || ''
       });
     } else {
       setEditingPromo(null);
@@ -85,9 +88,11 @@ const PromocoesPage = () => {
         nome: '',
         descricao: '',
         data_inicio: '',
+        data_inicio: '',
         data_fim: '',
         status: 'ativa',
-        numero_ganhadores: 3
+        numero_ganhadores: 3,
+        imagem_url: ''
       });
     }
     setIsModalOpen(true);
@@ -112,7 +117,8 @@ const PromocoesPage = () => {
       data_inicio: formatDateForInput(promo.data_inicio),
       data_fim: formatDateForInput(promo.data_fim),
       status: 'ativa',
-      numero_ganhadores: promo.numero_ganhadores || 3
+      numero_ganhadores: promo.numero_ganhadores || 3,
+      imagem_url: promo.imagem_url || ''
     };
 
     setEditingPromo(null); // Modo criação
@@ -129,11 +135,52 @@ const PromocoesPage = () => {
     }));
   };
 
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showToast('A imagem é muito grande. O tamanho máximo é 5MB.', 'error');
+        return;
+      }
+
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        showToast('Enviando imagem para o Drive...', 'info');
+        const response = await fetch('/api/upload-drive', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          setPromoData(prev => ({ ...prev, imagem_url: data.url }));
+          showToast('Imagem enviada com sucesso!', 'success');
+        } else {
+          throw new Error(data.message || 'Erro ao enviar imagem.');
+        }
+      } catch (error) {
+        console.error('Erro no upload:', error);
+        showToast(`Erro ao enviar imagem: ${error.message}`, 'error');
+      } finally {
+        setUploading(false);
+        // Limpar o input file para permitir selecionar o mesmo arquivo novamente se falhar
+        e.target.value = '';
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
 
     // Validação de datas
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
     const dataInicio = new Date(promoData.data_inicio);
     const dataFim = new Date(promoData.data_fim);
 
@@ -142,8 +189,12 @@ const PromocoesPage = () => {
       return;
     }
 
+    if (dataFim < hoje) {
+      showToast('A data de fim não pode ser anterior ao dia de hoje.', 'error');
+      return;
+    }
+
     try {
-      setIsSubmitting(true);
       if (editingPromo) {
         // Atualizar promoção existente
         const updatedPromo = await updatePromocao(editingPromo.id, promoData);
@@ -167,8 +218,6 @@ const PromocoesPage = () => {
     } catch (err) {
       showToast('Falha ao salvar promoção: ' + err.message, 'error');
       console.error(err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -265,7 +314,7 @@ const PromocoesPage = () => {
 
   // Função para filtrar promoções
   const filteredPromocoes = useMemo(() => {
-    return promocoes.filter(promo => {
+    const filtered = promocoes.filter(promo => {
       // Filtro por texto (nome ou descrição)
       const matchesSearch =
         !searchText ||
@@ -278,6 +327,19 @@ const PromocoesPage = () => {
         promo.status === filterStatus;
 
       return matchesSearch && matchesStatus;
+    });
+
+    // Ordenar: Ativas primeiro, depois por data de fim (mais recente primeiro)
+    return filtered.sort((a, b) => {
+      // 1. Status 'ativa' tem prioridade (case insensitive)
+      const statusA = (a.status || '').toLowerCase();
+      const statusB = (b.status || '').toLowerCase();
+
+      if (statusA === 'ativa' && statusB !== 'ativa') return -1;
+      if (statusA !== 'ativa' && statusB === 'ativa') return 1;
+
+      // 2. Desempate por data de fim (promoções que acabam mais tarde primeiro)
+      return new Date(b.data_fim) - new Date(a.data_fim);
     });
   }, [promocoes, searchText, filterStatus]);
 
@@ -384,17 +446,19 @@ const PromocoesPage = () => {
           )}
         </div>
 
+
         {/* Tabela de Promoções */}
         <div className="table-container">
           <table className="promocoes-table">
             <thead>
               <tr>
+                <th>Imagem</th>
                 <th>Nome</th>
                 <th>Descrição</th>
                 <th>Data Início</th>
                 <th>Data Fim</th>
                 <th>Status</th>
-                <th>Participantes</th>
+                <th>Participações</th>
                 <th>Ganhadores</th>
                 <th>Ações</th>
               </tr>
@@ -403,6 +467,13 @@ const PromocoesPage = () => {
               {paginatedPromocoes.length > 0 ? (
                 paginatedPromocoes.map(promo => (
                   <tr key={promo.id}>
+                    <td>
+                      {promo.imagem_url ? (
+                        <img src={promo.imagem_url} alt={promo.nome} className="promo-thumbnail" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                      ) : (
+                        <span className="no-image">📷</span>
+                      )}
+                    </td>
                     <td>{promo.nome}</td>
                     <td>{promo.descricao}</td>
                     <td>{new Date(promo.data_inicio).toLocaleDateString('pt-BR')}</td>
@@ -498,7 +569,7 @@ const PromocoesPage = () => {
                 ))
               ) : (
                 <tr className="empty-state">
-                  <td colSpan="8">
+                  <td colSpan="9">
                     <div className="empty-message">
                       <span className="empty-icon">📭</span>
                       <p>Nenhuma promoção encontrada</p>
@@ -572,6 +643,47 @@ const PromocoesPage = () => {
                 />
               </div>
 
+              <div className="form-group">
+                <label>Imagem da Promoção</label>
+                <div className="image-input-container" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {promoData.imagem_url && (
+                    <div className="image-preview">
+                      <img src={promoData.imagem_url} alt="Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px', objectFit: 'contain' }} />
+                      <button
+                        type="button"
+                        className="btn-text-danger"
+                        onClick={() => setPromoData(prev => ({ ...prev, imagem_url: '' }))}
+                        style={{ marginTop: '5px', fontSize: '0.8rem', color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}
+                      >
+                        Remover imagem
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="input-group">
+                    <label htmlFor="imagem_url_input" style={{ fontSize: '0.9rem', color: '#666' }}>URL da Imagem</label>
+                    <input
+                      type="text"
+                      id="imagem_url"
+                      name="imagem_url"
+                      value={promoData.imagem_url}
+                      onChange={handleInputChange}
+                      placeholder="https://exemplo.com/imagem.jpg"
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="imagem_file" style={{ fontSize: '0.9rem', color: '#666' }}>Ou faça Upload</label>
+                    <input
+                      type="file"
+                      id="imagem_file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="data_inicio">Data de Início</label>
@@ -632,8 +744,8 @@ const PromocoesPage = () => {
                 <button type="button" className="btn-secondary" onClick={handleCloseModal}>
                   Cancelar
                 </button>
-                <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                  {isSubmitting ? 'Salvando...' : (editingPromo ? 'Atualizar' : 'Criar')} Promoção
+                <button type="submit" className="btn-primary">
+                  {editingPromo ? 'Atualizar' : 'Criar'} Promoção
                 </button>
               </div>
             </form>

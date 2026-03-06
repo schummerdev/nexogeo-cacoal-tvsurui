@@ -1,5 +1,6 @@
 const { getSecureHeaders, checkRateLimit } = require('../_lib/security');
 const databasePool = require('../_lib/database');
+const { getCanonicalPhone } = require('../_lib/phoneUtils');
 
 module.exports = async (req, res) => {
   // ============================================================
@@ -141,6 +142,69 @@ module.exports = async (req, res) => {
         }
       }
 
+      // ============================================================
+      // ENDPOINT DE VERIFICAÇÃO POR TELEFONE (Para fluxo de Enquetes/Sorteio Público)
+      // ============================================================
+      if (url.searchParams.get('endpoint') === 'verificar') {
+        const telefoneRaw = url.searchParams.get('telefone');
+        if (!telefoneRaw) {
+          return res.status(400).json({ success: false, message: 'Telefone é obrigatório.' });
+        }
+
+        const telefoneClean = getCanonicalPhone(telefoneRaw);
+
+        const promocaoId = parseInt(url.searchParams.get('promocao_id'));
+        if (isNaN(promocaoId)) {
+          return res.status(400).json({ success: false, message: 'ID da promoção inválido.' });
+        }
+
+        try {
+          // 1. Busca básica para ver se o participante existe no sistema (qualquer promoção/público)
+          const dbResult = await databasePool.query(`
+                SELECT id, name AS nome, phone AS telefone, city AS cidade, neighborhood AS bairro
+                FROM participantes_unicos
+                WHERE phone = $1
+                LIMIT 1
+             `, [telefoneClean]);
+
+          const exists = dbResult.rows.length > 0;
+          let jaNaPromocao = false;
+          let data = exists ? dbResult.rows[0] : null;
+
+          // 2. Se existe e enviamos promocao_id, verificar se JÁ está nesta promoção específica
+          if (exists && promocaoId) {
+            const promoCheck = await databasePool.query(`
+              SELECT id, nome, telefone, bairro, cidade FROM participantes 
+              WHERE telefone = $1 AND promocao_id = $2 AND deleted_at IS NULL
+              LIMIT 1
+            `, [telefoneClean, promocaoId]);
+
+            if (promoCheck.rows.length > 0) {
+              jaNaPromocao = true;
+              // IMPORTANTE: Retornar os dados e o ID específicos desta participação
+              data = {
+                ...dbResult.rows[0], // Mantém base se houver campos extras
+                id: promoCheck.rows[0].id,
+                nome: promoCheck.rows[0].nome,
+                telefone: promoCheck.rows[0].telefone,
+                bairro: promoCheck.rows[0].bairro,
+                cidade: promoCheck.rows[0].cidade
+              };
+            }
+          }
+
+          return res.status(200).json({
+            success: true,
+            exists,
+            ja_na_promocao: jaNaPromocao,
+            data
+          });
+        } catch (verifError) {
+          console.error('❌ [PARTICIPANTES VERIFICAR] Erro ao buscar telefone:', verifError);
+          return res.status(500).json({ success: false, message: 'Erro ao verificar cadastro.' });
+        }
+      }
+
       // SEMPRE usar modo unificado (sem deduplicação)
       // Lista TODOS os participantes das 2 tabelas
       const unified = true; // ✅ SEMPRE TRUE - sem deduplicação
@@ -174,11 +238,18 @@ module.exports = async (req, res) => {
               p.latitude,
               p.longitude,
               p.promocao_id,
-              pr.nome AS promocao_nome,
+              CASE 
+                WHEN p.origem_source LIKE 'tv_enquete%' THEN eq.titulo 
+                ELSE pr.nome 
+              END AS promocao_nome,
               p.origem_source,
               p.origem_medium,
               COALESCE(p.participou_em, CURRENT_TIMESTAMP) AS created_at,
-              'regular' AS participant_type,
+              CASE 
+                WHEN p.origem_source LIKE 'tv_enquete%' THEN 'enquete' 
+                ELSE 'regular' 
+              END AS participant_type,
+              NULL AS opcao_escolhida,
               NULL AS referral_code,
               NULL AS extra_guesses,
               0 AS total_submissions,
@@ -189,6 +260,7 @@ module.exports = async (req, res) => {
               p.origem
             FROM participantes p
             LEFT JOIN promocoes pr ON p.promocao_id = pr.id
+            LEFT JOIN enquetes eq ON p.promocao_id = eq.id
             WHERE p.deleted_at IS NULL
             ORDER BY COALESCE(p.participou_em, CURRENT_TIMESTAMP) DESC
           `);
@@ -295,8 +367,8 @@ module.exports = async (req, res) => {
                 diagnosis: uniquePhones === 1
                   ? `✅ CORRETO: ${totalParticipantes} registros do mesmo telefone (mesma pessoa ${totalParticipantes}x)`
                   : uniquePhones === totalParticipantes
-                  ? `⚠️ AVISO: Todos os ${totalParticipantes} telefones são únicos - não há duplicatas reais`
-                  : `📊 INFO: ${uniquePhones} telefones únicos de ${totalParticipantes} registros - ${totalParticipantes - uniquePhones} duplicatas encontradas`
+                    ? `⚠️ AVISO: Todos os ${totalParticipantes} telefones são únicos - não há duplicatas reais`
+                    : `📊 INFO: ${uniquePhones} telefones únicos de ${totalParticipantes} registros - ${totalParticipantes - uniquePhones} duplicatas encontradas`
               }
             }
           });
@@ -409,28 +481,106 @@ module.exports = async (req, res) => {
     // POST - Criar participante
     // ============================================================
     else if (req.method === 'POST') {
-      let body = '';
-      req.on('data', chunk => (body += chunk.toString()));
-      req.on('end', async () => {
-        try {
-          const {
-            nome,
-            telefone,
-            email,
-            bairro,
-            cidade,
-            latitude,
-            longitude,
-            promocao_id,
-            origem_source,
-            origem_medium
-          } = JSON.parse(body);
+      try {
+        console.log(`📝 [PARTICIPANTES] Recebendo POST. Body type: ${typeof req.body}`);
 
-          if (!nome || !telefone) {
-            res.status(400).json({ message: 'Nome e telefone são obrigatórios' });
-            return;
+        // 1. Tentar dados já no req.body (Vercel)
+        let data = req.body;
+
+        // Se req.body for uma string (comum em alguns setups Vercel/Node), parsear
+        if (data && typeof data === 'string') {
+          try {
+            console.log('📜 [PARTICIPANTES] req.body é string, tentando parsear JSON...');
+            data = JSON.parse(data);
+          } catch (e) {
+            console.error('❌ [PARTICIPANTES] Falha ao parsear req.body como string:', e.message);
+            // Se falhou o parse aqui, não abortamos ainda, tentamos o stream como fallback
+          }
+        }
+
+        // Se após o parse temos um objeto válido com dados
+        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+          console.log('📦 [PARTICIPANTES] Usando dados do body populado.');
+          await processarParticipante(data, res);
+          return;
+        }
+
+        // 2. Fallback: Ler stream manualmente (caso req.body esteja vazio/não-parseado)
+        let body = '';
+        req.on('data', chunk => {
+          body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+          try {
+            console.log(`📜 [PARTICIPANTES] Stream finalizada. Tamanho: ${body.length}`);
+            if (!body && (!data || Object.keys(data).length === 0)) {
+              console.error('❌ [PARTICIPANTES] Nenhum dado recebido (body e stream vazios)');
+              return res.status(400).json({ success: false, message: 'Dados não recebidos no corpo da requisição.' });
+            }
+
+            const streamData = JSON.parse(body || '{}');
+            // Se o body stream tinha dados, usamos ele; senão usamos o que tínhamos no 'data' do req.body
+            const finalData = Object.keys(streamData).length > 0 ? streamData : data;
+
+            await processarParticipante(finalData, res);
+          } catch (parseError) {
+            console.error('❌ [PARTICIPANTES] Erro ao parsear JSON do stream:', parseError.message);
+            res.status(400).json({ success: false, message: 'Dados inválidos (JSON malformado no stream)' });
+          }
+        });
+      } catch (postError) {
+        console.error('❌ [PARTICIPANTES] Erro fatal no bloco POST:', postError);
+        res.status(500).json({ success: false, message: 'Erro interno ao processar cadastro' });
+      }
+
+      // Função auxiliar para processar o participante (chamada pelos dois métodos acima)
+      async function processarParticipante(data, res) {
+        const {
+          nome,
+          telefone,
+          email,
+          bairro,
+          cidade,
+          latitude,
+          longitude,
+          promocao_id,
+          origem_source,
+          origem_medium
+        } = data;
+
+        if (!nome || !telefone) {
+          console.warn('⚠️ [PARTICIPANTES] Campos obrigatórios faltando:', {
+            hasNome: !!nome,
+            hasTelefone: !!telefone,
+            nomeValue: nome,
+            telefoneValue: telefone
+          });
+          return res.status(400).json({ success: false, message: 'Nome e telefone são obrigatórios' });
+        }
+
+        const telefoneClean = getCanonicalPhone(telefone);
+
+        try {
+          // 1. Verificação prévia de duplicidade por promoção
+          if (promocao_id) {
+            const existing = await databasePool.query(
+              `SELECT id FROM participantes 
+               WHERE telefone = $1 AND promocao_id = $2 AND deleted_at IS NULL
+               LIMIT 1`,
+              [telefoneClean, promocao_id]
+            );
+
+            if (existing.rows.length > 0) {
+              return res.status(409).json({
+                success: false,
+                message: 'Você já participou desta promoção com este telefone!',
+                error: 'DUPLICATE_PARTICIPATION'
+              });
+            }
           }
 
+          // 2. Inserir participante
           const result = await databasePool.query(
             `
             INSERT INTO participantes
@@ -439,45 +589,26 @@ module.exports = async (req, res) => {
               ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING *
           `,
-            [
-              nome,
-              telefone,
-              email,
-              bairro,
-              cidade,
-              latitude,
-              longitude,
-              promocao_id,
-              origem_source,
-              origem_medium
-            ]
+            [nome, telefoneClean, email, bairro, cidade, latitude, longitude, promocao_id, origem_source, origem_medium]
           );
 
-          res.status(201).json({ success: true, data: result.rows[0] });
-        } catch (parseError) {
-          console.error('Erro ao processar participante:', parseError);
+          console.log(`✅ [PARTICIPANTES] Novo participante criado: ${nome} (ID: ${result.rows[0].id})`);
+          return res.status(201).json({ success: true, data: result.rows[0] });
 
-          if (
-            parseError.message.includes(
-              'duplicate key value violates unique constraint'
-            ) &&
-            parseError.message.includes('idx_participante_unico_por_promocao')
-          ) {
+        } catch (dbError) {
+          console.error('❌ [PARTICIPANTES] Erro DB ao inserir:', dbError.message);
+
+          if (dbError.message.includes('unique constraint')) {
             return res.status(409).json({
-              message: 'Você já participou desta promoção com este telefone!',
-              error: 'DUPLICATE_PARTICIPATION',
-              details:
-                'Cada telefone pode participar apenas uma vez por promoção.'
+              success: false,
+              message: 'Participação duplicada detectada.',
+              error: 'DUPLICATE_PARTICIPATION'
             });
           }
 
-          res.status(400).json({
-            message: 'Dados inválidos',
-            error: parseError.message,
-            received_body: body
-          });
+          return res.status(500).json({ success: false, message: 'Erro ao salvar no banco de dados' });
         }
-      });
+      }
     }
 
     // ============================================================

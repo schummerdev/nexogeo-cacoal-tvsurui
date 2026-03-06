@@ -9,7 +9,7 @@ import './DashboardPages.css';
 const ViewerDashboardPage = () => {
   const { user, userName } = useAuth();
   const { showToast } = useToast();
-  
+
   const [reports, setReports] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [charts, setCharts] = useState(null);
@@ -23,7 +23,7 @@ const ViewerDashboardPage = () => {
   const loadViewerDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       const [reportsResponse, analyticsResponse, chartsResponse] = await Promise.allSettled([
         fetch('/api/dashboard?action=reports-summary', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
@@ -82,7 +82,7 @@ const ViewerDashboardPage = () => {
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
-        
+
         showToast('Relatório exportado com sucesso!', 'success');
       } else {
         const error = await response.json();
@@ -113,7 +113,7 @@ const ViewerDashboardPage = () => {
   if (loading) {
     return (
       <>
-        <Header 
+        <Header
           title={`Relatórios - ${userName}`}
           subtitle="Visualização de dados e analytics"
         />
@@ -126,11 +126,11 @@ const ViewerDashboardPage = () => {
 
   return (
     <>
-      <Header 
+      <Header
         title={`👁️ Relatórios - ${userName}`}
         subtitle="Visualização de dados e analytics"
       />
-      
+
       <div className="dashboard-content viewer-dashboard">
         {/* Resumo Executivo */}
         <div className="card executive-summary">
@@ -140,7 +140,7 @@ const ViewerDashboardPage = () => {
               <div className="summary-icon">👥</div>
               <div className="summary-content">
                 <div className="summary-value">{reports?.totalParticipantes || 0}</div>
-                <div className="summary-label">Total de Participantes</div>
+                <div className="summary-label">Total de Participações</div>
                 <div className="summary-trend positive">
                   +{reports?.crescimentoParticipantes || 0}% este mês
                 </div>
@@ -189,7 +189,7 @@ const ViewerDashboardPage = () => {
             <div className="report-card">
               <div className="report-header">
                 <span className="report-icon">👥</span>
-                <h4>Relatório de Participantes</h4>
+                <h4>Relatório de Participações</h4>
               </div>
               <div className="report-content">
                 <p>Análise detalhada dos participantes por região, período e demografias.</p>
@@ -199,7 +199,7 @@ const ViewerDashboardPage = () => {
                 </div>
               </div>
               <div className="report-actions">
-                <button 
+                <button
                   className="btn-secondary btn-small"
                   onClick={() => handleViewDetailedReport('participantes')}
                 >
@@ -221,7 +221,7 @@ const ViewerDashboardPage = () => {
                 </div>
               </div>
               <div className="report-actions">
-                <button 
+                <button
                   className="btn-secondary btn-small"
                   onClick={() => handleViewDetailedReport('geografico')}
                 >
@@ -243,7 +243,7 @@ const ViewerDashboardPage = () => {
                 </div>
               </div>
               <div className="report-actions">
-                <button 
+                <button
                   className="btn-secondary btn-small"
                   onClick={() => handleViewDetailedReport('promocoes')}
                 >
@@ -264,11 +264,11 @@ const ViewerDashboardPage = () => {
                 <div className="chart-placeholder">
                   <div className="chart-mock">
                     <div className="chart-bars">
-                      <div className="bar" style={{height: '60%'}}></div>
-                      <div className="bar" style={{height: '80%'}}></div>
-                      <div className="bar" style={{height: '45%'}}></div>
-                      <div className="bar" style={{height: '90%'}}></div>
-                      <div className="bar" style={{height: '70%'}}></div>
+                      <div className="bar" style={{ height: '60%' }}></div>
+                      <div className="bar" style={{ height: '80%' }}></div>
+                      <div className="bar" style={{ height: '45%' }}></div>
+                      <div className="bar" style={{ height: '90%' }}></div>
+                      <div className="bar" style={{ height: '70%' }}></div>
                     </div>
                     <div className="chart-labels">
                       <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span>
@@ -303,7 +303,7 @@ const ViewerDashboardPage = () => {
           <h3 className="card-title">📥 Exportar Relatórios</h3>
           <div className="export-grid">
             {exportOptions.map((option) => (
-              <button 
+              <button
                 key={option.id}
                 className="export-btn"
                 onClick={() => handleExportReport(option.id)}
@@ -329,7 +329,7 @@ const ViewerDashboardPage = () => {
                 <p>Participações aumentaram 45% nas últimas 2 semanas</p>
               </div>
             </div>
-            
+
             <div className="insight-item warning">
               <span className="insight-icon">⚠️</span>
               <div className="insight-content">
@@ -337,7 +337,7 @@ const ViewerDashboardPage = () => {
                 <p>85% dos participantes estão em apenas 3 cidades</p>
               </div>
             </div>
-            
+
             <div className="insight-item info">
               <span className="insight-icon">ℹ️</span>
               <div className="insight-content">
@@ -345,7 +345,7 @@ const ViewerDashboardPage = () => {
                 <p>Horário de maior atividade: 19h às 21h</p>
               </div>
             </div>
-            
+
             <div className="insight-item positive">
               <span className="insight-icon">🎯</span>
               <div className="insight-content">

@@ -4,18 +4,19 @@ import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { cleanupOldLogs, exportAuditLogs, fetchAuditStats } from '../services/auditService';
+import { validarBairro } from '../utils/bairrosUtils';
 import './DashboardPages.css';
 
 const ConfiguracoesPage = () => {
   const { currentTheme } = useTheme();
-  const { 
-    user, 
-    canManageSystem, 
-    canManageUsers, 
+  const {
+    user,
+    canManageSystem,
+    canManageUsers,
     isUserAdmin,
-    userRole 
+    userRole
   } = useAuth();
-  
+
   const [emissora, setEmissora] = useState({
     nome: '',
     logoUrl: '',
@@ -33,11 +34,11 @@ const ConfiguracoesPage = () => {
     email: '',
     descricao: ''
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
-  
+
+
   const [administradores, setAdministradores] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,18 +53,22 @@ const ConfiguracoesPage = () => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [changingPasswordUser, setChangingPasswordUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
-  
+
 
   // Estados para auditoria
   const [auditStats, setAuditStats] = useState(null);
   const [loadingAuditStats, setLoadingAuditStats] = useState(false);
 
+  // Estados para validação de bairros
+  const [validandoBairros, setValidandoBairros] = useState(false);
+  const [resultadoValidacao, setResultadoValidacao] = useState(null);
+
   // Verificar se o usuário tem acesso à página de configurações
   if (!canManageSystem()) {
     return (
       <>
-        <Header 
-          title="Configurações do Sistema" 
+        <Header
+          title="Configurações do Sistema"
           subtitle="Acesso restrito - apenas administradores"
         />
         <div className="access-denied-container">
@@ -72,7 +77,7 @@ const ConfiguracoesPage = () => {
             <h2>Acesso Negado</h2>
             <p>Você não tem permissão para acessar as configurações do sistema.</p>
             <p>Entre em contato com o administrador se acredita que isso é um erro.</p>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => window.history.back()}
             >
@@ -101,7 +106,7 @@ const ConfiguracoesPage = () => {
   const buscarRedesSociais = async (nomeEmissora) => {
     // Simular busca real - em produção, integrar com APIs de busca
     const nomeSlug = nomeEmissora.toLowerCase().replace(/\s+/g, '');
-    
+
     // Simular resultados de pesquisa
     const opcoesEncontradas = [
       {
@@ -167,7 +172,7 @@ const ConfiguracoesPage = () => {
       const opcoes = await buscarRedesSociais(emissora.nome);
       setSocialOptions(opcoes);
       setShowSocialOptions(true);
-      
+
     } catch (error) {
       console.error('Erro ao buscar redes sociais:', error);
       alert('Erro ao buscar dados online. Tente novamente.');
@@ -179,23 +184,23 @@ const ConfiguracoesPage = () => {
   // Função para aplicar seleção de rede social
   const aplicarOpcaoSocial = (opcao, campo) => {
     const updates = {};
-    
+
     if (campo === 'logo' || campo === 'all') {
       updates.logoUrl = opcao.profileImage;
     }
-    
+
     if (campo === 'instagram' || campo === 'all') {
       if (opcao.plataforma === 'Instagram') {
         updates.instagram = opcao.url;
       }
     }
-    
+
     if (campo === 'facebook' || campo === 'all') {
       if (opcao.plataforma === 'Facebook') {
         updates.facebook = opcao.url;
       }
     }
-    
+
     if (campo === 'youtube' || campo === 'all') {
       if (opcao.plataforma === 'YouTube') {
         updates.youtube = opcao.url;
@@ -211,7 +216,7 @@ const ConfiguracoesPage = () => {
   const buscarDadosOnline = async () => {
     // Simular busca online com delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     const nome = emissora.nome.trim();
     const nomeSlug = nome.toLowerCase()
       .replace(/\s+/g, '')
@@ -225,7 +230,7 @@ const ConfiguracoesPage = () => {
 
     // Dados mais sofisticados baseados no tipo de emissora
     let dadosEncontrados = {};
-    
+
     if (nome.toLowerCase().includes('radio') || nome.toLowerCase().includes('rádio')) {
       dadosEncontrados = {
         website: emissora.website || `https://www.${nomeSlug}.com.br`,
@@ -300,8 +305,8 @@ const ConfiguracoesPage = () => {
     setEmissora(prev => ({ ...prev, ...dadosSugeridos }));
     alert('Dados preenchidos automaticamente! Revise e ajuste conforme necessário.');
   };
-  
-  
+
+
   // Funções para auditoria e manutenção
   const handleCleanupLogs = async () => {
     if (window.confirm('Executar limpeza de logs antigos? Esta ação não pode ser desfeita.')) {
@@ -346,6 +351,45 @@ const ConfiguracoesPage = () => {
       console.error('Erro ao carregar estatísticas de auditoria:', error);
     } finally {
       setLoadingAuditStats(false);
+    }
+  };
+
+  // Função para validar e normalizar bairros dos participantes (SERVER-SIDE)
+  const handleValidarBairros = async () => {
+    if (!window.confirm('Deseja validar e normalizar os bairros de todos os participantes (Modo Turbo Server-Side)?\n\nIsso irá:\n- Executar a normalização diretamente no banco de dados\n- Corrigir erros de digitação e aplicar UPPERCASE\n\nEsta ação é muito mais rápida e segura.')) {
+      return;
+    }
+
+    setValidandoBairros(true);
+    setResultadoValidacao(null);
+
+    try {
+      console.log('🚀 Solicitando normalização server-side...');
+
+      const response = await fetch('/api/?route=maintenance&action=normalize_bairros', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({}), // Body vazio mas necessário para Content-Type funcionar corretamente em alguns parsers
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        console.log('✅ Resultado da normalização:', data.stats);
+        setResultadoValidacao(data.stats);
+        alert(`Sucesso! Validação V4 (Server-Side) concluída!\n\nAtualizados: ${data.stats.atualizados}\nErros: ${data.stats.erros}\nTotal: ${data.stats.total}`);
+      } else {
+        console.error('Erro na resposta:', data);
+        alert(`Erro: ${data.error || 'Falha desconhecida no servidor'}`);
+      }
+
+    } catch (error) {
+      console.error('Erro na validação de bairros:', error);
+      alert('Erro ao validar bairros: ' + error.message);
+    } finally {
+      setValidandoBairros(false);
     }
   };
 
@@ -435,12 +479,12 @@ const ConfiguracoesPage = () => {
         credentials: 'include', // SEGURANÇA: Enviar cookies HttpOnly
         body: JSON.stringify(payload)
       });
-      
+
 
       if (response.ok) {
         const data = await response.json();
         alert('Configurações salvas com sucesso!');
-        
+
         // Atualizar estado local com todos os campos salvos
         if (data.data) {
           setEmissora(prev => ({
@@ -575,7 +619,7 @@ const ConfiguracoesPage = () => {
           alert(errorData.message || 'Erro ao criar administrador');
         }
       }
-      
+
       handleCloseModal();
     } catch (error) {
       console.error('Erro ao salvar administrador:', error);
@@ -651,15 +695,15 @@ const ConfiguracoesPage = () => {
 
   return (
     <>
-      <Header 
-        title="Configurações" 
+      <Header
+        title="Configurações"
         subtitle="Gerencie as configurações do sistema"
       />
-      
+
       <div className="configuracoes-content">
         <div className="card">
           <h3 className="card-title">Informações da Emissora</h3>
-          
+
           {loading ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
               Carregando configurações...
@@ -677,7 +721,7 @@ const ConfiguracoesPage = () => {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="logoUrl">URL do Logo</label>
                 <input
@@ -759,22 +803,22 @@ const ConfiguracoesPage = () => {
                   placeholder="Breve descrição sobre a emissora"
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Tema do Sistema</label>
                 <ThemeSelector inline={true} showLabel={false} />
                 <small className="form-help">Escolha o tema de cores do painel administrativo</small>
               </div>
-              
+
             </form>
           )}
-          
+
           {/* Botão de salvar posicionado abaixo dos dados */}
           {!loading && (
             <div className="form-group align-right" style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
-              <button 
-                type="button" 
-                className="btn-primary" 
+              <button
+                type="button"
+                className="btn-primary"
                 disabled={saving}
                 onClick={handleSave}
                 title="Pressione Ctrl+Enter para salvar rapidamente"
@@ -788,7 +832,7 @@ const ConfiguracoesPage = () => {
 
         <div className="card">
           <h3 className="card-title">Redes Sociais</h3>
-          
+
           <div className="social-media-section">
             <div className="form-row">
               <div className="form-group">
@@ -867,12 +911,12 @@ const ConfiguracoesPage = () => {
                 />
               </div>
             </div>
-            
+
             {/* Botão de salvar para redes sociais */}
             <div className="form-group align-right" style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
-              <button 
-                type="button" 
-                className="btn-primary" 
+              <button
+                type="button"
+                className="btn-primary"
                 disabled={saving}
                 onClick={handleSave}
                 title="Salvar todas as configurações - Ctrl+Enter"
@@ -883,8 +927,8 @@ const ConfiguracoesPage = () => {
             </div>
           </div>
         </div>
-        
-        
+
+
 
         {isUserAdmin() && (
           <div className="card">
@@ -987,84 +1031,149 @@ const ConfiguracoesPage = () => {
           </div>
         )}
 
+        {/* Ferramentas de Dados */}
+        {isUserAdmin() && (
+          <div className="card">
+            <h3 className="card-title">🔧 Ferramentas de Dados</h3>
+            <p style={{ marginBottom: '20px', color: 'var(--color-text-secondary)' }}>
+              Ferramentas para validação e normalização de dados cadastrados.
+            </p>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
+                📍 Validação de Bairros
+              </h4>
+              <p style={{ marginBottom: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                Normaliza os nomes dos bairros dos participantes para o padrão oficial dos Correios (Cacoal-RO).
+                Corrige erros de digitação e padroniza nomenclaturas.
+              </p>
+              <button
+                className="btn-secondary"
+                onClick={handleValidarBairros}
+                disabled={validandoBairros}
+                style={{ marginRight: '1rem' }}
+              >
+                {validandoBairros ? '⏳ Validando...' : '✅ Validar Bairros'}
+              </button>
+            </div>
+
+            {resultadoValidacao && (
+              <div style={{
+                marginTop: '1rem',
+                padding: '1rem',
+                background: 'var(--color-surface-alt)',
+                borderRadius: '8px',
+                border: '1px solid var(--color-border)'
+              }}>
+                <h5 style={{ marginBottom: '0.5rem' }}>Resultado da Validação</h5>
+                <p style={{ margin: '0.25rem 0', fontSize: '0.9rem' }}>
+                  📊 Total analisado: <strong>{resultadoValidacao.total}</strong>
+                </p>
+                <p style={{ margin: '0.25rem 0', fontSize: '0.9rem', color: '#10B981' }}>
+                  ✅ Atualizados: <strong>{resultadoValidacao.atualizados}</strong>
+                </p>
+                {resultadoValidacao.erros > 0 && (
+                  <p style={{ margin: '0.25rem 0', fontSize: '0.9rem', color: '#EF4444' }}>
+                    ❌ Erros: <strong>{resultadoValidacao.erros}</strong>
+                  </p>
+                )}
+                {resultadoValidacao.alteracoes.length > 0 && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <p style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+                      Exemplos de alterações:
+                    </p>
+                    <ul style={{ fontSize: '0.8rem', paddingLeft: '1.25rem', margin: 0 }}>
+                      {resultadoValidacao.alteracoes.map((a, i) => (
+                        <li key={i} style={{ marginBottom: '0.25rem' }}>
+                          "{a.de}" → "{a.para}" {a.oficial ? '✓' : '(não oficial)'}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {canManageUsers() && (
           <div className="card">
             <h3 className="card-title">Administradores</h3>
-          
-          <div className="table-container">
-            <table className="administradores-table">
-              <thead>
-                <tr>
-                  <th>Usuário</th>
-                  <th>Tipo</th>
-                  <th>Data de Criação</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {administradores.map(admin => (
-                  <tr key={admin.id}>
-                    <td>{admin.usuario}</td>
-                    <td>
-                      <span className={`role-badge role-${admin.role}`}>
-                        {admin.role === 'admin' ? '🛡️ Admin' : '👤 Usuário'}
-                      </span>
-                    </td>
-                    <td>{new Date(admin.created_at).toLocaleDateString()}</td>
-                    <td>
-                      <div className="action-buttons">
-                        {userRole === 'admin' && (
-                          <button
-                            className="btn-icon-small"
-                            onClick={() => handleOpenModal(admin)}
-                            title="Editar"
-                          >
-                            <span className="icon">✏️</span>
-                          </button>
-                        )}
-                        {userRole === 'admin' && (
-                          <button
-                            className="btn-icon-small"
-                            onClick={() => handleOpenPasswordModal(admin)}
-                            title="Alterar Senha"
-                          >
-                            <span className="icon">🔑</span>
-                          </button>
-                        )}
-                        {userRole === 'admin' && (
-                          <button
-                            className="btn-icon-small"
-                            onClick={() => handleDeleteAdmin(admin.id)}
-                            title="Excluir"
-                          >
-                            <span className="icon">🗑️</span>
-                          </button>
-                        )}
-                        {userRole !== 'admin' && (
-                          <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-                            Sem permissão
-                          </span>
-                        )}
-                      </div>
-                    </td>
+
+            <div className="table-container">
+              <table className="administradores-table">
+                <thead>
+                  <tr>
+                    <th>Usuário</th>
+                    <th>Tipo</th>
+                    <th>Data de Criação</th>
+                    <th>Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {userRole === 'admin' && (
-            <div className="form-group align-right">
-              <button 
-                className="btn-secondary" 
-                style={{ marginTop: '1rem' }}
-                onClick={() => handleOpenModal()}
-              >
-                <span className="btn-icon">➕</span>
-                Adicionar Administrador
-              </button>
+                </thead>
+                <tbody>
+                  {administradores.map(admin => (
+                    <tr key={admin.id}>
+                      <td>{admin.usuario}</td>
+                      <td>
+                        <span className={`role-badge role-${admin.role}`}>
+                          {admin.role === 'admin' ? '🛡️ Admin' : '👤 Usuário'}
+                        </span>
+                      </td>
+                      <td>{new Date(admin.created_at).toLocaleDateString()}</td>
+                      <td>
+                        <div className="action-buttons">
+                          {userRole === 'admin' && (
+                            <button
+                              className="btn-icon-small"
+                              onClick={() => handleOpenModal(admin)}
+                              title="Editar"
+                            >
+                              <span className="icon">✏️</span>
+                            </button>
+                          )}
+                          {userRole === 'admin' && (
+                            <button
+                              className="btn-icon-small"
+                              onClick={() => handleOpenPasswordModal(admin)}
+                              title="Alterar Senha"
+                            >
+                              <span className="icon">🔑</span>
+                            </button>
+                          )}
+                          {userRole === 'admin' && (
+                            <button
+                              className="btn-icon-small"
+                              onClick={() => handleDeleteAdmin(admin.id)}
+                              title="Excluir"
+                            >
+                              <span className="icon">🗑️</span>
+                            </button>
+                          )}
+                          {userRole !== 'admin' && (
+                            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
+                              Sem permissão
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+
+            {userRole === 'admin' && (
+              <div className="form-group align-right">
+                <button
+                  className="btn-secondary"
+                  style={{ marginTop: '1rem' }}
+                  onClick={() => handleOpenModal()}
+                >
+                  <span className="btn-icon">➕</span>
+                  Adicionar Administrador
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -1083,7 +1192,7 @@ const ConfiguracoesPage = () => {
               <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-secondary)' }}>
                 Encontramos estas opções para <strong>{emissora.nome}</strong>. Selecione a opção correta:
               </p>
-              
+
               <div className="social-options-list">
                 {socialOptions.map((opcao) => (
                   <div key={opcao.id} className="social-option-item" style={{
@@ -1098,16 +1207,16 @@ const ConfiguracoesPage = () => {
                     transition: 'all 0.2s ease',
                     backgroundColor: 'var(--color-background-alt)'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-primary)';
-                    e.currentTarget.style.backgroundColor = 'var(--color-background-hover)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-border)';
-                    e.currentTarget.style.backgroundColor = 'var(--color-background-alt)';
-                  }}>
-                    <img 
-                      src={opcao.profileImage} 
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-primary)';
+                      e.currentTarget.style.backgroundColor = 'var(--color-background-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border)';
+                      e.currentTarget.style.backgroundColor = 'var(--color-background-alt)';
+                    }}>
+                    <img
+                      src={opcao.profileImage}
                       alt={opcao.handle}
                       style={{
                         width: '50px',
@@ -1117,13 +1226,13 @@ const ConfiguracoesPage = () => {
                       }}
                     />
                     <div style={{ flex: 1 }}>
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: '0.5rem',
                         marginBottom: '0.25rem'
                       }}>
-                        <span style={{ 
+                        <span style={{
                           fontWeight: 'bold',
                           fontSize: '1rem'
                         }}>
@@ -1181,11 +1290,11 @@ const ConfiguracoesPage = () => {
                   </div>
                 ))}
               </div>
-              
+
               <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                <button 
-                  type="button" 
-                  className="btn-secondary" 
+                <button
+                  type="button"
+                  className="btn-secondary"
                   onClick={() => setShowSocialOptions(false)}
                 >
                   ❌ Fechar
@@ -1271,7 +1380,7 @@ const ConfiguracoesPage = () => {
                   placeholder="Nome de usuário para login"
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="admin-role">Tipo de Usuário</label>
                 <select
@@ -1285,13 +1394,13 @@ const ConfiguracoesPage = () => {
                   <option value="admin">🛡️ Administrador</option>
                 </select>
                 <small className="form-help">
-                  {adminData.role === 'admin' 
+                  {adminData.role === 'admin'
                     ? 'Pode gerenciar usuários, configurações e todas as funcionalidades'
                     : 'Acesso limitado - não pode excluir ou alterar dados importantes'
                   }
                 </small>
               </div>
-              
+
               {!editingAdmin && (
                 <div className="form-group">
                   <label htmlFor="senha">Senha</label>
@@ -1307,7 +1416,7 @@ const ConfiguracoesPage = () => {
                   />
                 </div>
               )}
-              
+
               <div className="modal-actions">
                 <button type="button" className="btn-secondary" onClick={handleCloseModal}>
                   Cancelar

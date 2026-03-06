@@ -1,10 +1,10 @@
 // ModernDashboardPage.jsx - Exemplo de uso de todas as melhorias
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
-import { 
-  LoadingSpinner, 
-  SkeletonDashboard, 
-  useLoading 
+import {
+  LoadingSpinner,
+  SkeletonDashboard,
+  useLoading
 } from '../components/LoadingComponents';
 import {
   ModernLineChart,
@@ -47,7 +47,7 @@ const ModernDashboardPage = () => {
     {
       icon: '👥',
       value: 1234,
-      label: 'Total Participantes',
+      label: 'Total Participações',
       trend: 12,
       color: 'primary'
     },
@@ -77,11 +77,11 @@ const ModernDashboardPage = () => {
   // Simular carregamento de dados
   useEffect(() => {
     startLoading();
-    
+
     const loadData = async () => {
       // Simular API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       setDashboardData({
         stats: kpiStats,
         charts: {
@@ -90,7 +90,7 @@ const ModernDashboardPage = () => {
           bar: barChartData
         }
       });
-      
+
       stopLoading();
     };
 
@@ -119,22 +119,22 @@ const ModernDashboardPage = () => {
   }
 
   return (
-    <div style={{ 
+    <div style={{
       padding: '24px',
       background: 'var(--color-background)',
       minHeight: '100vh'
     }}>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ 
-          fontSize: '2rem', 
-          fontWeight: '700', 
+        <h1 style={{
+          fontSize: '2rem',
+          fontWeight: '700',
           color: 'var(--color-text)',
           marginBottom: '8px'
         }}>
           Dashboard Moderno 🚀
         </h1>
-        <p style={{ 
+        <p style={{
           color: 'var(--color-text-secondary)',
           fontSize: '1.1rem'
         }}>
@@ -143,32 +143,32 @@ const ModernDashboardPage = () => {
       </div>
 
       {/* Botões para testar toasts */}
-      <div className="card-modern" style={{ 
-        padding: '24px', 
+      <div className="card-modern" style={{
+        padding: '24px',
         marginBottom: '32px'
       }}>
-        <h3 style={{ 
+        <h3 style={{
           marginBottom: '16px',
           color: 'var(--color-text)',
           fontSize: '1.125rem'
         }}>
           Testar Notificações (Toast Modernizado)
         </h3>
-        <div style={{ 
-          display: 'flex', 
-          gap: '12px', 
+        <div style={{
+          display: 'flex',
+          gap: '12px',
           flexWrap: 'wrap'
         }}>
-          <button 
+          <button
             className="btn btn-primary hover-lift transition-normal"
             onClick={showSuccessToast}
           >
             ✅ Sucesso
           </button>
-          <button 
+          <button
             className="btn hover-lift transition-normal"
-            style={{ 
-              background: 'var(--color-danger)', 
+            style={{
+              background: 'var(--color-danger)',
               color: 'white',
               border: 'none'
             }}
@@ -176,10 +176,10 @@ const ModernDashboardPage = () => {
           >
             ❌ Erro
           </button>
-          <button 
+          <button
             className="btn hover-lift transition-normal"
-            style={{ 
-              background: 'var(--color-warning)', 
+            style={{
+              background: 'var(--color-warning)',
               color: 'white',
               border: 'none'
             }}
@@ -187,10 +187,10 @@ const ModernDashboardPage = () => {
           >
             ⚠️ Aviso
           </button>
-          <button 
+          <button
             className="btn hover-lift transition-normal"
-            style={{ 
-              background: 'var(--color-primary)', 
+            style={{
+              background: 'var(--color-primary)',
               color: 'white',
               border: 'none'
             }}
@@ -206,12 +206,12 @@ const ModernDashboardPage = () => {
 
       {/* Gráficos Modernos */}
       <div className="grid grid-2" style={{ gap: '24px', marginBottom: '32px' }}>
-        <ModernLineChart 
+        <ModernLineChart
           data={dashboardData.charts.line}
           title="📈 Crescimento Mensal"
           height={300}
         />
-        <ModernPieChart 
+        <ModernPieChart
           data={dashboardData.charts.pie}
           title="📱 Dispositivos"
           height={300}
@@ -219,12 +219,12 @@ const ModernDashboardPage = () => {
       </div>
 
       <div className="grid grid-2" style={{ gap: '24px', marginBottom: '32px' }}>
-        <ModernBarChart 
+        <ModernBarChart
           data={dashboardData.charts.bar}
           title="⏰ Participações por Horário"
           height={300}
         />
-        
+
         {/* Card com efeitos modernos */}
         <div className="card-glass hover-lift transition-normal" style={{
           padding: '24px',
@@ -237,14 +237,14 @@ const ModernDashboardPage = () => {
           <div style={{ fontSize: '3rem', marginBottom: '16px' }}>
             ✨
           </div>
-          <h3 style={{ 
+          <h3 style={{
             color: 'var(--color-text)',
             marginBottom: '8px',
             fontSize: '1.25rem'
           }}>
             Glassmorphism
           </h3>
-          <p style={{ 
+          <p style={{
             color: 'var(--color-text-secondary)',
             fontSize: '0.875rem',
             lineHeight: '1.5'
@@ -291,28 +291,28 @@ const ModernDashboardPage = () => {
       </div>
 
       {/* Loading spinner demonstrativo */}
-      <div className="card-modern" style={{ 
-        padding: '24px', 
+      <div className="card-modern" style={{
+        padding: '24px',
         marginTop: '32px',
         textAlign: 'center'
       }}>
-        <h3 style={{ 
+        <h3 style={{
           marginBottom: '24px',
           color: 'var(--color-text)'
         }}>
           Loading Spinners
         </h3>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-around', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-around',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '24px'
         }}>
           <div>
             <LoadingSpinner size="sm" color="primary" />
-            <p style={{ 
-              marginTop: '8px', 
+            <p style={{
+              marginTop: '8px',
               fontSize: '0.75rem',
               color: 'var(--color-text-secondary)'
             }}>
@@ -321,8 +321,8 @@ const ModernDashboardPage = () => {
           </div>
           <div>
             <LoadingSpinner size="md" color="success" />
-            <p style={{ 
-              marginTop: '8px', 
+            <p style={{
+              marginTop: '8px',
               fontSize: '0.75rem',
               color: 'var(--color-text-secondary)'
             }}>
@@ -331,8 +331,8 @@ const ModernDashboardPage = () => {
           </div>
           <div>
             <LoadingSpinner size="lg" color="warning" />
-            <p style={{ 
-              marginTop: '8px', 
+            <p style={{
+              marginTop: '8px',
               fontSize: '0.75rem',
               color: 'var(--color-text-secondary)'
             }}>

@@ -10,7 +10,7 @@ import './DashboardPages.css';
 const UserDashboardPage = () => {
   const { user, userName, userRole } = useAuth();
   const { showToast } = useToast();
-  
+
   const [userStats, setUserStats] = useState(null);
   const [userActivity, setUserActivity] = useState([]);
   const [availablePromotions, setAvailablePromotions] = useState([]);
@@ -23,7 +23,7 @@ const UserDashboardPage = () => {
   const loadUserDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Carregar dados limitados para usuário
       const [statsResponse, activityResponse, promotionsResponse] = await Promise.allSettled([
         fetch('/api/dashboard?action=user-stats', {
@@ -81,7 +81,7 @@ const UserDashboardPage = () => {
   if (loading) {
     return (
       <>
-        <Header 
+        <Header
           title={`Meu Painel - ${userName}`}
           subtitle="Suas atividades e promoções disponíveis"
         />
@@ -94,11 +94,11 @@ const UserDashboardPage = () => {
 
   return (
     <>
-      <Header 
+      <Header
         title={`👤 Meu Painel - ${userName}`}
         subtitle="Suas atividades e promoções disponíveis"
       />
-      
+
       <div className="dashboard-content user-dashboard">
         {/* Badge de Role */}
         <div className="user-role-badge">
@@ -177,17 +177,17 @@ const UserDashboardPage = () => {
                     <p>{promotion.descricao}</p>
                     <div className="promotion-meta">
                       <span>📅 Até: {new Date(promotion.data_fim).toLocaleDateString('pt-BR')}</span>
-                      <span>👥 {promotion.participantes || 0} participantes</span>
+                      <span>👥 {promotion.participantes || 0} participações</span>
                     </div>
                   </div>
                   <div className="promotion-actions">
-                    <button 
+                    <button
                       className="btn-secondary btn-small"
                       onClick={() => handlePromotionAction(promotion.id, 'view')}
                     >
                       👁️ Ver Detalhes
                     </button>
-                    <button 
+                    <button
                       className="btn-primary btn-small"
                       onClick={() => handlePromotionAction(promotion.id, 'share')}
                     >
@@ -248,27 +248,33 @@ const UserDashboardPage = () => {
                 <span className="link-label">Configurações</span>
               </Link>
             )}
-            
+
             {['admin', 'moderator', 'editor'].includes(userRole) && (
               <Link to="/dashboard/promocoes" className="quick-link editor">
                 <span className="link-icon">🎁</span>
                 <span className="link-label">Gerenciar Promoções</span>
               </Link>
             )}
-            
+
             {['admin', 'moderator'].includes(userRole) && (
               <Link to="/dashboard/sorteio" className="quick-link moderator">
                 <span className="link-icon">🎲</span>
                 <span className="link-label">Realizar Sorteios</span>
               </Link>
             )}
-            
+
             {['admin', 'moderator', 'editor', 'viewer'].includes(userRole) && (
               <Link to="/dashboard/mapas" className="quick-link viewer">
                 <span className="link-icon">🗺️</span>
                 <span className="link-label">Ver Mapas</span>
               </Link>
             )}
+
+            {/* Link para promoções ativas - disponível para todos */}
+            <a href="/promocoes-ativas" target="_blank" rel="noopener noreferrer" className="quick-link user">
+              <span className="link-icon">🎁</span>
+              <span className="link-label">Ver Promoções Ativas</span>
+            </a>
           </div>
         </div>
       </div>

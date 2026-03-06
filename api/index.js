@@ -856,7 +856,7 @@ module.exports = async function handler(req, res) {
     if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
       const contentType = req.headers['content-type'];
 
-      if (!contentType || !contentType.includes('application/json')) {
+      if (!contentType || (!contentType.includes('application/json') && !contentType.includes('multipart/form-data'))) {
         console.warn(`⚠️ Content-Type inválido: ${contentType} - rejeitando ${req.method} request`);
 
         return res.status(415).json({
@@ -891,6 +891,28 @@ module.exports = async function handler(req, res) {
     }
 
     console.log('🔍 [ROUTER] Route final:', route, 'Endpoint:', endpoint, 'URL:', req.url);
+
+    // Rota para Upload no Drive
+    if (route === 'upload-drive') {
+      try {
+        const uploadHandler = require('./_handlers/uploadHandler.js');
+        return await uploadHandler(req, res);
+      } catch (err) {
+        console.error('Erro ao carregar/executar upload-drive:', err);
+        return res.status(500).json({ success: false, message: 'Erro no handler de upload', error: err.message });
+      }
+    }
+
+    // Rota para Enquetes Online (TV)
+    if (route === 'enquetes') {
+      try {
+        const enquetesHandler = require('./_handlers/enquetes.js');
+        return await enquetesHandler(req, res);
+      } catch (err) {
+        console.error('Erro ao carregar/executar enquetes handler:', err);
+        return res.status(500).json({ success: false, message: 'Erro interno no módulo de enquetes', error: err.message });
+      }
+    }
 
     // ✅ DIAGNÓSTICO: Endpoint /api/health para verificar status de inicialização
     // Endpoint para testar conexão com banco (health check já foi feito acima)
@@ -1308,7 +1330,7 @@ module.exports = async function handler(req, res) {
 
           // Criar novo administrador
           if (req.method === 'POST') {
-            const { usuario, role } = req.body || {};
+            const { usuario, role, senha, password } = req.body || {};
 
             if (!usuario) {
               return res.status(400).json({
@@ -1318,24 +1340,16 @@ module.exports = async function handler(req, res) {
               });
             }
 
-            // ✅ SEGURANÇA: Gerar senha temporária criptograficamente segura [CRÍTICO-005]
-            const senhaTemporaria = generateSecurePassword();  // crypto.randomBytes(16) = 128 bits
-            const hashedPassword = await bcrypt.hash(senhaTemporaria, 10);
+            // ✅ SEGURANÇA: Usar senha fornecida ou gerar uma segura [CRÍTICO-005]
+            const passwordToUse = senha || password || generateSecurePassword();
+            const hashedPassword = await bcrypt.hash(passwordToUse, 10);
 
-            // 📝 LOG: Senha registrada apenas uma vez (não será incluída na resposta API)
-            console.log(`
-╔════════════════════════════════════════════════════════════════╗
-║ ✅ USUÁRIO CRIADO COM SUCESSO                                  ║
-╠════════════════════════════════════════════════════════════════╣
-║ Usuário:  ${usuario.padEnd(52)} ║
-║ Senha:    ${senhaTemporaria.padEnd(52)} ║
-╠════════════════════════════════════════════════════════════════╣
-║ ⚠️  IMPORTANTE:                                                 ║
-║ • Anote esta senha AGORA (aparece apenas uma vez)             ║
-║ • Envie por canal seguro (email, WhatsApp)                    ║
-║ • Solicite alteração no primeiro login                        ║
-╚════════════════════════════════════════════════════════════════╝
-          `);
+            // Log simplificado
+            if (!senha && !password) {
+              console.log(`[AUTH] ⚠️ Senha gerada automaticamente para ${usuario}: ${passwordToUse}`);
+            } else {
+              console.log(`[AUTH] ✅ Usando senha fornecida pelo cliente para ${usuario}`);
+            }
 
             const insertResult = await query(`
             INSERT INTO usuarios (usuario, senha_hash, role)
@@ -1354,7 +1368,7 @@ module.exports = async function handler(req, res) {
           // Atualizar administrador existente
           if (req.method === 'PUT') {
             const { id } = req.query || {};
-            const { usuario, role } = req.body || {};
+            const { usuario, role, senha, password } = req.body || {};
 
             if (!id || !usuario) {
               return res.status(400).json({
@@ -1364,12 +1378,32 @@ module.exports = async function handler(req, res) {
               });
             }
 
-            const updateResult = await query(`
-            UPDATE usuarios
-            SET usuario = $1, role = $2
-            WHERE id = $3
-            RETURNING id, usuario, role, created_at
-          `, [usuario, role || 'user', parseInt(id)]);
+            let updateQuery;
+            let queryParams;
+
+            if (senha || password) {
+              // Se enviou senha, criptografa e inclui no UPDATE
+              const passwordToUse = senha || password;
+              const hashedPassword = await bcrypt.hash(passwordToUse, 10);
+              updateQuery = `
+                UPDATE usuarios 
+                SET usuario = $1, role = $2, senha_hash = $3, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = $4 
+                RETURNING id, usuario, role, created_at
+              `;
+              queryParams = [usuario, role || 'user', hashedPassword, parseInt(id)];
+            } else {
+              // Caso contrário, atualiza apenas nome e cargo
+              updateQuery = `
+                UPDATE usuarios 
+                SET usuario = $1, role = $2, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = $3 
+                RETURNING id, usuario, role, created_at
+              `;
+              queryParams = [usuario, role || 'user', parseInt(id)];
+            }
+
+            const updateResult = await query(updateQuery, queryParams);
 
             if (updateResult.rows.length === 0) {
               return res.status(404).json({
@@ -1382,7 +1416,7 @@ module.exports = async function handler(req, res) {
             return res.status(200).json({
               success: true,
               data: updateResult.rows[0],
-              message: 'Administrador atualizado com sucesso',
+              message: 'Administrador atualizado com sucesso' + ((senha || password) ? ' (senha alterada)' : ''),
               timestamp: new Date().toISOString()
             });
           }
@@ -1473,22 +1507,28 @@ module.exports = async function handler(req, res) {
     // Rota para promoções (dados do banco PostgreSQL)
     if (route === 'promocoes') {
       try {
+        // Migração automática: garantir que coluna imagem_url existe
+        try {
+          await query('ALTER TABLE promocoes ADD COLUMN IF NOT EXISTS imagem_url TEXT');
+        } catch (migrationError) {
+          console.log('Migração imagem_url: coluna já existe ou erro ignorável');
+        }
 
         // GET - Listar promoções ou buscar por ID
         if (req.method === 'GET') {
           const { id, status } = req.query || {};
 
-          // Se um ID for fornecido, a rota é PÚBLICA para permitir que o formulário de captura funcione.
+          // Se um ID for fornecido, a rota é PÚBLICA (ou se for listagem pública explícita)
           if (id) {
             console.log(`[PUBLIC] Buscando promoção pública por ID: ${id}`);
             // Buscar promoção específica por ID
             // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
             const result = await query(`
-            SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by, COUNT(pt.id) as participantes_count
+            SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.imagem_url, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by, COUNT(pt.id) as participantes_count
             FROM promocoes p
             LEFT JOIN participantes pt ON p.id = pt.promocao_id AND pt.deleted_at IS NULL
             WHERE p.id = $1 AND p.deleted_at IS NULL
-            GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by
+            GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.imagem_url, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by
           `, [parseInt(id)]);
 
             if (result.rows.length === 0) {
@@ -1506,7 +1546,22 @@ module.exports = async function handler(req, res) {
               timestamp: new Date().toISOString()
             });
           } else {
-            // Se nenhum ID for fornecido, a rota é PRIVADA e requer autenticação.
+            // Verificar se é uma solicitação pública
+            const { public: isPublic } = req.query || {};
+
+            if (isPublic === 'true') {
+              console.log('[PUBLIC] Listando promoções ativas publicamente');
+              const result = await query(`
+                SELECT id, nome, slug, descricao, data_inicio, data_fim, status, imagem_url, link_participacao
+                FROM promocoes
+                WHERE LOWER(status) = 'ativa'
+                  AND deleted_at IS NULL
+                ORDER BY criado_em DESC
+              `);
+              return res.status(200).json({ success: true, data: result.rows, source: 'database_public' });
+            }
+
+            // Se nenhum ID for fornecido e não for público, a rota é PRIVADA e requer autenticação.
             // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user, viewer
             const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user', 'viewer']);
             console.log('[DASHBOARD] Usuário autenticado para listar promoções:', user.usuario);
@@ -1514,7 +1569,7 @@ module.exports = async function handler(req, res) {
             // Listar todas as promoções (com filtro de status opcional)
             // ✅ SEGURANÇA (ALTO-005): Soft Delete - filtrar registros deletados
             let queryText = `
-            SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by, COUNT(pt.id) as participantes_count
+            SELECT p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.imagem_url, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by, COUNT(pt.id) as participantes_count
             FROM promocoes p
             LEFT JOIN participantes pt ON p.id = pt.promocao_id AND pt.deleted_at IS NULL
             WHERE p.deleted_at IS NULL
@@ -1526,7 +1581,7 @@ module.exports = async function handler(req, res) {
               queryParams.push(status);
             }
 
-            queryText += ` GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by ORDER BY p.id DESC`;
+            queryText += ` GROUP BY p.id, p.nome, p.slug, p.descricao, p.data_inicio, p.data_fim, p.status, p.imagem_url, p.link_participacao, p.criado_em, p.emissora_id, p.numero_ganhadores, p.deleted_at, p.deleted_by ORDER BY p.id DESC`;
 
             const result = await query(queryText, queryParams);
 
@@ -1548,7 +1603,7 @@ module.exports = async function handler(req, res) {
 
           // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
           const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
-          const { nome, descricao, data_inicio, data_fim, status = 'ativa', numero_ganhadores = 1 } = req.body || {};
+          const { nome, descricao, data_inicio, data_fim, status = 'ativa', numero_ganhadores = 1, imagem_url } = req.body || {};
 
           if (!nome || !data_inicio || !data_fim) {
             return res.status(400).json({
@@ -1565,8 +1620,15 @@ module.exports = async function handler(req, res) {
             // 1️⃣ INICIAR TRANSAÇÃO
             await client.query('BEGIN');
 
+            // Migração inline: garantir que coluna imagem_url existe
+            try {
+              await client.query('ALTER TABLE promocoes ADD COLUMN IF NOT EXISTS imagem_url TEXT');
+            } catch (e) {
+              console.log('Coluna imagem_url já existe ou erro ignorável');
+            }
+
             // Criar slug da promoção
-            let slug = nome.toLowerCase()
+            const slug = nome.toLowerCase()
               .replace(/[áàãâ]/g, 'a')
               .replace(/[éêë]/g, 'e')
               .replace(/[íîï]/g, 'i')
@@ -1578,17 +1640,12 @@ module.exports = async function handler(req, res) {
               .replace(/-+/g, '-')
               .trim();
 
-            // ✅ MELHORIA: Se for uma cópia/duplicação, garantir slug único adicionando timestamp
-            if (nome.includes(' - Cópia')) {
-              slug += '-' + Math.floor(Date.now() / 1000).toString().substring(6);
-            }
-
             // 2️⃣ INSERIR PROMOÇÃO
             const insertResult = await client.query(`
-            INSERT INTO promocoes (nome, descricao, slug, data_inicio, data_fim, status, numero_ganhadores)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO promocoes (nome, descricao, slug, data_inicio, data_fim, status, numero_ganhadores, imagem_url)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *
-          `, [nome, descricao, slug, data_inicio, data_fim, status, parseInt(numero_ganhadores)]);
+          `, [nome, descricao, slug, data_inicio, data_fim, status, parseInt(numero_ganhadores), imagem_url]);
 
             const novaPromocao = insertResult.rows[0];
 
@@ -1625,32 +1682,11 @@ module.exports = async function handler(req, res) {
               console.error('❌ Erro ao fazer rollback:', rollbackError);
             }
 
-            console.error('❌ Erro ao criar promoção:', error.message, error);
-
-            // Tentar identificar se o erro é de duplicidade de slug
-            let errorMessage = 'Erro ao criar promoção. Tente novamente.';
-            if (error.code === '23505') { // Unique violation
-              const msg = error.message || '';
-              if (error.constraint === 'promocoes_slug_key' || msg.includes('slug')) {
-                errorMessage = 'Já existe uma promoção com um nome similar (URL duplicada). Escolha um nome diferente.';
-              } else if (msg.includes('nome')) {
-                errorMessage = 'Já existe uma promoção com este nome.';
-              }
-            } else if (error.code === '23514') { // Check constraint violation
-              const msg = error.message || '';
-              if (error.constraint === 'check_datas_validas' || msg.includes('data')) {
-                errorMessage = 'A data de fim deve ser posterior ou igual à data de início.';
-              }
-            } else if (error.code === '23503') { // Foreign key violation
-              errorMessage = 'Erro de integridade técnica (Chave Estrangeira). Por favor, execute a inicialização do banco de dados em /api/?route=db&endpoint=init';
-            }
+            console.error('❌ Erro ao criar promoção:', error);
 
             return res.status(500).json({
               success: false,
-              error: errorMessage,
-              message: error.message,
-              detail: error.detail,
-              code: error.code,
+              error: 'Erro ao criar promoção. Tente novamente.',
               timestamp: new Date().toISOString()
             });
 
@@ -1665,7 +1701,7 @@ module.exports = async function handler(req, res) {
           // ✅ SEGURANÇA (ALTO-004): Validar autenticação - permite admin, moderator, editor, user
           const user = await getAuthenticatedUser(req, ['admin', 'moderator', 'editor', 'user']);
           const { id } = req.query || {};
-          const { nome, descricao, status, data_inicio, data_fim, numero_ganhadores } = req.body || {};
+          const { nome, descricao, status, data_inicio, data_fim, numero_ganhadores, imagem_url } = req.body || {};
 
           if (!id) {
             return res.status(400).json({
@@ -1704,10 +1740,11 @@ module.exports = async function handler(req, res) {
                 status = COALESCE($3, status),
                 data_inicio = COALESCE($4, data_inicio),
                 data_fim = COALESCE($5, data_fim),
-                numero_ganhadores = COALESCE($6, numero_ganhadores)
-            WHERE id = $7
+                numero_ganhadores = COALESCE($6, numero_ganhadores),
+                imagem_url = COALESCE($7, imagem_url)
+            WHERE id = $8
             RETURNING *
-          `, [nome, descricao, status, data_inicio, data_fim, numero_ganhadores, parseInt(id)]);
+          `, [nome, descricao, status, data_inicio, data_fim, numero_ganhadores, imagem_url, parseInt(id)]);
 
             const newPromoData = updateResult.rows[0];
 
@@ -1995,11 +2032,10 @@ module.exports = async function handler(req, res) {
         )
         SELECT
           (SELECT COUNT(*) FROM promocoes
-           WHERE status = 'ativa'
-           AND DATE(data_inicio) <= CURRENT_DATE
-           AND DATE(data_fim) >= CURRENT_DATE
+           WHERE LOWER(status) = 'ativa'
            AND deleted_at IS NULL) as promocoes_ativas,
-          (SELECT COUNT(*) FROM participantes_unicos) as participantes_total,
+          (SELECT COUNT(*) FROM participantes_unicos) as unique_participants,
+          (SELECT COUNT(*) FROM participantes_unificados) as total_participations,
           (SELECT COUNT(*) FROM participantes_unicos
            WHERE created_at >= NOW() - INTERVAL '24 hours') as participantes_24h,
           3 as usuarios_ativos,
@@ -2007,8 +2043,8 @@ module.exports = async function handler(req, res) {
       `);
 
         console.log('✅ [DASHBOARD] Estatísticas calculadas:', {
-          participantes_total: stats.rows[0].participantes_total,
-          participantes_24h: stats.rows[0].participantes_24h
+          unique: stats.rows[0].unique_participants,
+          total: stats.rows[0].total_participations
         });
 
         // Simplificar atividades recentes para não depender de colunas específicas
@@ -2021,7 +2057,8 @@ module.exports = async function handler(req, res) {
           success: true,
           data: {
             promocoes_ativas: parseInt(stats.rows[0].promocoes_ativas) || 0,
-            participantes_total: parseInt(stats.rows[0].participantes_total) || 0,
+            participantes_total: parseInt(stats.rows[0].unique_participants) || 0, // Mantendo compatibilidade (mas agora é unique)
+            participacoes_total: parseInt(stats.rows[0].total_participations) || 0, // Novo campo
             participantes_24h: parseInt(stats.rows[0].participantes_24h) || 0,
             usuarios_ativos: parseInt(stats.rows[0].usuarios_ativos) || 0,
             promocoes_mes: parseInt(stats.rows[0].promocoes_mes) || 0,
@@ -2055,9 +2092,9 @@ module.exports = async function handler(req, res) {
 
     // Rota para participantes - LISTAR TODOS SEM DEDUPLICACAO
     if (route === 'participantes') {
-      // ✅ FIX: Verificar método HTTP - delegar POST/PUT/DELETE para handler
-      if (req.method !== 'GET') {
-        console.log(`📝 [INDEX] Delegando ${req.method} /api/participantes para handler`);
+      // ✅ FIX: Delegar para o handler se não for um GET simples de listagem
+      if (req.method !== 'GET' || endpoint) {
+        console.log(`📝 [INDEX] Delegando ${req.method} /api/participantes${endpoint ? ' [' + endpoint + ']' : ''} para handler`);
 
         // Verificar se handler foi carregado corretamente
         if (!participantesHandler || typeof participantesHandler !== 'function') {
@@ -2091,17 +2128,18 @@ module.exports = async function handler(req, res) {
           p.telefone AS phone,
           p.bairro AS neighborhood,
           p.cidade AS city,
-          p.promocao_id,
-          pr.nome AS promocao_nome,
-          COALESCE(p.participou_em, CURRENT_TIMESTAMP) AS created_at,
-          'regular' AS participant_type,
-          p.origem_source,
-          p.origem_medium,
           p.latitude,
           p.longitude,
+          p.promocao_id,
+          COALESCE(pr.nome, eq.pergunta) AS promocao_nome,
+          p.origem_source,
+          p.origem_medium,
+          COALESCE(p.participou_em, CURRENT_TIMESTAMP) AS created_at,
+          'regular' AS participant_type,
           p.email
         FROM participantes p
         LEFT JOIN promocoes pr ON p.promocao_id = pr.id
+        LEFT JOIN enquetes eq ON p.promocao_id = eq.id
         WHERE p.deleted_at IS NULL
         ORDER BY p.participou_em DESC
       `);
@@ -2554,6 +2592,9 @@ module.exports = async function handler(req, res) {
 
         // GET /api/?route=audit&action=stats - Estatísticas de auditoria
         if (req.method === 'GET' && action === 'stats') {
+          // ✅ SEGURANÇA: Validar autenticação para estatísticas de auditoria
+          await getAuthenticatedUser(req, ['admin']);
+
           const { days = 30 } = req.query;
 
           console.log('🔍 Buscando estatísticas de auditoria para:', { days });
@@ -2568,16 +2609,16 @@ module.exports = async function handler(req, res) {
           }
 
           const auditStats = await query(`
-          SELECT
-            COUNT(*) as total_actions,
-            COUNT(*) FILTER (WHERE action = 'CREATE') as creates,
-            COUNT(*) FILTER (WHERE action = 'UPDATE') as updates,
-            COUNT(*) FILTER (WHERE action = 'DELETE') as deletes,
-            COUNT(*) FILTER (WHERE action = 'VIEW') as views,
-            COUNT(*) FILTER (WHERE error_message IS NOT NULL) as recent_errors
-          FROM audit_logs
-          WHERE created_at >= NOW() - INTERVAL $1
-        `, [`${daysParam} days`]);
+            SELECT
+              COUNT(*) as total_actions,
+              COUNT(*) FILTER (WHERE action = 'CREATE') as creates,
+              COUNT(*) FILTER (WHERE action = 'UPDATE') as updates,
+              COUNT(*) FILTER (WHERE action = 'DELETE') as deletes,
+              COUNT(*) FILTER (WHERE action = 'VIEW') as views,
+              COUNT(*) FILTER (WHERE error_message IS NOT NULL) as recent_errors
+            FROM audit_logs
+            WHERE created_at >= NOW() - ($1 * INTERVAL '1 day')
+          `, [daysParam]);
 
           const stats = auditStats.rows[0] || {
             total_actions: 0,
@@ -3123,12 +3164,108 @@ module.exports = async function handler(req, res) {
         });
 
       } catch (error) {
-        console.error('Erro na API de auditoria:', error);
+        console.error('❌ Erro na auditoria:', error);
+        return res.status(500).json({ error: 'Erro interno na auditoria' });
+      }
+    }
+
+    // ============================================================
+    // ROTA DE MANUTENÇÃO (Admin Only)
+    // ============================================================
+    if (route === 'maintenance') {
+      const { action } = req.query;
+
+      try {
+        // POST /api/?route=maintenance&action=normalize_bairros
+        if (req.method === 'POST' && action === 'normalize_bairros') {
+          // 🔒 SEGURANÇA: Apenas Admin
+          await getAuthenticatedUser(req, ['admin']);
+
+          console.log('🚀 Iniciando normalização de bairros em massa (Server-Side)...');
+
+          // Importar utils (Lazy load para evitar erro se arquivo não existir em dev)
+          const { validarBairro } = require('./_lib/bairrosUtils');
+
+          // 1. Buscar todos os participantes ativos
+          const resultParticipantes = await databasePool.query(`
+            SELECT id, nome, bairro, telefone FROM participantes WHERE deleted_at IS NULL
+          `);
+
+          // 1.5 Buscar todos os public_participants ativos
+          const resultPublic = await databasePool.query(`
+            SELECT id, name, neighborhood, phone FROM public_participants WHERE deleted_at IS NULL
+          `);
+
+          const participantes = resultParticipantes.rows;
+          const publicParticipants = resultPublic.rows;
+
+          let atualizados = 0;
+          let erros = 0;
+          const alteracoes = [];
+
+          console.log(`🔍 Total para analisar: ${participantes.length} participantes + ${publicParticipants.length} public_participants`);
+
+          // 2. Processar tabela PARTICIPANTES (bairro)
+          for (const p of participantes) {
+            if (!p.bairro) continue;
+
+            const resultado = validarBairro(p.bairro);
+            const diferencaString = resultado.bairro && p.bairro && resultado.bairro.trim() !== p.bairro.trim();
+
+            if (resultado.foiNormalizado || diferencaString) {
+              try {
+                await databasePool.query(`UPDATE participantes SET bairro = $1 WHERE id = $2`, [resultado.bairro, p.id]);
+                atualizados++;
+                alteracoes.push({ table: 'participantes', id: p.id, de: p.bairro, para: resultado.bairro });
+              } catch (err) {
+                console.error(`❌ Erro ao atualizar participantes ID ${p.id}:`, err.message);
+                erros++;
+              }
+            }
+          }
+
+          // 3. Processar tabela PUBLIC_PARTICIPANTS (neighborhood)
+          for (const p of publicParticipants) {
+            if (!p.neighborhood) continue;
+
+            const resultado = validarBairro(p.neighborhood);
+            const diferencaString = resultado.bairro && p.neighborhood && resultado.bairro.trim() !== p.neighborhood.trim();
+
+            if (resultado.foiNormalizado || diferencaString) {
+              try {
+                await databasePool.query(`UPDATE public_participants SET neighborhood = $1 WHERE id = $2`, [resultado.bairro, p.id]);
+                atualizados++;
+                alteracoes.push({ table: 'public_participants', id: p.id, de: p.neighborhood, para: resultado.bairro });
+              } catch (err) {
+                console.error(`❌ Erro ao atualizar public_participants ID ${p.id}:`, err.message);
+                erros++;
+              }
+            }
+          }
+
+          console.log(`✅ Normalização GERAL concluída. Atualizados: ${atualizados}, Erros: ${erros}`);
+
+          return res.status(200).json({
+            success: true,
+            message: 'Normalização concluída com sucesso (Todas as tabelas)',
+            stats: {
+              total: participantes.length + publicParticipants.length,
+              participantes: participantes.length,
+              public_participants: publicParticipants.length,
+              atualizados,
+              erros,
+              alteracoes: alteracoes.slice(0, 50)
+            },
+            timestamp: new Date().toISOString()
+          });
+        }
+
+      } catch (error) {
+        console.error('❌ Erro na manutenção:', error);
         return res.status(500).json({
           success: false,
-          error: 'Erro na API de auditoria',
-
-          timestamp: new Date().toISOString()
+          error: 'Erro interno na manutenção',
+          details: error.message
         });
       }
     }
@@ -3562,7 +3699,7 @@ async function getUserStats(req, res) {
   try {
     const stats = await query(`
       SELECT
-        (SELECT COUNT(*) FROM promocoes WHERE status = 'ativa' AND deleted_at IS NULL) as promocoes_ativas,
+        (SELECT COUNT(*) FROM promocoes WHERE LOWER(status) = 'ativa' AND deleted_at IS NULL) as promocoes_ativas,
         (SELECT COUNT(*) FROM participantes WHERE deleted_at IS NULL) as total_participacoes,
         (SELECT COUNT(*) FROM usuarios) as total_usuarios
     `);
@@ -3664,7 +3801,7 @@ async function getModeratorStats(req, res) {
     const stats = await query(`
       SELECT
         (SELECT COUNT(*) FROM promocoes WHERE deleted_at IS NULL) as promocoesGerenciadas,
-        (SELECT COUNT(*) FROM promocoes WHERE status = 'ativa' AND deleted_at IS NULL) as promocoesAtivas,
+        (SELECT COUNT(*) FROM promocoes WHERE LOWER(status) = 'ativa' AND deleted_at IS NULL) as promocoesAtivas,
         (SELECT COUNT(*) FROM participantes WHERE deleted_at IS NULL) as participantesAtivos,
         (SELECT COUNT(*) FROM participantes WHERE participou_em >= CURRENT_DATE - INTERVAL '7 days' AND deleted_at IS NULL) as novosPariticipantes
     `);
@@ -3748,7 +3885,7 @@ async function getSorteioStats(req, res) {
         (SELECT COUNT(*) FROM ganhadores WHERE data_sorteio >= DATE_TRUNC('month', CURRENT_DATE)) as sorteiosEsseMes,
         (SELECT COUNT(*) FROM ganhadores) as ganhadores,
         (SELECT AVG(CASE WHEN LENGTH(premio) > 0 THEN 85 ELSE 0 END)) as participacaoMedia,
-        (SELECT COUNT(*) FROM promocoes WHERE status = 'ativa' AND deleted_at IS NULL) as promocoesSorteadas
+        (SELECT COUNT(*) FROM promocoes WHERE LOWER(status) = 'ativa' AND deleted_at IS NULL) as promocoesSorteadas
     `);
 
     return res.status(200).json({
@@ -3779,7 +3916,7 @@ async function getReportsSummary(req, res) {
     const stats = await query(`
       SELECT
         (SELECT COUNT(*) FROM participantes WHERE deleted_at IS NULL) as totalParticipantes,
-        (SELECT COUNT(*) FROM promocoes WHERE status = 'ativa' AND deleted_at IS NULL) as promocoesAtivas,
+        (SELECT COUNT(*) FROM promocoes WHERE LOWER(status) = 'ativa' AND deleted_at IS NULL) as promocoesAtivas,
         (SELECT COUNT(*) FROM promocoes WHERE deleted_at IS NULL) as promocoesTotal,
         (SELECT COUNT(*) FROM ganhadores) as sorteiosRealizados,
         (SELECT COUNT(*) FROM ganhadores) as ganhadores,

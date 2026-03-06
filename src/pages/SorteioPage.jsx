@@ -19,26 +19,26 @@ import './DashboardPages.css';
 
 const SorteioPage = () => {
   const { canPerformDraw, canCancelWinner } = useAuth();
-  
+
   const [selectedPromotion, setSelectedPromotion] = useState('');
   const [participants, setParticipants] = useState([]);
   const [promotions, setPromotions] = useState([]);
   const [ganhadores, setGanhadores] = useState([]);
   const [winner, setWinner] = useState(null);
   const [statistics, setStatistics] = useState(null);
-  
+
   const [isDrawing, setIsDrawing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  
+
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
   const [videoUrl, setVideoUrl] = useState('');
-  
+
   // Estados para promoções encerradas
   const [promocoesEncerradas, setPromocoesEncerradas] = useState([]);
   const [loadingEncerradas, setLoadingEncerradas] = useState(false);
-  
+
   const [filters, setFilters] = useState({
     cidade: '',
     bairro: '',
@@ -53,7 +53,7 @@ const SorteioPage = () => {
     // Registrar acesso à página de sorteio
     logAcesso('Página de Sorteio');
   }, []);
-  
+
   const carregarDados = async () => {
     try {
       setLoading(true);
@@ -63,15 +63,15 @@ const SorteioPage = () => {
         obterEstatisticas(),
         buscarPromocoesEncerradas()
       ]);
-      
+
       setPromotions(promocoesData || []);
       setStatistics(estatisticasData.data || {});
-      
+
       // Sempre carregar e mostrar promoções encerradas
       if (promocoesEncerradasData.success) {
         setPromocoesEncerradas(promocoesEncerradasData.data || []);
       }
-      
+
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       showToast('Erro ao carregar dados do sorteio', 'error');
@@ -80,43 +80,43 @@ const SorteioPage = () => {
       setLoadingEncerradas(false);
     }
   };
-  
+
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
   };
-  
+
   // Função para cancelar um ganhador específico (apenas admins)
   const handleCancelarGanhador = async (ganhadorId, promocaoNome) => {
     if (!window.confirm(`Tem certeza que deseja cancelar este ganhador da promoção "${promocaoNome}"?`)) {
       return;
     }
-    
+
     try {
       const motivo = prompt('Motivo do cancelamento (opcional):', 'Cancelado pelo administrador');
-      
+
       const result = await cancelarGanhador(ganhadorId, motivo);
-      
+
       if (result.success) {
         showToast(`Ganhador ${result.data.participante_nome} cancelado com sucesso`, 'success');
-        
+
         // Registrar log do cancelamento
         logCancelamentoSorteio(promocaoNome, ganhadorId);
-        
+
         // Recarregar dados para atualizar a lista
         carregarDados();
       }
-      
+
     } catch (error) {
       console.error('Erro ao cancelar ganhador:', error);
       showToast(error.message || 'Erro ao cancelar ganhador', 'error');
     }
   };
-  
+
   const handlePromotionChange = async (e) => {
     const promotionId = e.target.value;
     setSelectedPromotion(promotionId);
     setWinner(null);
-    
+
     if (promotionId) {
       await carregarParticipantes(promotionId);
       await carregarGanhadores(promotionId);
@@ -125,7 +125,7 @@ const SorteioPage = () => {
       setGanhadores([]);
     }
   };
-  
+
   const carregarParticipantes = async (promocaoId) => {
     try {
       setLoadingParticipants(true);
@@ -138,7 +138,7 @@ const SorteioPage = () => {
       setLoadingParticipants(false);
     }
   };
-  
+
   const carregarGanhadores = async (promocaoId) => {
     try {
       const data = await buscarGanhadores(promocaoId);
@@ -153,7 +153,7 @@ const SorteioPage = () => {
       showToast('Selecione uma promoção primeiro', 'error');
       return;
     }
-    
+
     if (participants.length === 0) {
       showToast('Não há participantes disponíveis para sortear nesta promoção', 'error');
       return;
@@ -161,14 +161,7 @@ const SorteioPage = () => {
 
     setIsDrawing(true);
     setWinner(null);
-    
-    // Tocar música de sorteio
-    const audioElement = document.getElementById('sorteio-audio');
-    if (audioElement) {
-      audioElement.currentTime = 0; // Reiniciar do início
-      audioElement.play().catch(e => console.log('Erro ao tocar áudio:', e));
-    }
-    
+
     try {
       // Simular animação de sorteio
       setTimeout(async () => {
@@ -183,16 +176,7 @@ const SorteioPage = () => {
           if (ganhadoresSorteados.length > 0) {
             logSorteio(selectedPromotion, ganhadoresSorteados[0]);
           }
-          
-          // Sorteio realizado - tocar som de aplausos
-          const audioAplausos = document.getElementById('sorteio-audio');
-          if (audioAplausos) {
-            audioAplausos.pause();
-            audioAplausos.currentTime = 0;
-            audioAplausos.loop = false; // Não repetir os aplausos
-            audioAplausos.play().catch(e => console.log('Erro ao tocar aplausos:', e));
-          }
-          
+
           // Recarregar listas
           await Promise.all([
             carregarParticipantes(selectedPromotion),
@@ -210,26 +194,16 @@ const SorteioPage = () => {
           setTimeout(() => {
             handleOpenPublicView();
           }, 1000);
-          
+
         } catch (error) {
           console.error('Erro no sorteio:', error);
           showToast('Erro ao realizar sorteio', 'error');
         } finally {
           setIsDrawing(false);
-          // Parar música do sorteio
-          const audioElement = document.getElementById('sorteio-audio');
-          if (audioElement) {
-            audioElement.pause();
-          }
         }
       }, 11000);
     } catch (error) {
       setIsDrawing(false);
-      // Parar música do sorteio em caso de erro
-      const audioElement = document.getElementById('sorteio-audio');
-      if (audioElement) {
-        audioElement.pause();
-      }
       console.error('Erro ao iniciar sorteio:', error);
       showToast('Erro ao iniciar sorteio', 'error');
     }
@@ -239,30 +213,30 @@ const SorteioPage = () => {
     if (window.confirm('Tem certeza que deseja cancelar este sorteio?')) {
       try {
         await cancelarSorteio(ganhadorId, selectedPromotion);
-        
+
         // Registrar log do cancelamento do sorteio
         logCancelamentoSorteio(selectedPromotion, ganhadorId);
-        
+
         showToast('Sorteio cancelado com sucesso', 'success');
-        
+
         // Recarregar listas
         await Promise.all([
           carregarParticipantes(selectedPromotion),
           carregarGanhadores(selectedPromotion),
           obterEstatisticas().then(stats => setStatistics(stats.data))
         ]);
-        
+
         if (winner && winner.ganhador_id === ganhadorId) {
           setWinner(null);
         }
-        
+
       } catch (error) {
         console.error('Erro ao cancelar sorteio:', error);
         showToast('Erro ao cancelar sorteio', 'error');
       }
     }
   };
-  
+
   const handleNotifyWinner = () => {
     if (winner) {
       showToast(`Funcionalidade de notificação será implementada em breve`, 'info');
@@ -293,7 +267,7 @@ const SorteioPage = () => {
     }
 
     showToast('Funcionalidade de upload será implementada em breve. Por enquanto, coloque o vídeo em /public/videos/', 'info');
-    
+
     // Sugerir path local
     const fileName = file.name.replace(/\s+/g, '-').toLowerCase();
     setVideoUrl(`/videos/${fileName}`);
@@ -304,18 +278,18 @@ const SorteioPage = () => {
       showToast('Selecione uma promoção primeiro', 'error');
       return;
     }
-    
+
     // Construir URL da página pública do sorteio
     let publicUrl = `/sorteio-publico?promocao=${selectedPromotion}`;
     if (videoUrl.trim()) {
       publicUrl += `&video=${encodeURIComponent(videoUrl.trim())}`;
     }
-    
+
     // Abrir em nova aba
     window.open(publicUrl, '_blank');
     showToast('Página pública do sorteio aberta em nova aba', 'success');
   };
-  
+
   const filteredParticipants = useMemo(() => {
     return participants.filter(participant => {
       if (filters.cidade && !participant.cidade?.toLowerCase().includes(filters.cidade.toLowerCase())) return false;
@@ -355,8 +329,8 @@ const SorteioPage = () => {
   if (loading) {
     return (
       <>
-        <Header 
-          title="Módulo de Sorteio" 
+        <Header
+          title="Módulo de Sorteio"
           subtitle="Realize sorteios de forma justa e transparente"
         />
         <div className="loading-container">
@@ -368,22 +342,15 @@ const SorteioPage = () => {
 
   return (
     <>
-      <Header 
-        title="Módulo de Sorteio" 
+      <Header
+        title="Módulo de Sorteio"
         subtitle="Realize sorteios de forma justa e transparente"
       />
-      
-      {/* Elemento de áudio para música de sorteio */}
-      <audio id="sorteio-audio" preload="auto" loop>
-        <source src="/audio/sorteio-aplausos.mp3" type="audio/mpeg" />
-        <source src="/audio/sorteio-aplausos.wav" type="audio/wav" />
-        Seu navegador não suporta o elemento de áudio.
-      </audio>
-      
+
       <div className="sorteio-content">
         <div className="card">
           <h3 className="card-title">Configurações do Sorteio</h3>
-          
+
           <div className="form-group">
             <label htmlFor="promocaoSorteio">Selecione a Promoção</label>
             <select
@@ -396,10 +363,10 @@ const SorteioPage = () => {
               {promotions
                 .filter(promo => promo.status === 'ativa')
                 .map(promo => (
-                <option key={promo.id} value={promo.id}>
-                  {promo.nome} ✅
-                </option>
-              ))}
+                  <option key={promo.id} value={promo.id}>
+                    {promo.nome} ✅
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -444,7 +411,7 @@ const SorteioPage = () => {
                       🎥 Testar Vídeo
                     </button>
                     <button
-                      type="button" 
+                      type="button"
                       className="btn-secondary btn-small"
                       onClick={() => {
                         if (selectedPromotion) {
@@ -473,11 +440,11 @@ const SorteioPage = () => {
               🎯 Padrão: Se não especificar URL, usará automaticamente /videos/sorteio.webp
             </small>
           </div>
-          
+
           {selectedPromotion && (
             <div className="sorteio-stats">
               <div className="stat-item">
-                <span className="stat-label">Participantes Disponíveis:</span>
+                <span className="stat-label">Participações Disponíveis:</span>
                 <span className="stat-value">{filteredParticipants.length}</span>
               </div>
               <div className="stat-item">
@@ -486,12 +453,12 @@ const SorteioPage = () => {
               </div>
             </div>
           )}
-          
+
           <div className="form-group align-right">
             <div className="button-group">
               {canPerformDraw() && (
-                <button 
-                  onClick={handleDraw} 
+                <button
+                  onClick={handleDraw}
                   disabled={!selectedPromotion || isDrawing}
                   className="btn-primary"
                 >
@@ -499,9 +466,9 @@ const SorteioPage = () => {
                   {isDrawing ? 'Sorteando...' : 'Realizar Sorteio'}
                 </button>
               )}
-              
-              <button 
-                onClick={handleOpenPublicView} 
+
+              <button
+                onClick={handleOpenPublicView}
                 disabled={!selectedPromotion}
                 className="btn-secondary"
               >
@@ -511,7 +478,7 @@ const SorteioPage = () => {
             </div>
           </div>
         </div>
-        
+
         {statistics && (
           <div className="card">
             <h3 className="card-title">📊 Estatísticas Gerais</h3>
@@ -526,7 +493,7 @@ const SorteioPage = () => {
               </div>
               <div className="stat-card">
                 <div className="stat-number">{statistics.participantesDisponiveis || 0}</div>
-                <div className="stat-label">Participantes Disponíveis</div>
+                <div className="stat-label">Participações Disponíveis</div>
               </div>
               <div className="stat-card">
                 <div className="stat-number">{statistics.participantesTotal || 0}</div>
@@ -535,19 +502,19 @@ const SorteioPage = () => {
             </div>
           </div>
         )}
-        
+
         {selectedPromotion && (
           <div className="card">
             <div className="card-header">
-              <h3 className="card-title">👥 Participantes Disponíveis ({filteredParticipants.length})</h3>
-              <button 
+              <h3 className="card-title">👥 Participações Disponíveis ({filteredParticipants.length})</h3>
+              <button
                 className="btn-secondary btn-small"
                 onClick={() => setShowFilters(!showFilters)}
               >
                 🔍 {showFilters ? 'Ocultar' : 'Filtros'}
               </button>
             </div>
-            
+
             {showFilters && (
               <div className="filters-section">
                 <div className="filters-grid">
@@ -557,7 +524,7 @@ const SorteioPage = () => {
                       type="text"
                       placeholder="Digite o nome da cidade"
                       value={filters.cidade}
-                      onChange={(e) => setFilters(prev => ({...prev, cidade: e.target.value}))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, cidade: e.target.value }))}
                     />
                   </div>
                   <div className="form-group">
@@ -566,13 +533,13 @@ const SorteioPage = () => {
                       type="text"
                       placeholder="Digite o nome do bairro"
                       value={filters.bairro}
-                      onChange={(e) => setFilters(prev => ({...prev, bairro: e.target.value}))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, bairro: e.target.value }))}
                     />
                   </div>
                 </div>
               </div>
             )}
-            
+
             {loadingParticipants ? (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <LoadingSpinner size="lg" />
@@ -640,7 +607,7 @@ const SorteioPage = () => {
             )}
           </div>
         )}
-        
+
         {ganhadores.length > 0 && (
           <div className="card">
             <h3 className="card-title">🏆 Ganhadores Anteriores ({ganhadores.length})</h3>
@@ -661,10 +628,10 @@ const SorteioPage = () => {
                     <tr key={ganhador.ganhador_id}>
                       <td>
                         <span className={`position-badge position-${ganhador.posicao || 1}`}>
-                          {ganhador.posicao === 1 ? '🥇 1º' : 
-                           ganhador.posicao === 2 ? '🥈 2º' : 
-                           ganhador.posicao === 3 ? '🥉 3º' : 
-                           `${ganhador.posicao || 1}º`}
+                          {ganhador.posicao === 1 ? '🥇 1º' :
+                            ganhador.posicao === 2 ? '🥈 2º' :
+                              ganhador.posicao === 3 ? '🥉 3º' :
+                                `${ganhador.posicao || 1}º`}
                         </span>
                       </td>
                       <td><strong>{ganhador.nome}</strong></td>
@@ -708,8 +675,8 @@ const SorteioPage = () => {
         {/* Seção de Promoções Encerradas */}
         {promocoesEncerradas.length > 0 && (
           <div className="card" style={{ marginTop: '30px' }}>
-            <div style={{ 
-              marginBottom: '20px' 
+            <div style={{
+              marginBottom: '20px'
             }}>
               <h3 className="card-title" style={{ margin: 0 }}>
                 🏆 Últimas Promoções Encerradas ({promocoesEncerradas.length})
@@ -786,7 +753,7 @@ const SorteioPage = () => {
 
                   {/* Lista de Ganhadores */}
                   <div className="ganhadores-list">
-                    <h5 style={{ 
+                    <h5 style={{
                       margin: '0 0 12px 0',
                       color: 'var(--color-primary)',
                       fontSize: '1rem',
@@ -794,7 +761,7 @@ const SorteioPage = () => {
                     }}>
                       🎉 Ganhadores:
                     </h5>
-                    
+
                     <div className="ganhadores-grid" style={{
                       display: 'grid',
                       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
@@ -881,11 +848,11 @@ const SorteioPage = () => {
             </div>
           </div>
         )}
-        
+
       </div>
-      
+
       {toast.show && (
-        <Toast 
+        <Toast
           message={toast.message}
           type={toast.type}
           onClose={() => setToast({ show: false, message: '', type: '' })}

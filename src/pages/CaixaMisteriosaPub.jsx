@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
+import { filtrarBairrosAutocomplete, validarBairro } from '../utils/bairrosUtils';
 
 // Página pública da Caixa Misteriosa - sem necessidade de login
 const CaixaMisteriosaPub = () => {
@@ -35,11 +36,32 @@ const CaixaMisteriosaPub = () => {
     const [referrals, setReferrals] = useState([]);
     const [recentSubmissions, setRecentSubmissions] = useState([]);
     const [geolocalizacao, setGeolocalizacao] = useState(null);
+    const [sugestoesBairro, setSugestoesBairro] = useState([]);
+    const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+    const [emissora, setEmissora] = useState(null);
 
     // Carrega dados do jogo
     useEffect(() => {
         fetchLiveGame();
     }, [gameId]);
+
+    // Carrega dados da emissora
+    useEffect(() => {
+        const fetchEmissora = async () => {
+            try {
+                const res = await fetch('/api/configuracoes?type=emissora');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.data) {
+                        setEmissora(data.data);
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao buscar dados da emissora:', err);
+            }
+        };
+        fetchEmissora();
+    }, []);
 
     // Atualiza feed de palpites a cada 60 segundos
     useEffect(() => {
@@ -192,7 +214,7 @@ const CaixaMisteriosaPub = () => {
                 }
 
                 console.log('✅ Dados do jogo carregados:', gameData);
-            } else{
+            } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Erro ao carregar dados do jogo');
             }
@@ -380,9 +402,39 @@ const CaixaMisteriosaPub = () => {
             if (formattedValue.length <= 15) {
                 setFormData(prev => ({ ...prev, [name]: formattedValue }));
             }
+        } else if (name === 'userNeighborhood') {
+            // Autocomplete para bairro
+            const sugestoes = filtrarBairrosAutocomplete(value, 5);
+            setSugestoesBairro(sugestoes);
+            setMostrarSugestoes(sugestoes.length > 0 && value.length >= 2);
+            setFormData(prev => ({ ...prev, [name]: value }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
+    };
+
+    // Função para selecionar bairro da lista de sugestões
+    const handleSelecionarBairro = (bairro) => {
+        setFormData(prev => ({
+            ...prev,
+            userNeighborhood: bairro,
+        }));
+        setSugestoesBairro([]);
+        setMostrarSugestoes(false);
+    };
+
+    // Normaliza o bairro ao sair do campo
+    const handleBairroBlur = () => {
+        setTimeout(() => {
+            if (formData.userNeighborhood) {
+                const resultado = validarBairro(formData.userNeighborhood);
+                setFormData(prev => ({
+                    ...prev,
+                    userNeighborhood: resultado.bairro,
+                }));
+            }
+            setMostrarSugestoes(false);
+        }, 200);
     };
 
     const handleRegister = async (e) => {
@@ -562,8 +614,9 @@ const CaixaMisteriosaPub = () => {
     };
 
     const generateWhatsAppLink = () => {
+        const emissoraNome = emissora?.nome || 'TV SURUÍ – CANAL 15.1';
         const text = `🎉 *ATENÇÃO, GALERA!* 🎉
-Chegou o *GAME DA CAIXA MISTERIOSA* na *TV SURUÍ – CANAL 15.1*!
+Chegou o *GAME DA CAIXA MISTERIOSA* na *${emissoraNome.toUpperCase()}*!
 
 👉 É fácil participar:
 1️⃣ Clique no link
@@ -683,7 +736,7 @@ E aí, qual você prefere?
                         </h1>
                         <h2 style={{ color: currentThemeData.warning, marginBottom: '1rem' }}>Nenhum jogo ativo no momento</h2>
                         <p style={{ color: currentThemeData.textSecondary, marginBottom: '1.5rem', lineHeight: '1.6' }}>
-                            Não há nenhum jogo da Caixa Misteriosa ativo no momento.<br/>
+                            Não há nenhum jogo da Caixa Misteriosa ativo no momento.<br />
                             Os administradores precisam configurar e iniciar um novo jogo.
                         </p>
                         <div style={{ background: currentThemeData.surface, padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'left', border: `1px solid ${currentThemeData.border}` }}>
@@ -711,6 +764,45 @@ E aí, qual você prefere?
     if (isWinner && liveGame?.status === 'finished') {
         return (
             <main style={styles.main}>
+                {/* Cabeçalho da Emissora */}
+                {emissora && (
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        marginBottom: '1.5rem',
+                        textAlign: 'center',
+                        width: '100%',
+                        maxWidth: '600px'
+                    }}>
+                        {emissora.logo_url && (
+                            <img
+                                src={emissora.logo_url}
+                                alt={emissora.nome}
+                                style={{
+                                    height: '80px',
+                                    width: 'auto',
+                                    objectFit: 'contain',
+                                    marginBottom: '0.5rem',
+                                    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+                                }}
+                            />
+                        )}
+                        {emissora.nome && (
+                            <h2 style={{
+                                margin: 0,
+                                fontSize: '1.4rem',
+                                fontWeight: '800',
+                                color: currentThemeData.text,
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px'
+                            }}>
+                                {emissora.nome}
+                            </h2>
+                        )}
+                    </div>
+                )}
+
                 <div style={styles.winnerCard}>
                     <h1 style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>🎉</h1>
                     <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
@@ -745,6 +837,45 @@ E aí, qual você prefere?
             }}>
                 <ThemeSelector mode="inline" />
             </div>
+
+            {/* Cabeçalho da Emissora */}
+            {emissora && (
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    marginBottom: '1.5rem',
+                    textAlign: 'center',
+                    width: '100%',
+                    maxWidth: '600px'
+                }}>
+                    {emissora.logo_url && (
+                        <img
+                            src={emissora.logo_url}
+                            alt={emissora.nome}
+                            style={{
+                                height: '80px',
+                                width: 'auto',
+                                objectFit: 'contain',
+                                marginBottom: '0.5rem',
+                                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+                            }}
+                        />
+                    )}
+                    {emissora.nome && (
+                        <h2 style={{
+                            margin: 0,
+                            fontSize: '1.4rem',
+                            fontWeight: '800',
+                            color: currentThemeData.text,
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px'
+                        }}>
+                            {emissora.nome}
+                        </h2>
+                    )}
+                </div>
+            )}
 
             <div style={styles.card}>
                 {/* Indicador de usuário logado + botão logout */}
@@ -859,7 +990,7 @@ E aí, qual você prefere?
                         fontWeight: 'bold'
                     }}>
                         Status: {liveGame.status === 'accepting' ? 'Aceitando Palpites' :
-                                liveGame.status === 'closed' ? 'Palpites Encerrados' :
+                            liveGame.status === 'closed' ? 'Palpites Encerrados' :
                                 liveGame.status === 'finished' ? 'Jogo Finalizado' : liveGame.status}
                     </span>
                 </div>
@@ -933,15 +1064,58 @@ E aí, qual você prefere?
                                     onChange={handleInputChange}
                                     required
                                 />
-                                <input
-                                    style={styles.input}
-                                    type="text"
-                                    name="userNeighborhood"
-                                    placeholder="Bairro"
-                                    value={formData.userNeighborhood}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        style={styles.input}
+                                        type="text"
+                                        name="userNeighborhood"
+                                        placeholder="Bairro"
+                                        value={formData.userNeighborhood}
+                                        onChange={handleInputChange}
+                                        onBlur={handleBairroBlur}
+                                        autoComplete="off"
+                                        required
+                                    />
+                                    {mostrarSugestoes && sugestoesBairro.length > 0 && (
+                                        <ul style={{
+                                            position: 'absolute',
+                                            top: '100%',
+                                            left: 0,
+                                            right: 0,
+                                            background: currentThemeData.surface,
+                                            border: `1px solid ${currentThemeData.border}`,
+                                            borderTop: 'none',
+                                            borderRadius: '0 0 0.5rem 0.5rem',
+                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                            listStyle: 'none',
+                                            margin: 0,
+                                            padding: 0,
+                                            zIndex: 1000,
+                                            maxHeight: '200px',
+                                            overflowY: 'auto'
+                                        }}>
+                                            {sugestoesBairro.map((bairro, index) => (
+                                                <li
+                                                    key={index}
+                                                    onClick={() => handleSelecionarBairro(bairro)}
+                                                    onMouseDown={(e) => e.preventDefault()}
+                                                    style={{
+                                                        padding: '0.75rem 1rem',
+                                                        cursor: 'pointer',
+                                                        borderBottom: `1px solid ${currentThemeData.border}`,
+                                                        color: currentThemeData.text,
+                                                        fontSize: '0.95rem',
+                                                        transition: 'background-color 0.15s ease'
+                                                    }}
+                                                    onMouseEnter={(e) => e.target.style.backgroundColor = currentThemeData.surfaceAlt || '#f5f5f5'}
+                                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                                >
+                                                    {bairro}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                                 <input
                                     style={styles.input}
                                     type="text"
@@ -985,14 +1159,51 @@ E aí, qual você prefere?
                                 <div style={{
                                     background: 'linear-gradient(135deg, #10B981, #059669)',
                                     color: 'white',
-                                    padding: '1rem',
-                                    borderRadius: '0.5rem',
+                                    padding: '1.5rem',
+                                    borderRadius: '0.75rem',
                                     marginBottom: '1rem',
                                     textAlign: 'center',
                                     fontWeight: '500',
-                                    border: '2px solid #6EE7B7'
+                                    border: '2px solid #6EE7B7',
+                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
                                 }}>
-                                    ✅ Cadastro realizado com sucesso! Compartilhe o link abaixo para ganhar palpites extras.
+                                    <div style={{ fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                        ✅ Cadastro Realizado!
+                                    </div>
+                                    <div style={{ marginBottom: '1rem', opacity: 0.9 }}>
+                                        Olá, <strong>{participant?.name}</strong> do bairro <strong>{participant?.neighborhood || participant?.bairro}</strong>.
+                                        Seu cadastro foi concluído com sucesso!
+                                    </div>
+
+                                    <a
+                                        href={`https://wa.me/${emissora?.whatsapp?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(`Olá! Acabei de me cadastrar no Game da Caixa Misteriosa na ${emissora?.nome || 'TV'} e gostaria de acompanhar as novidades!`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.75rem',
+                                            background: '#25D366',
+                                            color: 'white',
+                                            textDecoration: 'none',
+                                            padding: '0.85rem',
+                                            borderRadius: '0.5rem',
+                                            fontWeight: 'bold',
+                                            fontSize: '1.05rem',
+                                            marginBottom: '1rem',
+                                            boxShadow: '0 4px 10px rgba(37, 211, 102, 0.3)',
+                                            transition: 'transform 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    >
+                                        <span style={{ fontSize: '1.2rem' }}>📱</span> Falar com a TV no WhatsApp
+                                    </a>
+
+                                    <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                                        Compartilhe seu link exclusivo abaixo para ganhar palpites extras!
+                                    </div>
                                 </div>
                             )}
 
@@ -1281,37 +1492,37 @@ E aí, qual você prefere?
                                     {referrals.length > 0 ? (
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                             {referrals.map((ref, idx) => (
-                                            <div key={idx} style={{
-                                                background: currentThemeData.background,
-                                                padding: '0.75rem',
-                                                borderRadius: '0.5rem',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                border: `1px solid ${currentThemeData.border}`
-                                            }}>
-                                                <div style={{ flex: 1 }}>
-                                                    <div>
-                                                        <span style={{ color: currentThemeData.success, fontWeight: 'bold' }}>{ref.name}</span>
-                                                        <span style={{ color: currentThemeData.textSecondary, fontSize: '0.85rem', marginLeft: '0.5rem' }}>
-                                                            {ref.phone}
-                                                        </span>
-                                                    </div>
-                                                    <div style={{ marginTop: '0.25rem' }}>
-                                                        <span style={{ color: currentThemeData.textSecondary, fontSize: '0.8rem' }}>
-                                                            {new Date(ref.registeredAt).toLocaleDateString('pt-BR')}
-                                                        </span>
-                                                        <span style={{
-                                                            marginLeft: '0.5rem',
-                                                            color: ref.isRegistered ? currentThemeData.success : currentThemeData.warning,
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: '500'
-                                                        }}>
-                                                            {ref.isRegistered ? '(cadastrado)' : '(aguardando...)'}
-                                                        </span>
+                                                <div key={idx} style={{
+                                                    background: currentThemeData.background,
+                                                    padding: '0.75rem',
+                                                    borderRadius: '0.5rem',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    border: `1px solid ${currentThemeData.border}`
+                                                }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div>
+                                                            <span style={{ color: currentThemeData.success, fontWeight: 'bold' }}>{ref.name}</span>
+                                                            <span style={{ color: currentThemeData.textSecondary, fontSize: '0.85rem', marginLeft: '0.5rem' }}>
+                                                                {ref.phone}
+                                                            </span>
+                                                        </div>
+                                                        <div style={{ marginTop: '0.25rem' }}>
+                                                            <span style={{ color: currentThemeData.textSecondary, fontSize: '0.8rem' }}>
+                                                                {new Date(ref.registeredAt).toLocaleDateString('pt-BR')}
+                                                            </span>
+                                                            <span style={{
+                                                                marginLeft: '0.5rem',
+                                                                color: ref.isRegistered ? currentThemeData.success : currentThemeData.warning,
+                                                                fontSize: '0.75rem',
+                                                                fontWeight: '500'
+                                                            }}>
+                                                                {ref.isRegistered ? '(cadastrado)' : '(aguardando...)'}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
                                             ))}
                                         </div>
                                     ) : (

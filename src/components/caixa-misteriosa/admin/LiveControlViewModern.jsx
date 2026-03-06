@@ -211,8 +211,8 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
         status: (status) => ({
             fontWeight: 'bold',
             color: status === 'accepting' ? currentThemeData.success :
-                   status === 'closed' ? currentThemeData.warning :
-                   status === 'finished' ? currentThemeData.primary : currentThemeData.textSecondary
+                status === 'closed' ? currentThemeData.warning :
+                    status === 'finished' ? currentThemeData.primary : currentThemeData.textSecondary
         }),
         buttonGroup: {
             display: 'flex',
@@ -456,7 +456,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
         return (
             <div style={styles.card}>
                 <h3 style={styles.h3}>Dados Incompletos</h3>
-                <p style={{color: currentThemeData.warning, marginBottom: '1rem'}}>Os dados do jogo estão incompletos. Por favor, recarregue ou reset o jogo.</p>
+                <p style={{ color: currentThemeData.warning, marginBottom: '1rem' }}>Os dados do jogo estão incompletos. Por favor, recarregue ou reset o jogo.</p>
                 <button
                     style={styles.button.primary}
                     onClick={() => {
@@ -467,7 +467,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                     Recarregar Dados
                 </button>
                 <button
-                    style={{...styles.button.danger, marginTop: '1rem'}}
+                    style={{ ...styles.button.danger, marginTop: '1rem' }}
                     onClick={() => {
                         if (window.confirm('⚠️ ATENÇÃO - RESETAR JOGO\n\nIsso irá DELETAR PERMANENTEMENTE do banco de dados:\n❌ O jogo atual\n❌ Todos os palpites\n❌ Dados do ganhador\n\n⚠️ ESTA AÇÃO NÃO PODE SER DESFEITA!\n\nTem certeza?')) {
                             if (window.confirm('🔴 ÚLTIMA CONFIRMAÇÃO\n\nConfirma RESETAR e DELETAR tudo?')) {
@@ -487,19 +487,19 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
         <div style={styles.container}>
             {/* Header com Estatísticas */}
             <div style={styles.statsGrid}>
-                <div style={{...styles.statCard, borderLeft: '4px solid #10B981'}}>
+                <div style={{ ...styles.statCard, borderLeft: '4px solid #10B981' }}>
                     <div style={styles.statValue}>{stats.totalParticipants}</div>
                     <div style={styles.statLabel}>👥 Total Cadastrados</div>
                 </div>
-                <div style={{...styles.statCard, borderLeft: '4px solid #3B82F6'}}>
+                <div style={{ ...styles.statCard, borderLeft: '4px solid #3B82F6' }}>
                     <div style={styles.statValue}>{stats.uniqueParticipants}</div>
-                    <div style={styles.statLabel}>🎮 Participantes Ativos</div>
+                    <div style={styles.statLabel}>🎮 Participações Ativas</div>
                 </div>
-                <div style={{...styles.statCard, borderLeft: '4px solid #A78BFA'}}>
+                <div style={{ ...styles.statCard, borderLeft: '4px solid #A78BFA' }}>
                     <div style={styles.statValue}>{stats.totalSubmissions}</div>
                     <div style={styles.statLabel}>📝 Total de Palpites</div>
                 </div>
-                <div style={{...styles.statCard, borderLeft: '4px solid #F59E0B'}}>
+                <div style={{ ...styles.statCard, borderLeft: '4px solid #F59E0B' }}>
                     <div style={styles.statValue}>{stats.correctGuesses}</div>
                     <div style={styles.statLabel}>✅ Palpites Corretos</div>
                 </div>
@@ -518,15 +518,15 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                 <strong>Status:</strong>{' '}
                                 <span style={styles.status(status)}>
                                     {status === 'accepting' ? '🟢 Aceitando Palpites' :
-                                     status === 'closed' ? '🟡 Encerrado' :
-                                     status === 'finished' ? '🏁 Finalizado' :
-                                     status || 'Desconhecido'}
+                                        status === 'closed' ? '🟡 Encerrado' :
+                                            status === 'finished' ? '🏁 Finalizado' :
+                                                status || 'Desconhecido'}
                                 </span>
                             </p>
 
-                            <div style={{marginTop: '1rem', padding: '0.75rem', background: currentThemeData.secondary, borderRadius: '0.5rem', border: `1px solid ${currentThemeData.primary}30`}}>
-                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem'}}>
-                                    <p style={{margin: 0, color: currentThemeData.text}}>
+                            <div style={{ marginTop: '1rem', padding: '0.75rem', background: currentThemeData.secondary, borderRadius: '0.5rem', border: `1px solid ${currentThemeData.primary}30` }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                    <p style={{ margin: 0, color: currentThemeData.text }}>
                                         <strong>Patrocinador:</strong> {giveaway?.sponsor?.name || 'N/A'}
                                     </p>
                                     <button
@@ -545,8 +545,8 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                         ✏️ Editar
                                     </button>
                                 </div>
-                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <p style={{margin: 0, color: currentThemeData.text}}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <p style={{ margin: 0, color: currentThemeData.text }}>
                                         <strong>Produto atual:</strong> {giveaway?.product?.name || 'N/A'}
                                     </p>
                                     <button
@@ -570,11 +570,11 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
 
                         {/* Link Público */}
                         <div style={styles.publicLinkBox}>
-                            <h4 style={{color: 'white', margin: '0 0 0.5rem 0', fontSize: '1rem'}}>🔗 Link Público</h4>
-                            <p style={{color: 'white', fontSize: '0.85rem', margin: '0 0 0.75rem 0', opacity: 0.95}}>
+                            <h4 style={{ color: 'white', margin: '0 0 0.5rem 0', fontSize: '1rem' }}>🔗 Link Público</h4>
+                            <p style={{ color: 'white', fontSize: '0.85rem', margin: '0 0 0.75rem 0', opacity: 0.95 }}>
                                 Compartilhe com os participantes:
                             </p>
-                            <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                 <input
                                     type="text"
                                     value={`${window.location.origin}/caixa-misteriosa-pub/${liveGame.id}`}
@@ -627,9 +627,9 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
 
                             {status === 'finished' && liveGame.winner && (
                                 <div style={styles.winnerBox}>
-                                    <h4 style={{color: 'white', margin: '0 0 0.5rem 0'}}>🏆 Jogo Finalizado!</h4>
-                                    <p style={{color: 'white', margin: '0 0 1rem 0', opacity: 0.95}}>
-                                        <strong>Vencedor:</strong> {liveGame.winner.userName}<br/>
+                                    <h4 style={{ color: 'white', margin: '0 0 0.5rem 0' }}>🏆 Jogo Finalizado!</h4>
+                                    <p style={{ color: 'white', margin: '0 0 1rem 0', opacity: 0.95 }}>
+                                        <strong>Vencedor:</strong> {liveGame.winner.userName}<br />
                                         <strong>Palpite:</strong> {liveGame.winner.guess}
                                     </p>
                                     <button
@@ -654,8 +654,8 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
 
                     {/* Dicas */}
                     <div style={styles.card}>
-                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem'}}>
-                            <h3 style={{...styles.h3, margin: 0}}>💡 Dicas Reveladas</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                            <h3 style={{ ...styles.h3, margin: 0 }}>💡 Dicas Reveladas</h3>
                             <button
                                 style={{
                                     background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
@@ -681,7 +681,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                             {(giveaway?.product?.clues || []).map((clue, i) => (
                                 <li key={i} style={styles.clue(i < (revealedCluesCount || 0))}>
                                     <strong>Dica {i + 1}:</strong> {clue}
-                                    {i < (revealedCluesCount || 0) && <span style={{marginLeft: '0.5rem'}}>✅</span>}
+                                    {i < (revealedCluesCount || 0) && <span style={{ marginLeft: '0.5rem' }}>✅</span>}
                                 </li>
                             ))}
                         </ul>
@@ -691,11 +691,11 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                 {/* Coluna de Palpites */}
                 <div style={styles.column}>
                     <div style={styles.card}>
-                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-                            <h3 style={{...styles.h3, margin: 0}}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ ...styles.h3, margin: 0 }}>
                                 📝 Palpites Recebidos ({(submissions || []).length})
                             </h3>
-                            <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center'}}>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                 <button
                                     onClick={async () => {
                                         if (window.confirm('Corrigir erros ortográficos nos palpites?\n\nIsso irá atualizar automaticamente os palpites com a grafia correta usando IA.')) {
@@ -723,7 +723,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                             }
                                         }
                                     }}
-                                    style={{...styles.button.primary, fontSize: '0.85rem', padding: '0.4rem 0.8rem'}}
+                                    style={{ ...styles.button.primary, fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
                                     disabled={loading}
                                 >
                                     ✏️ Corrigir Ortografia
@@ -748,7 +748,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                             }
                                         }
                                     }}
-                                    style={{...styles.button.danger, fontSize: '0.85rem', padding: '0.4rem 0.8rem'}}
+                                    style={{ ...styles.button.danger, fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
                                     disabled={loading}
                                 >
                                     🧹 Limpar Ofensivos
@@ -774,11 +774,11 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                         fontSize: '0.75rem',
                                         fontWeight: '600',
                                         background: aiStatus.status === 'active' ? '#10B981' :
-                                                   aiStatus.status === 'loading' ? '#6B7280' : '#EF4444',
+                                            aiStatus.status === 'loading' ? '#6B7280' : '#EF4444',
                                         color: 'white',
                                         border: 'none',
                                         boxShadow: aiStatus.status === 'active' ? '0 2px 8px rgba(16, 185, 129, 0.3)' :
-                                                  aiStatus.status === 'loading' ? '0 2px 8px rgba(107, 114, 128, 0.3)' : '0 2px 8px rgba(239, 68, 68, 0.3)',
+                                            aiStatus.status === 'loading' ? '0 2px 8px rgba(107, 114, 128, 0.3)' : '0 2px 8px rgba(239, 68, 68, 0.3)',
                                         whiteSpace: 'nowrap',
                                         cursor: 'help'
                                     }}
@@ -790,7 +790,7 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                     <span>{aiStatus.status === 'active' ? '🟢' : aiStatus.status === 'loading' ? '⏳' : '🔴'}</span>
                                     <span>
                                         {aiStatus.status === 'active' ? 'IA Ativa' :
-                                         aiStatus.status === 'loading' ? 'Verificando IA...' : 'IA Desativada'}
+                                            aiStatus.status === 'loading' ? 'Verificando IA...' : 'IA Desativada'}
                                     </span>
                                 </div>
                             </div>
@@ -806,32 +806,32 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                             ...styles.submissionItem,
                                             borderLeft: isCorrect ? '4px solid #10B981' : `4px solid ${currentThemeData.secondary}`
                                         }}>
-                                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                                <div style={{flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap'}}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                                                     {/* Formato: hora:minuto - nome - bairro - palpite */}
                                                     {sub.created_at && (
-                                                        <span style={{color: '#6B7280', fontSize: '0.9rem', fontWeight: 'bold'}}>
+                                                        <span style={{ color: '#6B7280', fontSize: '0.9rem', fontWeight: 'bold' }}>
                                                             {new Date(sub.created_at).toLocaleTimeString('pt-BR', {
                                                                 hour: '2-digit',
                                                                 minute: '2-digit'
                                                             })}
                                                         </span>
                                                     )}
-                                                    <span style={{color: '#6B7280'}}>-</span>
-                                                    <strong style={{color: isCorrect ? '#10B981' : '#A78BFA', fontSize: '0.95rem'}}>
+                                                    <span style={{ color: '#6B7280' }}>-</span>
+                                                    <strong style={{ color: isCorrect ? '#10B981' : '#A78BFA', fontSize: '0.95rem' }}>
                                                         {(sub.userName || sub.user_name || '').split(' ')[0]}
                                                     </strong>
-                                                    <span style={{color: '#6B7280'}}>-</span>
-                                                    <span style={{color: '#9CA3AF', fontSize: '0.9rem'}}>
+                                                    <span style={{ color: '#6B7280' }}>-</span>
+                                                    <span style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>
                                                         {sub.userNeighborhood || sub.user_neighborhood || 'Bairro não informado'}
                                                     </span>
-                                                    <span style={{color: '#6B7280'}}>-</span>
-                                                    <span style={{color: currentThemeData.text, fontSize: '0.95rem', fontWeight: '500'}}>
+                                                    <span style={{ color: '#6B7280' }}>-</span>
+                                                    <span style={{ color: currentThemeData.text, fontSize: '0.95rem', fontWeight: '500' }}>
                                                         {sub.guess}
                                                     </span>
-                                                    {isCorrect && <span style={{fontSize: '1.1rem'}}>✅</span>}
+                                                    {isCorrect && <span style={{ fontSize: '1.1rem' }}>✅</span>}
                                                 </div>
-                                                <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+                                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                                     <button
                                                         onClick={async () => {
                                                             const novoTexto = prompt('Editar palpite:', sub.guess);
@@ -941,9 +941,9 @@ const LiveControlViewModern = ({ liveGame, actions, loading, onEditSponsor, onEd
                                 })
                             ) : (
                                 <div style={styles.emptyState}>
-                                    <p style={{fontSize: '3rem', margin: '0 0 1rem 0'}}>📭</p>
-                                    <p style={{fontSize: '1.1rem', margin: '0 0 0.5rem 0'}}>Aguardando o primeiro palpite...</p>
-                                    <p style={{fontSize: '0.9rem', color: '#6B7280'}}>
+                                    <p style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>📭</p>
+                                    <p style={{ fontSize: '1.1rem', margin: '0 0 0.5rem 0' }}>Aguardando o primeiro palpite...</p>
+                                    <p style={{ fontSize: '0.9rem', color: '#6B7280' }}>
                                         Os palpites aparecerão aqui em tempo real
                                     </p>
                                 </div>

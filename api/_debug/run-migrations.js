@@ -249,6 +249,148 @@ const migrations = [
       COMMENT ON VIEW participantes_unicos IS 'Participantes únicos baseado no telefone (mais recente por telefone)';
       COMMENT ON FUNCTION cleanup_old_logs() IS 'Remove logs antigos conforme política de retenção';
     `
+  },
+  {
+    id: 'v2.3.0-014',
+    name: 'Criar tabelas de Enquetes para TV',
+    priority: 'ALTA',
+    sql: `
+      CREATE TABLE IF NOT EXISTS enquetes (
+        id SERIAL PRIMARY KEY,
+        titulo VARCHAR(100) NOT NULL,
+        pergunta VARCHAR(255) NOT NULL,
+        status VARCHAR(20) DEFAULT 'inativa' CHECK (status IN ('inativa', 'ativa', 'encerrada')),
+        cor_tema VARCHAR(50) DEFAULT 'nexogeo',
+        data_inicio TIMESTAMP WITH TIME ZONE,
+        data_fim TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP WITH TIME ZONE
+      );
+
+      CREATE TABLE IF NOT EXISTS enquete_opcoes (
+        id SERIAL PRIMARY KEY,
+        enquete_id INTEGER REFERENCES enquetes(id) ON DELETE CASCADE,
+        texto_opcao VARCHAR(100) NOT NULL,
+        cor_grafico VARCHAR(50) DEFAULT '#4F46E5',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS enquete_votos (
+        id SERIAL PRIMARY KEY,
+        enquete_id INTEGER REFERENCES enquetes(id) ON DELETE CASCADE,
+        opcao_id INTEGER REFERENCES enquete_opcoes(id) ON DELETE CASCADE,
+        ip_address INET,
+        user_agent TEXT,
+        session_cookie VARCHAR(255),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_enquete_votos_enquete_id ON enquete_votos(enquete_id);
+      CREATE INDEX IF NOT EXISTS idx_enquete_votos_ip ON enquete_votos(enquete_id, ip_address);
+      CREATE INDEX IF NOT EXISTS idx_enquetes_status ON enquetes(status) WHERE deleted_at IS NULL;
+    `
+  },
+  {
+    id: 'v2.4.0-015',
+    name: 'Vincular votos de enquetes à tabela de participantes',
+    priority: 'ALTA',
+    sql: `
+      TRUNCATE TABLE enquete_votos;
+
+      ALTER TABLE enquete_votos 
+      ADD COLUMN IF NOT EXISTS participante_id INTEGER NOT NULL REFERENCES participantes(id) ON DELETE CASCADE;
+
+      DROP INDEX IF EXISTS idx_enquete_votos_ip;
+
+      CREATE UNIQUE INDEX IF NOT EXISTS unq_voto_por_participante ON enquete_votos(enquete_id, participante_id);
+
+      CREATE INDEX IF NOT EXISTS idx_enquete_votos_participante_id ON enquete_votos(participante_id);
+    `
+  },
+  {
+    id: 'v2.4.0-016',
+    name: 'Adicionar coluna mostrar_votos na tabela enquetes',
+    priority: 'NORMAL',
+    sql: `
+      ALTER TABLE enquetes ADD COLUMN IF NOT EXISTS mostrar_votos BOOLEAN DEFAULT true;
+    `
+  },
+  {
+    id: 'v2.4.0-017',
+    name: 'Remover constraint restritiva de promocao_id em participantes',
+    priority: 'ALTA',
+    sql: `
+      -- Permite que promocao_id aceite IDs de enquetes sem violar FK de promocoes
+      ALTER TABLE participantes DROP CONSTRAINT IF EXISTS participantes_promocao_id_fkey;
+    `
+  },
+  {
+    id: 'v2.4.0-018',
+    name: 'Garantir colunas de software delete em tabelas críticas',
+    priority: 'ALTA',
+    sql: `
+      -- Tabela participantes
+      ALTER TABLE participantes ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE participantes ADD COLUMN IF NOT EXISTS deleted_by INTEGER;
+
+      -- Tabela public_participants
+      ALTER TABLE public_participants ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE public_participants ADD COLUMN IF NOT EXISTS deleted_by INTEGER;
+
+      -- Tabela enquetes
+      ALTER TABLE enquetes ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE enquetes ADD COLUMN IF NOT EXISTS deleted_by INTEGER;
+    `
+  },
+  {
+    id: 'v2.4.0-019',
+    name: 'Sincronizar nomes de colunas em Views do Dashboard',
+    priority: 'ALTA',
+    sql: `
+      -- Recriar views com mapeamento correto para o handler de participantes
+      CREATE OR REPLACE VIEW participantes_unificados AS
+      SELECT
+        id,
+        promocao_id,
+        nome AS name,
+        telefone AS phone,
+        bairro AS neighborhood,
+        cidade AS city,
+        latitude,
+        longitude,
+        email,
+        origem_source,
+        origem_medium,
+        participou_em AS created_at,
+        'regular' AS participant_type
+      FROM participantes
+      WHERE deleted_at IS NULL
+
+      UNION ALL
+
+      SELECT
+        id,
+        NULL AS promocao_id,
+        name,
+        phone,
+        neighborhood,
+        city,
+        latitude,
+        longitude,
+        NULL AS email,
+        'caixa_misteriosa' AS origem_source,
+        'game' AS origem_medium,
+        created_at,
+        'public' AS participant_type
+      FROM public_participants
+      WHERE deleted_at IS NULL;
+
+      CREATE OR REPLACE VIEW participantes_unicos AS
+      SELECT DISTINCT ON (phone) *
+      FROM participantes_unificados
+      ORDER BY phone, created_at DESC;
+    `
   }
 ];
 

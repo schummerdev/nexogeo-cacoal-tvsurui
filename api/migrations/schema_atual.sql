@@ -307,7 +307,7 @@ COMMENT ON TABLE system_logs IS 'Logs técnicos do sistema para monitoramento e 
 
 CREATE TABLE IF NOT EXISTS rate_limits (
     id SERIAL PRIMARY KEY,
-    key VARCHAR(255) NOT NULL, -- IP ou identificador único
+    rate_limit_key VARCHAR(255) NOT NULL, -- IP ou identificador único
     endpoint VARCHAR(255) NOT NULL,
     count INT DEFAULT 1,
     window_start TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -382,7 +382,7 @@ CREATE INDEX IF NOT EXISTS idx_system_logs_component ON system_logs(component);
 CREATE INDEX IF NOT EXISTS idx_system_logs_created_at ON system_logs(created_at);
 
 -- Índice para RATE LIMITING
-CREATE INDEX IF NOT EXISTS idx_rate_limits_key_endpoint ON rate_limits(key, endpoint);
+CREATE INDEX IF NOT EXISTS idx_rate_limits_key_endpoint ON rate_limits(rate_limit_key, endpoint);
 CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits(window_start);
 
 -- ============================================================

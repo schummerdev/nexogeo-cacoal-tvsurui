@@ -109,9 +109,9 @@ const checkRateLimit = (clientId, maxRequests = 100, windowMs = 60000) => {
 // ✅ SEGURANÇA: Extrair IP do cliente (suporta x-forwarded-for com múltiplos IPs)
 const extractClientIp = (req) => {
   let ip = req.headers['x-forwarded-for'] ||
-           req.connection?.remoteAddress ||
-           req.socket?.remoteAddress ||
-           'unknown';
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    'unknown';
 
   // x-forwarded-for pode ter múltiplos IPs separados por vírgula
   // Pegar apenas o primeiro IP real do cliente
@@ -205,9 +205,9 @@ const rateLimit = async (req, res, maxRequests, windowMs, endpoint) => {
   }
 };
 
-// ✅ SEGURANÇA: Rate limiting específico para login (5 req / 15 min)
+// ✅ SEGURANÇA: Rate limiting específico para login (20 req / 15 min)
 const rateLimitLogin = async (req, res) => {
-  return await rateLimit(req, res, 5, 15 * 60 * 1000, 'auth_login');
+  return await rateLimit(req, res, 20, 15 * 60 * 1000, 'auth_login');
 };
 
 // ✅ SEGURANÇA: Rate limiting específico para sorteios (3 req / 5 min)

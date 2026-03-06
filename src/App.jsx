@@ -24,6 +24,9 @@ const ParticipantesPage = React.lazy(() => import('./pages/ParticipantesPage'));
 const GeradorLinksPage = React.lazy(() => import('./pages/GeradorLinksPage'));
 const SorteioPage = React.lazy(() => import('./pages/SorteioPage'));
 const SorteioPublicoPage = React.lazy(() => import('./pages/SorteioPublicoPage'));
+const EnquetesPage = React.lazy(() => import('./pages/EnquetesPage'));
+const EnquetePublicaPage = React.lazy(() => import('./pages/EnquetePublicaPage'));
+const EnqueteBroadcastPage = React.lazy(() => import('./pages/EnqueteBroadcastPage'));
 const ConfiguracoesPage = React.lazy(() => import('./pages/ConfiguracoesPage'));
 const AuditLogsPage = React.lazy(() => import('./pages/AuditLogsPage'));
 const MapasPage = React.lazy(() => import('./pages/MapasPage'));
@@ -31,6 +34,7 @@ const MapaParticipantesPage = React.lazy(() => import('./pages/MapaParticipantes
 const CaixaMisteriosaPage = React.lazy(() => import('./pages/CaixaMisteriosaPage'));
 const CaixaMisteriosaPub = React.lazy(() => import('./pages/CaixaMisteriosaPub'));
 const CaixaMisteriosaSorteioPage = React.lazy(() => import('./pages/CaixaMisteriosaSorteioPage'));
+const PromocoesAtivasPage = React.lazy(() => import('./pages/PromocoesAtivasPage'));
 const DemoPage = React.lazy(() => import('./pages/DemoPage'));
 
 // Importar hook de autenticação
@@ -72,9 +76,12 @@ function App() {
             <Suspense fallback={<PageLoadingSpinner />}>
               <Routes>
                 {/* Rotas Públicas */}
+                <Route path="/promocoes-ativas" element={<PromocoesAtivasPage />} />
                 <Route path="/participar" element={<CapturaForm />} />
                 <Route path="/sucesso" element={<SucessoPage />} />
                 <Route path="/sorteio-publico" element={<SorteioPublicoPage />} />
+                <Route path="/votar" element={<EnquetePublicaPage />} />
+                <Route path="/enquete-broadcast" element={<EnqueteBroadcastPage />} />
                 <Route path="/caixa-misteriosa-pub" element={<CaixaMisteriosaPub />} />
                 <Route path="/caixa-misteriosa-pub/:gameId" element={<CaixaMisteriosaPub />} />
                 <Route path="/demo" element={<DemoPage />} />
@@ -131,6 +138,11 @@ function App() {
                   <Route path="sorteio" element={
                     <Suspense fallback={<LoadingSpinner message="Carregando sorteio..." />}>
                       <SorteioPage />
+                    </Suspense>
+                  } />
+                  <Route path="enquetes" element={
+                    <Suspense fallback={<LoadingSpinner message="Carregando enquetes..." />}>
+                      <EnquetesPage />
                     </Suspense>
                   } />
                   <Route path="configuracoes" element={

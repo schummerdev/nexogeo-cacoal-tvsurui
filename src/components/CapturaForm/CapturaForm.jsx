@@ -7,6 +7,8 @@ import { fetchPromocoes } from '../../services/promocaoService';
 import { auditHelpers } from '../../services/auditService';
 import { useTheme } from '../../contexts/ThemeContext';
 import ThemeSelector from '../ThemeSelector/ThemeSelector';
+import { filtrarBairrosAutocomplete, validarBairro } from '../../utils/bairrosUtils';
+import { submitWithRetry } from '../../services/smartQueueService';
 
 // Componente de Skeleton para o cabeçalho do formulário
 const FormHeaderSkeleton = () => (
@@ -39,6 +41,7 @@ const CapturaForm = () => {
     id: null,
     nome: '',
     descricao: '',
+    imagem_url: '',
   });
 
   const [promocoesDisponiveis, setPromocoesDisponiveis] = useState([]);
@@ -57,10 +60,13 @@ const CapturaForm = () => {
 
   const [geolocalizacao, setGeolocalizacao] = useState(null);
   const [origem, setOrigem] = useState({ source: '', medium: '' });
-  
+
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true); // Novo estado para o carregamento inicial
+  const [sugestoesBairro, setSugestoesBairro] = useState([]);
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+  const [queueStatus, setQueueStatus] = useState(null); // Estado para feedback da fila
 
   // --- EFEITOS (LÓGICA QUE RODA QUANDO O COMPONENTE CARREGA) ---
 
@@ -73,17 +79,18 @@ const CapturaForm = () => {
       } else {
         response = await fetch(`/api/promocoes-slug?slug=${identifier}`);
       }
-      
+
       if (!response.ok) {
         throw new Error('Promoção não encontrada');
       }
-      
+
       const data = await response.json();
       const promocaoData = data.data[0] || data.data;
       setPromocao({
         id: promocaoData.id,
         nome: promocaoData.nome,
         descricao: promocaoData.descricao,
+        imagem_url: promocaoData.imagem_url || '',
       });
     } catch (error) {
       console.error('Erro ao buscar promoção:', error);
@@ -101,9 +108,9 @@ const CapturaForm = () => {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
       });
-      
+
       if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
-      
+
       const result = await response.json();
       const promocoesAtivas = result.data.filter(p => p.status && p.status.toLowerCase() === 'ativa');
       setPromocoesDisponiveis(promocoesAtivas);
@@ -137,16 +144,16 @@ const CapturaForm = () => {
     const loadInitialData = async () => {
       setIsLoading(true);
       const params = new URLSearchParams(window.location.search);
-      const promocaoId = params.get('id');
+      const promocaoId = params.get('id') || params.get('promoId'); // Aceita ambos os parâmetros
       const promocaoSlug = params.get('slug');
-      
+
       setOrigem({
         source: params.get('utm_source') || 'direto',
         medium: params.get('utm_medium') || 'link',
       });
 
       let promocaoIdentifier = promocaoId || (promocaoSlug === 'tv-surui---comando-na-tv' ? '7' : promocaoSlug);
-      
+
       const dataPromises = [fetchEmissoraData()];
 
       if (promocaoIdentifier) {
@@ -195,7 +202,7 @@ const CapturaForm = () => {
   // Função para formatar telefone
   const formatTelefone = (value) => {
     const digits = value.replace(/\D/g, '');
-    
+
     if (digits.length <= 2) {
       return `(${digits}`;
     } else if (digits.length <= 7) {
@@ -203,25 +210,57 @@ const CapturaForm = () => {
     } else if (digits.length <= 11) {
       return `(${digits.substring(0, 2)}) ${digits.substring(2, 7)}-${digits.substring(7)}`;
     }
-    
+
     return `(${digits.substring(0, 2)}) ${digits.substring(2, 7)}-${digits.substring(7, 11)}`;
   };
 
   // Atualiza o estado do formulário conforme o usuário digita
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     let formattedValue = value;
-    
+
     // Aplicar formatação para telefone
     if (name === 'telefone') {
       formattedValue = formatTelefone(value);
     }
-    
+
+    // Autocomplete para bairro
+    if (name === 'bairro') {
+      const sugestoes = filtrarBairrosAutocomplete(value, 5);
+      setSugestoesBairro(sugestoes);
+      setMostrarSugestoes(sugestoes.length > 0 && value.length >= 2);
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: formattedValue,
     }));
+  };
+
+  // Função para selecionar bairro da lista de sugestões
+  const handleSelecionarBairro = (bairro) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      bairro: bairro,
+    }));
+    setSugestoesBairro([]);
+    setMostrarSugestoes(false);
+  };
+
+  // Normaliza o bairro ao sair do campo
+  const handleBairroBlur = () => {
+    // Aguarda um pouco para permitir clique na sugestão
+    setTimeout(() => {
+      if (formData.bairro) {
+        const resultado = validarBairro(formData.bairro);
+        setFormData((prevData) => ({
+          ...prevData,
+          bairro: resultado.bairro,
+        }));
+      }
+      setMostrarSugestoes(false);
+    }, 200);
   };
 
   // Função para lidar com a seleção de promoção
@@ -244,19 +283,20 @@ const CapturaForm = () => {
   // Lida com o envio do formulário
   const handleSubmit = async (e) => {
     e.preventDefault(); // Previne o recarregamento da página
-    
+
     if (!formData.nome || !formData.telefone || !formData.bairro) {
-        setErrorMessage('Nome, WhatsApp e Bairro são obrigatórios!');
-        return;
+      setErrorMessage('Nome, WhatsApp e Bairro são obrigatórios!');
+      return;
     }
 
     if (!promocao.id) {
-        setErrorMessage('Promoção não foi carregada. Verifique o link e tente novamente.');
-        return;
+      setErrorMessage('Promoção não foi carregada. Verifique o link e tente novamente.');
+      return;
     }
 
     setStatus('loading');
     setErrorMessage('');
+    setQueueStatus(null);
 
     // Formatação do telefone para remover caracteres especiais
     const telefoneFormatado = formData.telefone.replace(/\D/g, '');
@@ -273,37 +313,19 @@ const CapturaForm = () => {
       origem_medium: origem.medium,
     };
 
-    console.log('📤 Enviando para a API:', dadosCompletos);
-    console.log('📤 JSON stringified:', JSON.stringify(dadosCompletos));
-    console.log('🔍 Validação frontend:', {
-      promocao_id: dadosCompletos.promocao_id,
-      nome: dadosCompletos.nome,
-      telefone: dadosCompletos.telefone,
-      campos_ok: !!(dadosCompletos.promocao_id && dadosCompletos.nome && dadosCompletos.telefone)
-    });
+    console.log('📤 Enviando para a API (via SmartQueue):', dadosCompletos);
 
-    // Chamada real à API
     try {
-      const response = await fetch('/api/participantes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dadosCompletos),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ Erro da API:', errorData);
-        console.error('📊 Status:', response.status, response.statusText);
-
-        // Tratar erro de participação duplicada
-        if (response.status === 409 && errorData.error === 'DUPLICATE_PARTICIPATION') {
-          throw new Error('Você já participou desta promoção com este número! Cada telefone pode participar apenas uma vez.');
+      // ✅ SUBSTITUIÇÃO: Usar submitWithRetry em vez de fetch direto
+      const responseData = await submitWithRetry(
+        '/api/participantes',
+        dadosCompletos,
+        (statusUpdate) => {
+          // Callback para atualizar UI sobre estado da fila
+          console.log('🔄 Status da fila:', statusUpdate);
+          setQueueStatus(statusUpdate);
         }
-
-        throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
-      }
-
-      const responseData = await response.json();
+      );
 
       // Log de auditoria para criação de participante
       if (responseData.success && responseData.data) {
@@ -321,13 +343,21 @@ const CapturaForm = () => {
         const params = new URLSearchParams();
         if (origem.source) params.set('utm_source', origem.source);
         if (origem.medium) params.set('utm_medium', origem.medium);
-        
+
         const searchString = params.toString();
         navigate(`/sucesso${searchString ? `?${searchString}` : ''}`);
       }, 1000);
     } catch (error) {
+      console.error('❌ Erro no envio:', error);
+
+      // Tratamento específico para erro de duplicidade (que vem do smartQueueService como erro normal)
+      if (error.status === 409 && error.data?.error === 'DUPLICATE_PARTICIPATION') {
+        setErrorMessage('Você já participou desta promoção com este número! Cada telefone pode participar apenas uma vez.');
+      } else {
+        setErrorMessage(error.message || 'Não foi possível registrar sua participação. Tente novamente mais tarde.');
+      }
+
       setStatus('error');
-      setErrorMessage(error.message || 'Não foi possível registrar sua participação. Tente novamente mais tarde.');
     }
   };
 
@@ -364,12 +394,21 @@ const CapturaForm = () => {
           <FormHeaderSkeleton />
         ) : (
           <div className="form-header">
-            {emissora.logo_url ? (
+            {/* Prioridade: 1. Imagem da promoção, 2. Logo da emissora, 3. Logo NexoGeo */}
+            {promocao.imagem_url ? (
+              <div className="promocao-imagem-section">
+                <img
+                  src={promocao.imagem_url}
+                  alt={`Imagem ${promocao.nome}`}
+                  className="imagem-promocao-principal"
+                />
+              </div>
+            ) : emissora.logo_url ? (
               <div className="emissora-logo-section">
-                <img 
-                  src={emissora.logo_url} 
-                  alt={`Logo ${emissora.nome}`} 
-                  className="logo-emissora-principal" 
+                <img
+                  src={emissora.logo_url}
+                  alt={`Logo ${emissora.nome}`}
+                  className="logo-emissora-principal"
                 />
               </div>
             ) : (
@@ -381,7 +420,7 @@ const CapturaForm = () => {
                 />
               </div>
             )}
-            
+
             <div className="promocao-info">
               <h1 className="promocao-titulo">{promocao.nome}</h1>
               {promocao.descricao && (
@@ -390,7 +429,7 @@ const CapturaForm = () => {
             </div>
           </div>
         )}
-        
+
         {/* Seletor de promoção quando não há código na URL */}
         {mostrarSeletorPromocao && (
           <div className="promocao-selector-section">
@@ -411,8 +450,8 @@ const CapturaForm = () => {
                 }}
               >
                 <option value="">
-                  {promocoesDisponiveis.length === 0 
-                    ? "Nenhuma promoção ativa disponível no momento" 
+                  {promocoesDisponiveis.length === 0
+                    ? "Nenhuma promoção ativa disponível no momento"
                     : "Selecione uma promoção"
                   }
                 </option>
@@ -425,7 +464,7 @@ const CapturaForm = () => {
             </div>
           </div>
         )}
-        
+
         <div className="form-body">
           <div className="form-group">
             <label htmlFor="nome">Nome Completo</label>
@@ -438,7 +477,7 @@ const CapturaForm = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="telefone">WhatsApp</label>
             <input
@@ -452,7 +491,7 @@ const CapturaForm = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group bairro-autocomplete">
             <label htmlFor="bairro">Bairro</label>
             <input
               type="text"
@@ -460,8 +499,23 @@ const CapturaForm = () => {
               name="bairro"
               value={formData.bairro}
               onChange={handleChange}
+              onBlur={handleBairroBlur}
+              autoComplete="off"
               required
             />
+            {mostrarSugestoes && sugestoesBairro.length > 0 && (
+              <ul className="sugestoes-bairro">
+                {sugestoesBairro.map((bairro, index) => (
+                  <li
+                    key={index}
+                    onClick={() => handleSelecionarBairro(bairro)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {bairro}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="form-group">
@@ -477,6 +531,22 @@ const CapturaForm = () => {
         </div>
 
         <div className="form-footer">
+          {queueStatus && (
+            <div className="queue-message" style={{
+              marginBottom: '15px',
+              padding: '10px',
+              backgroundColor: '#fff3cd',
+              color: '#856404',
+              borderRadius: '8px',
+              textAlign: 'center',
+              border: '1px solid #ffeeba'
+            }}>
+              <p style={{ margin: 0, fontWeight: 'bold' }}>⏳ Muita gente participando!</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem' }}>
+                Você está na fila de espera... (Tentativa {queueStatus.attempt} de {queueStatus.maxRetries})
+              </p>
+            </div>
+          )}
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="form-group align-right">
             <button
@@ -492,7 +562,7 @@ const CapturaForm = () => {
           </div>
         </div>
       </form>
-      
+
       {/* Rodapé NexoGeo */}
       <div className="nexogeo-footer">
         <div className="nexogeo-info">

@@ -2,6 +2,18 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2.3.0] - 2026-03-06
+
+### 🎉 Novas Funcionalidades (Enquetes)
+- **Módulo de Enquetes**: Sistema completo de gerenciamento de enquetes/votações.
+- **Páginas de Frontend**: `EnquetesPage`, `EnquetePublicaPage` e `EnqueteBroadcastPage` (para exibição em TV).
+- **Backend**: Handlers de API para gerenciamento de votos e resultados em tempo real.
+- **Migrações**: Scripts SQL para criação de tabelas de enquetes e votos.
+
+### 🔧 Utilitários de Banco de Dados
+- Adicionados diversos scripts de manutenção e auditoria de banco de dados (`check-db.js`, `verify_views.js`, `run_corrections.js`, etc.).
+- Utilitários de manipulação de strings de bairro e telefone para normalização de dados.
+
 ## [2.2.0] - 2026-03-06
 
 ### 🚀 Melhorias e Segurança
