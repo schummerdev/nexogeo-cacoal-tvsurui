@@ -152,6 +152,7 @@ module.exports = async (req, res) => {
         }
 
         const telefoneClean = getCanonicalPhone(telefoneRaw);
+        const doubleClean = telefoneRaw.replace(/\D/g, ''); // Apenas números, sem remover o 9
 
         const promocaoId = parseInt(url.searchParams.get('promocao_id'));
         if (isNaN(promocaoId)) {
@@ -160,12 +161,16 @@ module.exports = async (req, res) => {
 
         try {
           // 1. Busca básica para ver se o participante existe no sistema (qualquer promoção/público)
+          // Verificamos tanto o formato canônico quanto o formato original (com 9 ou sem)
+          console.log(`🔍 [PARTICIPANTES VERIFICAR] Buscando por: ${telefoneClean} ou ${doubleClean}`);
+
           const dbResult = await databasePool.query(`
                 SELECT id, name AS nome, phone AS telefone, city AS cidade, neighborhood AS bairro
                 FROM participantes_unicos
-                WHERE phone = $1
+                WHERE phone IN ($1, $2)
+                ORDER BY created_at DESC
                 LIMIT 1
-             `, [telefoneClean]);
+             `, [telefoneClean, doubleClean]);
 
           const exists = dbResult.rows.length > 0;
           let jaNaPromocao = false;
@@ -174,10 +179,10 @@ module.exports = async (req, res) => {
           // 2. Se existe e enviamos promocao_id, verificar se JÁ está nesta promoção específica
           if (exists && promocaoId) {
             const promoCheck = await databasePool.query(`
-              SELECT id, nome, telefone, bairro, cidade FROM participantes 
-              WHERE telefone = $1 AND promocao_id = $2 AND deleted_at IS NULL
+              SELECT id, nome, telefone, bairro, city AS cidade FROM participantes_unificados 
+              WHERE phone IN ($1, $2) AND promocao_id = $3
               LIMIT 1
-            `, [telefoneClean, promocaoId]);
+            `, [telefoneClean, doubleClean, promocaoId]);
 
             if (promoCheck.rows.length > 0) {
               jaNaPromocao = true;

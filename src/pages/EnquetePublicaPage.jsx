@@ -121,41 +121,50 @@ const EnquetePublicaPage = () => {
             }
 
             if (data.exists && data.data) {
-                // Participante existe no sistema (ex: em outra promoção) mas não NESTA enquete ainda.
-                // AUTO-CADASTRAR para esta promoção (evita o "null" no dashboard e skipa o Step 2)
+                // Participante existe no sistema (ex: em outra promoção ou Caixa Misteriosa)
+                // mas não NESTA enquete ainda.
                 const pData = data.data;
-                const autoRegBody = {
-                    nome: pData.nome,
-                    telefone: telefoneNumeros,
-                    bairro: pData.bairro || 'Não Informado',
-                    cidade: pData.cidade || 'Cacoal',
-                    latitude: localizacao?.latitude || null,
-                    longitude: localizacao?.longitude || null,
-                    origem_source: 'tv_enquete_auto',
-                    origem_medium: 'celular',
-                    promocao_id: enquete.id
-                };
 
-                const regRes = await fetch('/api/participantes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(autoRegBody)
-                });
+                // Só tenta auto-registrar se houver um nome disponível
+                if (pData.nome) {
+                    console.log('🔄 [ENQUETE] Participante encontrado no sistema. Iniciando auto-registro...', pData);
 
-                const regData = await regRes.json();
-                if (regRes.ok && regData.data) {
-                    setParticipanteId(regData.data.id);
-                    setNome(pData.nome || '');
-                    setBairro(pData.bairro || '');
-                    setStep(3);
-                } else if (regRes.status === 409) {
-                    setParticipanteId(pData.id);
-                    setNome(pData.nome || '');
-                    setBairro(pData.bairro || '');
-                    setStep(3);
+                    const autoRegBody = {
+                        nome: pData.nome,
+                        telefone: telefoneNumeros,
+                        bairro: pData.bairro || 'Não Informado',
+                        cidade: pData.cidade || 'Cacoal',
+                        latitude: localizacao?.latitude || null,
+                        longitude: localizacao?.longitude || null,
+                        origem_source: 'tv_enquete_auto',
+                        origem_medium: 'celular',
+                        promocao_id: enquete.id
+                    };
+
+                    const regRes = await fetch('/api/participantes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(autoRegBody)
+                    });
+
+                    const regData = await regRes.json();
+                    console.log('📥 [ENQUETE] Resposta do auto-registro:', regData);
+
+                    if ((regRes.ok && regData.data) || regRes.status === 409) {
+                        const finalId = regData.data?.id || pData.id;
+                        console.log('✅ [ENQUETE] Auto-registro concluído ou duplicado. Indo para Step 3 com ID:', finalId);
+                        setParticipanteId(finalId);
+                        setNome(pData.nome || '');
+                        setBairro(pData.bairro || '');
+                        setStep(3);
+                    } else {
+                        console.warn('⚠️ [ENQUETE] Auto-registro falhou. Indo para Step 2 (Manual).');
+                        setStep(2);
+                    }
                 } else {
-                    // Fallback se o auto-registro falhar por outro motivo (ex: erro banco)
-                    setStep(2); // Mostra o form se der erro genérico no auto-registro
+                    console.log('ℹ️ [ENQUETE] Participante existe mas dados incompletos. Indo para Step 2.');
+                    obterLocalizacao();
+                    setStep(2);
                 }
             } else {
                 // Participante NOVO - vai para passo 2
