@@ -2,6 +2,21 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2.2.0] - 2026-03-06
+
+### 🚀 Melhorias e Segurança
+- **Segurança**: Implementação de restrições de segurança e auditoria no frontend.
+- **Correções**: Resolução de conflitos em restrições de chaves estrangeiras (`participantes_promocao_id_fkey`) para garantir o registro correto em sorteios e pesquisas.
+- **Frontend**: Remoção de elementos de áudio legados de `SorteioPage.jsx` e migração para `SorteioPublicoPage.jsx`.
+- **Manutenibilidade**: Auditoria de arquivos obsoletos e organização de scripts de banco de dados.
+
+## [2.1.0] - 2025-10-30
+
+### ✨ Ajustes Intermediários
+- Implementação de sistema automático de backup inteligente.
+- Scripts de sincronização de schema de banco de dados (`sync-database-schema.js`).
+- Melhorias nos testes de funcionalidade do sistema.
+
 ## [2.0.0] - 2025-10-13
 
 ### 🎉 Novas Funcionalidades
