@@ -63,15 +63,15 @@ const ParticipantesPage = () => {
         // Ajustar os nomes dos campos para corresponder ao frontend
         const formattedParticipantes = participantesData.map(participante => ({
           id: participante.id,
-          nome: participante.name || participante.nome,
-          telefone: participante.phone || participante.telefone,
-          bairro: participante.neighborhood || participante.bairro,
-          cidade: participante.city || participante.cidade,
-          email: participante.email,
+          nome: participante.name || participante.nome || '',
+          telefone: participante.phone || participante.telefone || '',
+          bairro: participante.neighborhood || participante.bairro || '',
+          cidade: participante.city || participante.cidade || '',
+          email: participante.email || '',
           latitude: participante.latitude,
           longitude: participante.longitude,
           promocao_id: participante.promocao_id,
-          promocao: participante.promocao_nome || participante.promocao || 'Caixa Misteriosa',
+          promocao: participante.promocao_nome || participante.promocao || 'Participação Geral',
           dataParticipacao: participante.created_at || participante.participou_em || participante.data_participacao,
           participant_type: participante.participant_type || 'regular',
           referral_code: participante.referral_code || null,
@@ -117,12 +117,13 @@ const ParticipantesPage = () => {
   const filteredParticipantes = useMemo(() => {
     return participantes.filter(participante => {
       // Filtro por texto (nome, telefone, bairro, cidade)
+      const searchLower = searchText.toLowerCase();
       const matchesSearch =
         !searchText ||
-        participante.nome.toLowerCase().includes(searchText.toLowerCase()) ||
-        participante.telefone.toLowerCase().includes(searchText.toLowerCase()) ||
-        participante.bairro.toLowerCase().includes(searchText.toLowerCase()) ||
-        participante.cidade.toLowerCase().includes(searchText.toLowerCase());
+        (participante.nome || '').toLowerCase().includes(searchLower) ||
+        (participante.telefone || '').toLowerCase().includes(searchLower) ||
+        (participante.bairro || '').toLowerCase().includes(searchLower) ||
+        (participante.cidade || '').toLowerCase().includes(searchLower);
 
       // Filtro por promoção
       const matchesPromocao =
